@@ -1,0 +1,17 @@
+.trashFolderTitle{
+	padding: 10px;
+	padding-left: 5px;
+	font-size: 14px;
+	font-weight:bold;
+}
+.trashPreloader{
+	height:36px;
+	background-color:#FFFFFF;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #006600;
+	background-image:url(ajax-loader.gif);
+ 	background-repeat: no-repeat;
+	background-position: center center;
+	text-align:center;
+}

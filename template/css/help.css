@@ -1,0 +1,39 @@
+div#help_bg{
+	background-color: #666666;
+	position: fixed;
+	height: 100px;
+	width: 100px;
+	left: 0px;
+	top: 0px;
+	-moz-opacity: 0.8; /* код для движков Mozilla */
+	opacity:.80;  /*свойство из спецификации CSS3, которое поддерживается не всеми браузерами*/
+	filter: alpha(opacity=80); /* код для IE */
+	z-index: 1900;
+}
+div#help_close{
+	background-color: #666666;
+	position: absolute;
+	height: 17px;
+	width: 17px;
+	background-image: url(../images/green/icon_close_ucw.gif);
+	cursor:pointer;
+	left: 0px;
+	top: 0px;
+	-moz-opacity: 0.8; /* код для движков Mozilla */
+	opacity:.80;  /*свойство из спецификации CSS3, которое поддерживается не всеми браузерами*/
+	filter: alpha(opacity=80); /* код для IE */
+	z-index:1902;
+}
+div#help_cont{
+	background-color: #FFFFFF;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	padding: 16px;
+	border: 1px solid #006600;
+	overflow: auto;
+	z-index:1901;
+	border-radius:10px;
+	height:auto;
+	width: 450px;
+}

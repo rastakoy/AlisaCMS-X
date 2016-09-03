@@ -1,0 +1,9 @@
+div.divLang{
+	background-color:#DFDFDF;
+	padding: 3px;
+	margin-bottom:3px;
+	cursor:pointer;
+}
+div.divLang:hover{
+	background-color:#EEEEEE;
+}

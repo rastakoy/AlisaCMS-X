@@ -1,0 +1,80 @@
+ul#ul_langDB{
+	margin:0px;
+	padding:0px;
+	
+}
+ul#ul_langDB li{
+	list-style-type:none;
+}
+ul#ul_langDB li.li_langRoot{
+	font-weight:bold;
+	padding-bottom: 10px;
+	width: 500px;
+	float:;
+	margin-top: 20px;
+}
+ul.ul_langDBSub{
+	margin:0;
+	padding:0;
+	padding-left: 0px;
+}
+ul.ul_langDBSub li.li_langDBSub{
+	font-weight:normal;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	border-bottom-width: 1px;
+	border-bottom-style: dashed;
+	border-bottom-color: #999999;	
+}
+ul.ul_langDBSub li.li_langDBSub span.active{
+	font-weight:bold;
+	border-bottom: 1px dashed #999999;
+	cursor:pointer;
+	color:#999999;
+	font-size: 11px;
+}
+ul.ul_langDBSub li.li_langDBSub span.active:hover{
+	text-decoration:none;
+	border-bottom: 1px solid #999999;
+}
+ul.ul_langDBSub li.li_langDBSub span.notactive{
+	font-weight:bold;
+	border-bottom: 1px dashed #006633;
+	cursor:pointer;
+	color:#006633;
+	font-size: 11px;
+}
+ul.ul_langDBSub li.li_langDBSub span.notactive:hover{
+	text-decoration:none;
+	border-bottom: 1px solid #006633;
+}
+div.divLang_addLanguage{
+	margin-left:3px;
+	margin-top:3px;
+	padding:3px;
+	background-color:#00CC33;
+	cursor:pointer;
+}
+div.divLang_addLanguage:hover{
+	background-color:#9BFFB5;
+}
+
+/*************************************/
+
+div.languagesTabs{
+	padding-left:30px;
+}
+div.languagesTabs span{
+	cursor:pointer;
+	display:block;
+	float:left;
+	font-weight:bold;
+	padding: 5px;
+	padding-left: 15px;
+	padding-right: 15px;
+	background-color:#99AF78;
+	border-left: 1px solid #999999;
+}
+div.languagesTabs span.active{
+	background-color:#A9C9A7;
+}

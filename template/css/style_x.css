@@ -1,0 +1,43 @@
+#loginForm_x{
+	position:absolute;
+	width:260px;
+	padding:20px;
+	top:30%;
+	left:50%;
+	margin-left:-130px;
+ 	border: 4px solid #a9c9a7;
+	background-color: #FFF;
+}
+.menutitle{
+	padding-left: 10px;
+}
+div.menuitem{
+	transition: all .35s ease;
+	padding-left: 10px;
+	margin-left:10px;
+}
+div.menuitem:last-child{
+	transition: none;
+}
+div.menu {
+	width: 281px;
+	background-position:right;
+}
+div.submenu{
+	width: 281px;
+	background-position:right bottom;
+}
+.menuitem:hover{
+	/*background-color:#339933;
+	position:absolute;
+	background-color:#49A233;
+	padding-left: 40px;
+	margin-left:0px;
+	background-image:url(/adminarea/template/images/green/leftmenuhover.png);
+	background-repeat:no-repeat;
+	background-position:left top;
+	
+}
+.menuitem:hover a{
+	text-shadow: 2px 2px 3px rgba(255,255,255,0.1);*/
+}
