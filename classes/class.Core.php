@@ -37,6 +37,7 @@ class Core extends DatabaseInterface{
 		$classLanguages = new Languages();
 		$classCatalog = new Catalog();
 		$classImages = new Images();
+		$classFilters = new Filters();
 		
 		$classTrash = new Trash();
 		$classStart = new Start();
@@ -76,15 +77,16 @@ class Core extends DatabaseInterface{
 					$_SESSION['login'] = '';
 					$_SESSION['password'] = '';
 					break;
-				case 'filters':
-					$classFilters = new Filters();
-					$showTemplate = true;
-					$loadPage = 'filters';
-					//echo "<pre>"; print_r($url); echo "</pre>";
-					$filters = $classFilters->getFilters($url);
-					$filterParent = $classFilters->getFilterParent($url);
-					$options = $classMenuSettings->getMenu();
-					break;
+			//	case 'filters':
+			//		$classFilters = new Filters();
+			//		$showTemplate = true;
+			//		$loadPage = 'filters';
+			//		//echo "<pre>"; print_r($url); echo "</pre>";
+			//		//$filters = $classFilters->getFilters($url);
+			//		$filters = $classFilters->getRootFilters();
+			//		$filterParent = $classFilters->getFilterParent($url);
+			//		$options = $classMenuSettings->getMenu();
+			//		break;
 				case 'trash':
 					$trash = $classMenuSettings->getMenu();
 					$trash = $classTrash->constructor($trash);
@@ -97,6 +99,9 @@ class Core extends DatabaseInterface{
 					if(!$params['option']){
 						if($params['action']=='editMenus'){
 							$panel = $classStart->getPanel($params['menuId']);
+							$titles = $classData->constructTitles($panel['title']);
+							$filters = $classFilters->getRootFilters();
+							//$admin->myPrint($titles);
 							if($panel['external']!='1'){
 								$freeTables = $classStart->getFreeTables($panel['link']);
 							}else{
@@ -104,14 +109,13 @@ class Core extends DatabaseInterface{
 							}
 							//$admin->myPrint($freeTables);
 						}else{
-							$menus = $classMenuSettings->getMenu();
+							$menus = $classMenuSettings->getMenu(false);
 							$menus = $classStart->constructor($menus);
 						}
 						$showTemplate = true;
 						$loadPage = '__start';
 					}else{
 						//print_r($array);
-						$classFilters = new Filters();
 						$showTemplate = true;
 						$loadPage = '__data';
 						$optionName = $params['option'];
@@ -124,7 +128,6 @@ class Core extends DatabaseInterface{
 							$parents = $classData->getParents($params);
 						}
 						$titles = $classData->constructTitles($option['title'], $parents);
-						$folder = $classData->getFolder($parents[count($parents)-1]['id'], $optionName);
 						//echo "<pre>"; print_r($parents); echo "</pre>";
 						if($params['action']=='addNewFolder'){
 							$fields = $classCatalog->getFolderFields($parents[count($parents)-1]['id']);
@@ -132,6 +135,19 @@ class Core extends DatabaseInterface{
 							$folder = $classData->getFolder($params['folderId'], $optionName);
 							$fields = $classCatalog->getFolderFields($parents[count($parents)-1]['id']);
 						}elseif($params['action']=='editItem'){
+							if($params['option']=='filters'){
+								$loadPage = '__filters';
+								$filter = $classFilters->getFilterClass($params['itemId']);
+								$options = $classData->getOptions();
+								$filterOption = $classMenuSettings->getMenuItemByName($params['option']);
+								if(is_array($GLOBALS['languages'])){ foreach($GLOBALS['languages'] as $key=>$lang){
+									$dataBases = $classLanguages->getDataBases(array("0"=>$filterOption), $key);
+									//echo "<pre>"; print_r($dataBases); echo "</pre>";
+									$langFields[] = $dataBases;
+								}}
+								//$filter = $classFilters->getFilterOption($params['itemId']);
+								break;
+							}
 							if($params['lang']!='' && $params['lang']!=$GLOBALS['language']){ $langPrefix='_'.$params['lang']; }
 							if($params['itemId']==''){
 								//echo "addNew";
@@ -151,6 +167,7 @@ class Core extends DatabaseInterface{
 								$orderType = 'asc';
 								$items = $classData->getExternalOptions($params['option'], $parents[count($parents)-1]['id'], '', $order, $orderType);
 							}else{
+								$folder = $classData->getFolder($parents[count($parents)-1]['id'], $optionName);
 								if(count($parents)=='0'){
 									//$items = $classMenuSettings->getOptions($params['option'], '0', '');
 									$items = $classData->getItems($params['option'], '0', '');

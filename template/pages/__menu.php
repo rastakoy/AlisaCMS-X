@@ -9,13 +9,10 @@
 <a href="/adminarea/scheme" class="amenu">—хема сайта</a></strong></div>
 <? foreach($leftMenu as $option){ ?>
 <div class="menuitem" id="root<?=$option['link']?>menu">
-<img src="/adminarea/template/tree/plus.jpg" style="cursor:pointer;"
-onclick="openLeftBranch('<?=$option['link']?>')">
-<?
-if($option['link']=='filters'){ ?><a href="<?=$GLOBALS['adminBase']?>/<?=$option['link']?>/"
-class="amenu"><strong><?=$option['name']?></strong></a><?
-}else{ ?><a href="<?=$GLOBALS['adminBase']?>/?option=<?=$option['link']?>"
-class="amenu"><strong><?=$option['name']?></strong></a><? } ?></div><? if($option['submenu']=='1'){ ?>
+<? if($option['submenu']){ ?><img src="/adminarea/template/tree/plus.jpg" style="cursor:pointer;"
+onclick="openLeftBranch('<?=$option['link']?>')">&nbsp;<? }else{ ?>&nbsp;&nbsp;&nbsp;<? } ?>
+<a href="<?=$GLOBALS['adminBase']?>/?option=<?=$option['link']?>"
+class="amenu"><strong><?=$option['name']?></strong></a></div><? if($option['submenu']=='1'){ ?>
 <div id="left_<?=$option['link']?>_0" class="items_left_menu" style="padding-bottom:25px;<?
 if($params['option']!=$option['link']){?>display:none;<? } ?>"></div>
 <? if($params['option']==$option['link']){?><script>

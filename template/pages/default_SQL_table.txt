@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS `%table%` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `parent` int(11) NOT NULL,
+  `folder` int(11) NOT NULL DEFAULT '0',
+  `prior` int(3) NOT NULL DEFAULT '0',
+  `link` varchar(50) COLLATE cp1251_ukrainian_ci NOT NULL,
+  `filter` int(11) NOT NULL DEFAULT '0',
+  `name` varchar(100) COLLATE cp1251_ukrainian_ci NOT NULL,
+  `name_ukr` varchar(100) COLLATE cp1251_ukrainian_ci NOT NULL,
+  `name_eng` varchar(100) COLLATE cp1251_ukrainian_ci NOT NULL,
+  `letters` varchar(60) COLLATE cp1251_ukrainian_ci NOT NULL,
+  `content` text COLLATE cp1251_ukrainian_ci NOT NULL,
+  `visible` int(1) NOT NULL DEFAULT '1',
+  `tmp` int(1) NOT NULL DEFAULT '0',
+  `trash` int(1) NOT NULL DEFAULT '0',
+  `metaTitle` varchar(200) COLLATE cp1251_ukrainian_ci NOT NULL,
+  `metaDescription` varchar(200) COLLATE cp1251_ukrainian_ci NOT NULL,
+  `addDate` datetime,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=cp1251 COLLATE=cp1251_ukrainian_ci AUTO_INCREMENT=1 ;

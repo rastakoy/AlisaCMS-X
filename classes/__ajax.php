@@ -74,14 +74,6 @@ switch($array['ajax']){
 		$items = json_encode($items);
 		echo $items;
 		break;
-	case 'saveFilterField':
-		$classFilters = new Filters();
-		//$array = $admin->iconvArray($array);
-		if(isset($array['link'])==''){
-			$array['link'] = $admin->transliteral($array['filterName']);
-		}
-		echo $classFilters->saveFilterField($array);
-		break;
 	case 'addFilterOption':
 		$classFilters = new Filters();
 		$classFilters->addFilterOption($array);
@@ -335,6 +327,24 @@ switch($array['ajax']){
 		break;
 	case 'setMenusPriors':
 		echo $classStart->setMenusPriors($array);
+		break;
+	case 'testUseTable':
+		echo $classStart->testUseTable($array);
+		break;
+	case 'addNewTable':
+		echo $classStart->addNewTable($array);
+		break;
+	case 'savePanel':
+		echo $classStart->savePanel($array);
+		break;
+	case 'testFilterUseFieldName':
+		echo $classFilters->testFilterUseFieldName($array);
+		break;
+	case 'saveFilterField':
+		echo $classFilters->saveFilterField($array);
+		break;
+	case 'testForConformance':
+		echo $classFilters->testForConformance($array);
 		break;
 	default:
 		//Значение параметра ajax по-умолчанию

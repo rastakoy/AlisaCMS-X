@@ -90,6 +90,76 @@ class Start extends DatabaseInterface{
 		return $tables;
 	}
 	
+	/**
+	
+	*/
+	function testUseTable($array){
+		$mytable = $array[$array['index']];
+		$return = '1';
+		$q = "SELECT `TABLE_NAME` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA LIKE '".($GLOBALS['database'])."' ";
+		$query = $this->query($q);
+		while($table=$query->fetch_assoc()){
+			if($table['TABLE_NAME']==$mytable){
+				$return = '0';
+			}
+		}
+		//****************************
+		$query = $this->query("SELECT * FROM `menusettings` ");
+		while($table=$query->fetch_assoc()){
+			if($table['link']==$mytable){
+				$return = '0';
+			}
+		}
+		//****************************
+		if($array['pattern']){
+			$prega = "/$array[pattern]/";
+			//echo "prega = $prega";
+			if(!preg_match($prega, $mytable)){
+				$return = '0';
+			}
+		}
+		//****************************
+		return "{\"return\":\"$return\",\"elementId\":\"$array[elementId]\"}";
+	}
+	
+	/**
+	
+	*/
+	function addNewTable($array){
+		$file = file_get_contents('template/pages/default_SQL_table.txt', true);
+		$file = str_replace("%table%", $array['tableName'], $file);
+		//echo $file;
+		$query = $this->query($file);
+		if($query){
+			$data = array("table"=>$array['tableName'],"data"=>$this->getFreeTables($array['tableName']));
+			$data = json_encode($data);
+			return $data;
+		}else{
+			return "{\"table\":\"error\"}";
+		}
+	}
+	
+	/**
+	
+	*/
+	function savePanel($array){
+		$query = $this->query("SELECT * FROM `menusettings` WHERE `id`='$array[id]' ");
+		$panel = $query->fetch_assoc();
+		//print_r($panel);
+		//print_r($array);
+		$titles = explode(":rules:", $panel['title']);
+		$titles = ($titles['1'])?$array['titles'].":rules:".$titles['1']:$array['titles'];
+		//print_r($titles);
+		$submenu = '1';
+		if($array['titleType']=='single'){
+			$submenu = '0';
+		}
+		$q = "UPDATE `menusettings` SET `name`='$array[name]', `link`='$array[link]', `active`='$array[active]', `external`='$array[external]', ";
+		$q .= "`filter`='$array[filter]', `submenu`='$submenu', `title`='$titles' WHERE `id`='$array[id]' ";
+		//echo $q."\n";
+		$query = $this->query($q);
+	}
+	
 }
 
 

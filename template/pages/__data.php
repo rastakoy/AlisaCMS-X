@@ -92,8 +92,8 @@ if($titles['0']=='catalog'){
 	$editFolderTitle = "Изменить<br/>".$titles['1']['2']['0'];
 	$deleteFolderTitle = "Удалить<br/>".$titles['1']['2']['0'];
 }elseif($titles['0']=='static'){
-	//echo count($parents)."::".count($titles['1']);
-	if(count($parents)==count($titles['1'])){
+	//echo count($parents)."::".count($titles['1']['0']);
+	if(count($parents)==count($titles['1']['0'])-1){
 		$addItem = true;
 		$addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 	}
@@ -103,7 +103,7 @@ if($titles['0']=='catalog'){
 		$editFolderTitle = "Редактировать<br/>".$titles['1']['2'][count($parents)-1];
 	}
 	//*****
-	if(count($parents)<=count($titles['1'])-1){
+	if(count($parents)<count($titles['1']['0'])-1){
 		$addFolder = true;
 		$addFolderTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 	}
@@ -112,7 +112,9 @@ if($titles['0']=='catalog'){
 		$deleteFolder = true;
 		$deleteFolderTitle = "Удалить<br/>".$titles['1']['2'][count($parents)-1];
 	}
-	
+}elseif($titles['0']=='single'){
+	$addItem = true;
+	$addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 }
 ?>
 		<div class="admintitle" style="padding:0px; margin:0px;" >
@@ -343,12 +345,12 @@ if(is_array($fields)){ foreach($fields as $fileld){
 				<? } ?> /></td>
 			</tr></table>
 			<? break;
-		case 'parent': ?>
+		case 'parent': if($option['useimg']=='1'){ ?>
 			<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 				<td width="150" height="30">Родитель</td>
 				<td><?=$parents[count($parents)-2]['name']?></td>
 			</tr></table>
-			<? break;
+			<? } break;
 		case 'link': if($option['external']!='1'){ ?>
 			<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 				<td width="150" height="30">HTML-путь</td>
@@ -356,7 +358,7 @@ if(is_array($fields)){ foreach($fields as $fileld){
 				onkeyup="__GLOBALS.editing=true;" onchange="__GLOBALS.editing=true;" /></td>
 			</tr></table>
 			<? } break;
-		case 'images': if($option['external']!='1'){ $initImages=true; ?>
+		case 'images': if($option['external']!='1' && $option['useimg']=='1'){ $initImages=true; ?>
 			<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 				<td width="150" height="30">Изображения</td>
 				<td><div id="file-uploader">
@@ -397,7 +399,7 @@ if(is_array($fields)){ foreach($fields as $fileld){
 			  </tr>
 			</table>
 			<? } break;
-		case 'content': if($option['external']!='1'){ ?>
+		case 'content': if($option['external']!='1' && $option['useimg']=='1'){ ?>
 			<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 				<td width="150" height="30">Описание</td>
 				<td><textarea id="content" style="width:100%; height:300px;"
@@ -412,7 +414,7 @@ if(is_array($fields)){ foreach($fields as $fileld){
 				} ?> /></td>
 			</tr></table>
 			<? } break;
-		case 'letters': if($option['external']!='1'){ ?>
+		case 'letters': if($option['external']!='1' && $option['useletters']=='1'){ ?>
 			<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 				<td width="150" height="30">Символьный	код</td>
 				<td><input type="text" id="letters" value="<?=$folder['letters']?>"
@@ -422,7 +424,7 @@ if(is_array($fields)){ foreach($fields as $fileld){
 	}
 } }
 ?>
-<? if($option['external']!='1'){ ?>
+<? if($option['external']!='1' && $option['usetemplate']=='1'){ ?>
 <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 	<td width="150" height="30">Используемый шаблон</td>
 	<td><select id="currentTemplate" onkeyup="__GLOBALS.editing=true;" onchange="__GLOBALS.editing=true;">
@@ -449,13 +451,13 @@ function saveNewLeftMenuFolder(){
 	<?  if($option['external']=='1'){ ?>paction += "&optionExternal=1";<? } ?>
 	paction += "&id=<?=$folder['id']?>";
 	paction += "&lang=<?=$langPrefix?>";
-	paction += "&letters="+document.getElementById("letters").value;
+	<?  if($option['useletters']=='1'){ ?>paction += "&letters="+document.getElementById("letters").value;<? } ?>
 	paction += "&name="+encodeURIComponent(document.getElementById("name").value);
 	paction += "&parent=<?=$myParent?>";
 	<?  if($option['external']!='1'){ ?>paction += "&visible=1";<? } ?>
 	<?  if($option['external']!='1'){ ?>paction += "&link="+document.getElementById("link").value;<? } ?>
-	<?  if($option['external']!='1'){ ?>paction += "&filter="+document.getElementById("currentTemplate").value;<? } ?>
-	<?  if($option['external']!='1'){ ?>
+	<?  if($option['external']!='1' && $option['usetemplate']=='1'){ ?>paction += "&filter="+document.getElementById("currentTemplate").value;<? } ?>
+	<?  if($option['external']!='1' && $option['usetext']=='1'){ ?>
 		tinyMCE.execCommand('mceRemoveControl',true, "content");
 		if(document.getElementById("content")){
 			paction += "&content="+encodeURIComponent(document.getElementById("content").value);
@@ -981,10 +983,12 @@ if($item['folder']=='1' && $titles['0']!='static') { //Выписываем дирректорию
 		<table id="folder_1" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
 			<td height="34" width="20"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif" id="imgcheck_1" width="16" height="16" border="0" class="items_select_all" style="cursor:pointer" onclick="toggle_item_check(1)"></td>
 			<td height="34" width="20"><a href="javascript:toggle_page_show(1)" title="Отображение страницы в сайте"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/glaz.gif" id="glaz_1" width="16" height="16" border="0"></a></td>
-			<? 	if($lnk){ ?><td height="34" width="50" align="center" style="background-image:url(<?=$GLOBALS['adminBase']?>/template/images/itemFolder.jpg);background-repeat:no-repeat;">
-				<img src="/loadimages/<?=$lnk?>" width="24" height="18" border="1" class="imggal" align="absmiddle" style="margin-right:5px;margin-top:3px;">
-			<? }else{ ?><td height="34" width="50" align="center" style="background-image:url(<?=$GLOBALS['adminBase']?>/template/images/itemFolder.jpg);background-repeat:no-repeat;">
-			<? } ?></td>
+			<? if($option['useimg']=='1'){ ?>
+				<? if($lnk){ ?><td height="34" width="50" align="center" style="background-image:url(<?=$GLOBALS['adminBase']?>/template/images/itemFolder.jpg);background-repeat:no-repeat;">
+					<img src="/loadimages/<?=$lnk?>" width="24" height="18" border="1" class="imggal" align="absmiddle" style="margin-right:5px;margin-top:3px;">
+				<? }else{ ?><td height="34" width="50" align="center" style="background-image:url(<?=$GLOBALS['adminBase']?>/template/images/itemFolder.jpg);background-repeat:no-repeat;">
+				<? } ?></td>
+			<? } ?>
 			<td height="34" width="" style="font-weight:bold;"><span id="itemName_<?=$item['id']?>"><?=$item['name']?></span></td>
 			<td height="34" width="20">&nbsp;</td>
 			<td height="34" width="20">&nbsp;</td>
@@ -1007,15 +1011,17 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 		<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
 			<td height="34" width="20"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif" id="imgcheck_105" width="16" height="16" border="0" class="items_select_all" style="cursor:pointer" onclick="toggle_item_check(105)"></td>
 			<td height="34" width="20"><a href="javascript:toggle_page_show(105)" title="Отображение страницы в сайте"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/glaz.gif" id="glaz_105" width="16" height="16" border="0"></a></td>
-			<td height="34" width="20">
-			<? if($lnk){ ?>
-			<img src="/loadimages/<?=$lnk?>" width="44" height="33"
-			border="1" class="imggal" align="absmiddle" style="margin-right:5px;">
-			<? }else{ ?>
-			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/no_img.gif" width="44" height="33"
-			border="1" class="imggal" align="absmiddle" style="margin-right:5px;">
+			<? if($option['useimg']=='1'){ ?>
+				<td height="34" width="20">
+				<? if($lnk){ ?>
+				<img src="/loadimages/<?=$lnk?>" width="44" height="33"
+				border="1" class="imggal" align="absmiddle" style="margin-right:5px;">
+				<? }else{ ?>
+				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/no_img.gif" width="44" height="33"
+				border="1" class="imggal" align="absmiddle" style="margin-right:5px;">
+				<? } ?>
+				</td>
 			<? } ?>
-			</td>
 			<td height="34" width="" style="font-weight:bold;"><span id="itemName_<?=$item['id']?>"><?=$item['name']?></span></td>
 			<td height="34" width="20">&nbsp;</td>
 			<td height="34" width="20">&nbsp;</td>

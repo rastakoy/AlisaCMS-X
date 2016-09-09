@@ -41,3 +41,22 @@ div.submenu{
 .menuitem:hover a{
 	text-shadow: 2px 2px 3px rgba(255,255,255,0.1);*/
 }
+.inputpreloader{
+	background-image: url("/adminarea/template/images/green/preloader-01.gif");
+	background-repeat:no-repeat;
+	background-position:right center;
+	background-size:20px 20px;
+	padding-right:20px;
+}
+.inputok{
+	background-image: url("/adminarea/template/images/green/input_ok.gif");
+	background-repeat:no-repeat;
+	background-position:right center;
+	padding-right:20px;
+}
+.inputfalse{
+	background-image: url("/adminarea/template/images/green/input_false.gif");
+	background-repeat:no-repeat;
+	background-position:right center;
+	padding-right:20px;
+}

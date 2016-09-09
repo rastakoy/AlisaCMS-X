@@ -4,6 +4,18 @@ class Data extends DatabaseInterface{
 	/**
 	
 	*/
+	function getOptions(){
+		$q = "SELECT * FROM `menusettings` WHERE `active`='1' ORDER BY `prior` ASC ";
+		$query = $this->query($q);
+		while($option=$query->fetch_assoc()){
+			$options[] = $option;
+		}
+		return $options;
+	}
+	
+	/**
+	
+	*/
 	function getParents($params, $option=false){
 		$array = explode("->", is_array($params)?$params['parents']:$params);
 		//echo "<pre>"; print_r($array); echo "</pre>";
@@ -181,13 +193,14 @@ class Data extends DatabaseInterface{
 		$admin = new Admin();
 		$str = trim($str);
 		$array = explode(":", $str, 4);
-		if($array['0']=='catalog'){
+		$titleType = $array['0'];
+		if($titleType=='catalog' || $titleType=='single'){
 			$array = explode("\n", $array['1']);
 			foreach($array as $key=>$value){
 				$value = explode("->", $value);
 				$array[$key] = $value;
 			}
-			return array("catalog", $array);
+			return array((($titleType=='catalog')?"catalog":"single"), $array);
 		//************************************
 		}elseif($array['0']=='static'){
 			$gArray = $array;
@@ -204,14 +217,14 @@ class Data extends DatabaseInterface{
 				$arr = iconv("CP1251", "UTF-8", $gArray['3']);
 				$arr = json_decode($arr, true);
 				$arr = $admin->iconvArray($arr);
-				foreach($parents as $parent){
+				if(is_array($parents)){ foreach($parents as $parent){
 					foreach($arr as $key=>$value){
 						//echo "$key==$parent[id]";
 						if($key==$parent['id']){
 							$arr2 = $value;
 						}
 					}
-				}
+				}}
 				if(is_array($arr2)){
 					foreach($arr2 as $key=>$value){
 						$value = trim($value);
@@ -405,11 +418,13 @@ class Data extends DatabaseInterface{
 			return $this->saveExternalItem($array);
 		}else{
 			if(!$array['id']){
-				$q  = "INSERT INTO `$array[option]` (`name`, `link`, `parent`, `visible`, `content`, `letters`, `folder`, `filter`, `addDate`) VALUES ";
-				$q .= " ('$array[name]', '$array[link]', '$array[parent]', '$array[visible]', '$array[content]', '$array[letters]', '0', '$array[filter]', '".date('Y-m-d H:i:s')."' ) ";
+				$q  = "INSERT INTO `$array[option]` (`name`, `link`, `parent`, `visible`, `folder`, `addDate`) VALUES ";
+				$q .= " ('$array[name]', '$array[link]', '$array[parent]', '$array[visible]', '0', '".date('Y-m-d H:i:s')."' ) ";
 				//echo $q."\n\n";
 				$query = $this->query($q);
-				$query = $this->query("SELECT * FROM `$array[option]` ORDER BY `id` DESC LIMIT 0,1 ");
+				$q = "SELECT * FROM `$array[option]` ORDER BY `id` DESC LIMIT 0,1 ";
+				//echo "MY: ".$q."\n";
+				$query = $this->query($q);
 				$item = $query->fetch_assoc();
 				$q = "UPDATE `$array[option]` SET `tmp`='1' WHERE `id`='$item[id]' ";
 				$query = $this->query($q);
@@ -529,8 +544,13 @@ class Data extends DatabaseInterface{
 		if($array['optionExternal']=='1'){
 			return $this->saveExternalFolder($array);
 		}else{
-			$q  = "INSERT INTO `$array[option]` (`name`, `link`, `parent`, `visible`, `content`, `letters`, `folder`, `filter`) VALUES ";
-			$q .= " ('$array[name]', '$array[link]', '$array[parent]', '$array[visible]', '$array[content]', '$array[letters]', '1', '$array[filter]' ) ";
+			if($array['option']=="filters"){
+				$q  = "INSERT INTO `$array[option]` (`name`, `link`, `parent`, `visible`, `folder`) VALUES ";
+				$q .= " ('$array[name]', '$array[link]', '$array[parent]', '$array[visible]', '1' ) ";
+			}else{
+				$q  = "INSERT INTO `$array[option]` (`name`, `link`, `parent`, `visible`, `content`, `letters`, `folder`, `filter`) VALUES ";
+				$q .= " ('$array[name]', '$array[link]', '$array[parent]', '$array[visible]', '$array[content]', '$array[letters]', '1', '$array[filter]' ) ";
+			}
 			//echo $q;
 			$query = $this->query($q);
 			$query = $this->query("SELECT * FROM `$array[option]` WHERE `folder`='1' ORDER BY `id` DESC LIMIT 0,1 ");
@@ -545,9 +565,22 @@ class Data extends DatabaseInterface{
 	
 	*/
 	function saveFolder($array){
+		$query = $this->query("SELECT * FROM `menusettings` WHERE link='$array[option]' LIMIT 0,1 ");
+		$option = $query->fetch_assoc();
 		$lang = $array['lang'];
-		$q  = "UPDATE `$array[option]` SET `name$lang`='$array[name]', `link`='$array[link]', `parent`='$array[parent]', `visible`='$array[visible]', ";
-		$q .= "`content$lang`='$array[content]', `letters`='$array[letters]', `filter`='$array[filter]' WHERE `id`='$array[id]' ";
+		$q  = "UPDATE `$array[option]` SET `name$lang`='$array[name]', `link`='$array[link]', `visible`='$array[visible]', ";
+		$q .= "`parent`='$array[parent]', ";
+		if($option['usetext']=='1'){
+			$q .= "`content$lang`='$array[content]', ";
+		}
+		if($option['useletters']=='1'){
+			$q .= "`letters`='$array[letters]', ";
+		}
+		if($option['usetemplate']){
+			$q .= "`filter`='$array[filter]' ";
+		}
+		$q .= "WHERE `id`='$array[id]' ";
+		$q = preg_replace("/, ? ? ?WHERE/", " WHERE", $q);
 		echo $q;
 		$query = $this->query($q);
 	}

@@ -61,6 +61,7 @@ class DatabaseInterface extends Mysqli{
 		$exceptions[] = "SHOW FIELDS";
 		$exceptions[] = "UPDATE";
 		$exceptions[] = "INSERT";
+		$exceptions[] = "CREATE";
 		$exceptions[] = "`admins`";
 		$exceptions[] = "`settings`";
 		$exceptions[] = "`menusettings`";
@@ -79,15 +80,15 @@ class DatabaseInterface extends Mysqli{
 			if(preg_match("/ WHERE /", $query)){
 				$query = preg_replace("/ WHERE /", " WHERE `trash`='0' AND ", $query);
 			}elseif(preg_match("/ ORDER /", $query)){
-				$query = preg_replace("/ ORDER /", " `trash`='0' ORDER ", $query);
+				$query = preg_replace("/ ORDER /", " WHERE `trash`='0' ORDER ", $query);
 			}else{
 				$query .= " WHERE `trash`='0' ";
 			}
-			//echo $query."<br/>";
+			//echo $query."<br/>\n";
 		}
 		//********************************
 		try{
-			//echo $query."<br/>";
+			//echo $query."<br/>\n";
 			return $this->s_query($query, $resultmode);
 		}catch(Exception $e){
 			//Core::s_writeToLog(array(

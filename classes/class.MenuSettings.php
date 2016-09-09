@@ -4,14 +4,28 @@ class MenuSettings extends DatabaseInterface{
 	/**
 	
 	*/
-	function getMenu(){
+	function getMenu($active=true){
 		$options = array();
-		$query = $this->query("SELECT * FROM `menusettings` WHERE `active`='1' ORDER BY `prior` ASC ");
+		if($active){
+			$query = $this->query("SELECT * FROM `menusettings` WHERE `active`='1' ORDER BY `prior` ASC ");
+		}else{
+			$query = $this->query("SELECT * FROM `menusettings` ORDER BY `prior` ASC ");
+		}
         if($query)
 		while($option=$query->fetch_assoc()){
 			$options[] = $option;
 		}
 		return $options;
+	}
+	
+	/**
+	
+	*/
+	function getMenuItemByName($name){
+		$query = $this->query("SELECT * FROM `menusettings` WHERE `link`='$name' ");
+		if($query && $query->num_rows>0){
+			return $query->fetch_assoc();
+		}
 	}
 	
 	/**

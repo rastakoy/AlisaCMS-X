@@ -26,6 +26,17 @@ class Filters extends DatabaseInterface{
 	/**
 	
 	*/
+	function getRootFilters(){
+		$query = $this->query("SELECT * FROM `filters` WHERE `folder`='1' AND `parent`='0' ORDER BY `prior` ASC ");
+		while($filter=$query->fetch_assoc()){
+			$filters[] = $filter;
+		}
+		return $filters;
+	}
+	
+	/**
+	
+	*/
 	function getFilters($array, $editItem=false){
 		$externalData = new ExternalData();
 		$admin = new Admin();
@@ -184,12 +195,13 @@ class Filters extends DatabaseInterface{
 	/**
 	
 	*/
-	function getFilterOption($array){
+	function getFilterOption($filterId){
 		//print_r($array);
 		$array = explode(",", $array);
-		$q = "SELECT * FROM `filters` WHERE `parent`='0' AND `link`='$array[0]' ";
+		$q = "SELECT * FROM `filters` WHERE `id`='$filterId' ";
 		$query = $this->query($q);
 		$parent = $query->fetch_assoc();
+		//echo "<pre>"; print_r($parent); echo "</pre>";
 		//**************************
 		$q = "SELECT * FROM `filters` WHERE `parent`='$parent[id]' AND `link`='$array[1]' ";
 		$query = $this->query($q);
@@ -208,7 +220,7 @@ class Filters extends DatabaseInterface{
 		$filter['tablename'] = $config['tablename'];
 		$filter['config'] = $config;
 		$filter['isprev'] = $config['isprev'];
-		//print_r($config);
+		print_r($config);
 		//**************************
 		//print_r($filter);
 		$filter['fields'] = $this->getFilterFields($filter['tablename'], $filter['datatype'], $parentId, $itemId);
@@ -219,42 +231,49 @@ class Filters extends DatabaseInterface{
 	/**
 	
 	*/
-	function getFilterClass($array){
-		$q = "SELECT * FROM `filters` WHERE `id`='$array[itemId]' ";
+	function getFilterClass($filterId){
+		$q = "SELECT * FROM `filters` WHERE `id`='$filterId' ";
 		$query = $this->query($q);
 		$filter = $query->fetch_assoc();
+		$config = json_decode($filter['config'], true);
+		//$filter['filtertype'] = $config['filtertype'];
+		//$filter['datatype'] = $config['datatype'];
+		//$filter['fieldname'] = $config['fieldname'];
+		//$filter['tablename'] = $config['tablename'];
+		$filter['config'] = $config;
+		$filter['fields'] = $this->getFilterFields($filter['tablename'], $filter['parent'], $filter['id']);
 		return $filter;
 	}
 	
 	/**
 	
 	*/
-	function getFilterFields($table, $datatype, $parentId, $itemId){
+	function getFilterFields($table, $parentId, $itemId){
 		if($table==''){
 			return false;
 		}
+		//echo "<pre>$table, $datatype, $parentId, $itemId</pre>";
 		$q = "SHOW FIELDS FROM `$table` ";
-		//echo $q;
+		echo "<pre>$q</pre>";
 		$query = $this->query($q);
 		$return = array();
 		while($field=$query->fetch_assoc()){
-			if(!$this->getFilterFieldsUse($field['Field'], $parentId, $itemId)){
-				if($datatype=='1'){
-					if(preg_match("/^int/", $field['Type'])){
-						if(  $this->testFieldIsNoDeafault($field['Field'])  ){
-							$return[] = $field['Field'];
-						}
-					}
-				}elseif($datatype=='2'){
-					if(preg_match("/^double/", $field['Type'])){
-						$return[] = $field['Field'];
-					}
-				}elseif($datatype=='3'){
-					if(preg_match("/^varchar/", $field['Type'])){
-						if(  $this->testFieldIsNoDeafault($field['Field'])  ){
-							$return[] = $field['Field'];
-						}
-					}
+			echo "<pre>"; print_r($field); echo "</pre>";
+			if($datatype=='int'){
+				if(preg_match("/^int/", $field['Type'])){
+					$return[] = $field['Field'];
+				}
+			}elseif($datatype=='double'){
+				if(preg_match("/^double/", $field['Type'])){
+					$return[] = $field['Field'];
+				}
+			}elseif($datatype=='varchar'){
+				if(preg_match("/^varchar/", $field['Type'])){
+					$return[] = $field['Field'];
+				}
+			}elseif($datatype=='text'){
+				if(preg_match("/^text/", $field['Type'])){
+					$return[] = $field['Field'];
 				}
 			}
 		}
@@ -303,27 +322,22 @@ class Filters extends DatabaseInterface{
 	
 	*/
 	function saveFilterField($array){
-		if($array['filterId']){
-			$config  = "{\"filtertype\":\"$array[filterType]\",\"datatype\":\"$array[filterDatatype]\",\"tablename\":\"$array[filterTableName]\",";
-			$config .= "\"fieldname\":\"$array[filterFieldName]\",\"isprev\":\"$array[filterIsprev]\"";
-			if($array['filterType']=='8'){
-				$config .= ",\"externalSettings\":{\"option\":\"$array[externalOption]\",\"level\":\"$array[externalLevel]\",";
-				$config .= "\"defaults\":\"".(str_replace(":", "=", $array['defaults']))."\"";
-				$config .= "}";
-			}
-			$config .= "}";
-			//echo $config;
-			foreach($GLOBALS['languages'] as $lang=>$lango){
-				if($GLOBALS['language']!=$lang){
-					if($array["filterName_$lang"]){
-						$names .= " , `name_$lang`='".$array["filterName_$lang"]."' ";
-					}
-				}
-			}
-			$q  = "UPDATE `filters` SET `name`='$array[filterName]' $names , ";
-			$q .= "`config`='$config', `link`='$array[filterLink]' WHERE `id`='$array[filterId]' ";
-			//echo $q;
-		}
+		//if(!$array['fieldId']){
+		//	$q = "INSERT INTO `filters` ";
+		//	$q .= "(parent) VALUES ($array[]) ";
+		//}
+		$q = "UPDATE `filters` SET %data% WHERE `id`='$array[fieldId]' ";
+		//print_r($array);
+		$data = "`name`='$array[fieldName]', ";
+		$data .= "`link`='$array[fieldDBName]', ";
+		$data .= "`datatype`='$array[fieldDataType]', ";
+		$data .= "`datalength`='$array[fieldDataLength]', ";
+		$data .= "`datadefault`='$array[fieldDataDefault]', ";
+		$data .= "`tmp`='0', ";
+		
+		$data = preg_replace("/, ?$/", "", $data);
+		$q = str_replace("%data%", $data, $q);
+		//echo $q;
 		$query = $this->query($q);
 		if($query){
 			return "{\"return\":\"ok\"}";
@@ -422,13 +436,13 @@ class Filters extends DatabaseInterface{
 	
 	*/
 	function getFilterDataFromId($parent){
-		$query = $this->query("SELECT * FROM `filters` WHERE `parent`='$parent' ORDER BY `prior` ASC ");
+		$q = "SELECT * FROM `filters` WHERE `parent`='$parent' ORDER BY `prior` ASC ";
+		$query = $this->query($q);
 		while($filtero = $query->fetch_assoc()){
-			$filter = json_decode($filtero['config'], true);
-			if($filter['fieldname']){
-				$filter['name'] = $filtero['name'];
-				$filters[] = $filter;
-			}
+			//$filter['id'] = $filtero['id'];
+			//$filter['name'] = $filtero['name'];
+			//$filter['fieldName'] = $filtero['link'];
+			$filters[] = $filtero;
 		}
 		//print_r($filters);
 		return $filters;
@@ -543,6 +557,71 @@ class Filters extends DatabaseInterface{
 			$query = $this->query($sql);
 		}
 		//$query = $this->query("");
+	}
+	
+	/**
+	
+	*/
+	function testFilterUseFieldName($array){
+		//print_r($array);
+		if(!$array['parentId']){
+			return "{\"return\":\"0\",\"elementId\":\"$array[elementId]\"}";
+		}
+		$q = "SELECT * FROM `filters` WHERE `parent`='$array[parentId]' ";
+		$query = $this->query($q);
+		$myValue = $array[$array['index']];
+		$return = '1';
+		while($item=$query->fetch_assoc()){
+			if($item['link']==$myValue && $array['myfieldId']!=$item['id']){
+				$return = '0';
+			}
+		}
+		//****************************
+		if($array['pattern']){
+			$prega = "/$array[pattern]/";
+			//echo "prega = $prega";
+			if(!preg_match($prega, $myValue)){
+				$return = '0';
+			}
+		}
+		//****************************
+		return "{\"return\":\"$return\",\"elementId\":\"$array[elementId]\"}";
+	}
+	
+	/**
+	
+	*/
+	function testForConformance($array){
+		$admin = new Admin();
+		$table = $array['table'];
+		$filter = $array['filter'];
+		//********************
+		$fields = $this->getFieldsFromTable($table);
+		$templateFields = $this->getFilterDataFromId($filter);
+		//print_r($fields);
+		//print_r($templateFields);
+		$errors = false;
+		foreach($templateFields as $field){
+			$toError = '1';
+			$mass = false;
+			foreach($fields as $tableField){
+				if($field['link']==$tableField['Field']){
+					$prega = "/^$tableField[Field](:|$)/";
+					//echo "$field[link] -- совпало\n";
+					$toError = '-1';
+					//$mass = $field;
+				}
+			}
+			if($toError=='1'){
+				$field['conformance'] = '0';
+				$errors[] = $field;
+			}else{
+				$field['conformance'] = '1';
+				$errors[] = $field;
+			}
+		}
+		print_r($errors);
+		//echo "$table:$filter";
 	}
 	
 	/**

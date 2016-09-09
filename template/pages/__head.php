@@ -44,6 +44,8 @@
 <script src="/adminarea/template/js/jquery.ui.draggable.js"></script>
 <link href="/adminarea/template/css/demos.css" rel="stylesheet" type="text/css" />
 
+<script src="/adminarea/template/js/input.preloader.js"></script>
+
 <!--<script src="/adminarea/template/tinymce/tinymce.min.js"></script>-->
 
 <?  require_once("__tiny.php"); ?>
