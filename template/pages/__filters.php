@@ -123,8 +123,15 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 <? //echo "<pre>"; print_r($filter); echo "</pre>"; ?>
 <? //echo "<pre>"; print_r($langFields); echo "</pre>"; ?>
 <? //echo "<pre>"; print_r($GLOBALS); echo "</pre>"; ?>
-<? //echo "<pre>"; print_r($filter); echo "</pre>"; ?>
+<? //echo "<pre>filter:"; print_r($filter); echo "</pre>"; ?>
 <? //echo "<pre>options: "; print_r($options); echo "</pre>"; ?>
+<? //echo "<pre>ports: "; print_r($ports); echo "</pre>"; ?>
+<? //echo "<pre>tablesWIthPorts: "; print_r($tablesWIthPorts); echo "</pre>"; ?>
+
+<? if(is_array($ports)){ ?><select id="portsFields" style="display:none;"><? foreach($ports as $port){ ?>
+<option value="<?=$port['port']?>:<?=$port['id']?>"><?=$port['name']?></option>
+<? } ?></select><? } ?>
+
 
 <div class="admintitle" style="padding:0px; margin:0px;" >
 	<a href="javascript:getData('<?=$GLOBALS['adminBase']?>/?action=editItem,option=filter,parents=<?=$params['params']?>')" id="add_item_to_cat_button"
@@ -152,27 +159,24 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
     <td><input type="text" id="fieldName"
 	value="<?=$filter["name$prefix"]?>" style="width:350px;height:25px;padding-left:3px;" /></td>
   </tr>
-  <!--<tr>
-    <td height="30" width="200">Таблица в базе данных</td>
-    <td><select onchange="getFilterFieldType()" id="sel_tablename" style="width:350px;height:25px;">
-	<option></option><? foreach($options as $option) { ?>
-		<option value="<?=$option['link']?>"
-		<? if($option['link']==$filter['tablename']){ ?>selected<? } ?>><?=$option['name']?> (<?=$option['link']?>)</option>
-	<? } ?></select></td>
-  </tr>-->
+
   <tr>
     <td height="30" width="200">Тип данных</td>
-    <td><select onchange="filterTypeProperties()" id="fieldDataType" style="width:120px;height:25px;">
+    <td><select onchange="filterTypeProperties()" id="fieldDataType" style="width:140px;height:25px;">
 		<? if($filter['tmp']=='1'){ ?><option></option><? } ?>
 		<option value="int" <? if(preg_match("/^int(:?|$)/", $filter['datatype'])){ ?>selected<? } ?>>Целое число</option>
 		<option value="double" <? if(preg_match("/^double(:?|$)/", $filter['datatype'])){ ?>selected<? } ?>>Дробное число</option>
 		<option value="varchar" <? if(preg_match("/^varchar(:?|$)/", $filter['datatype'])){ ?>selected<? } ?>>Строка</option>
 		<option value="text" <? if(preg_match("/^text(:?|$)/", $filter['datatype'])){ ?>selected<? } ?>>Текстовое поле</option>
-	</select> <strong>-›</strong> 
+		<option value="datetime" <? if(preg_match("/^datetime(:?|$)/", $filter['datatype'])){ ?>selected<? } ?>>Дата</option>
+		<option value="virtual" <? if(preg_match("/^virtual(:?|$)/", $filter['datatype'])){ ?>selected<? } ?>>Виртуальное поле</option>
+	</select> <!--<strong>-›</strong>--> 
 	
 		<select onchange="" id="fieldDataSubype_int"
 		style="width:140px;height:25px;<? if(!preg_match("/^int(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>" >
 			<option value="" >Не выбрано</option>
+			<option value="port" >Порт</option>
+			<option value="connector" >Коннектор</option>
 		</select>
 	
 		<select onchange="" id="fieldDataSubype_double"
@@ -184,33 +188,81 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 		style="width:180px;height:25px;<? if(!preg_match("/^varchar(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
 			<option value="" >Не выбрано</option>
 			<option value="colors" <? if(preg_match("/:colors$/", $filter['datatype'])){ ?>selected<? } ?>>Окно выбора цвета</option>
-			<option value="colors" <? if(preg_match("/:test$/", $filter['datatype'])){ ?>selected<? } ?>>Строка с подсказкой</option>
+			<option value="stringlist" <? if(preg_match("/:test$/", $filter['datatype'])){ ?>selected<? } ?>>Строка с подсказкой</option>
+			<option value="port" >Порт</option>
+			<option value="connector" >Коннектор</option>
 		</select>
 		
 		<select onchange="" id="fieldDataSubype_text"
 		style="width:180px;height:25px;<? if(!preg_match("/^text(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
 			<option value="" >Не выбрано</option>
-			<option value="colors" <? if(preg_match("/:tinymce$/", $filter['datatype'])){ ?>selected<? } ?>>Редактор TinyMCE</option>
+			<option value="tinymce" <? if(preg_match("/:tinymce$/", $filter['datatype'])){ ?>selected<? } ?>>Редактор TinyMCE</option>
 		</select>
 	</td>
   </tr>
-  <tr>
+  <tr id="tr_fieldDBName" style=";<? if(preg_match("/^virtual(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
     <td height="30" width="200" valign="top" style="padding-top:10px;">Поле в базе данных</td>
     <td valign="top" style="padding-top:7px;"><input type="text" id="fieldDBName" style="width:200px;height:25px;padding-left:3px;"
-	placeholder="Латинские a-z, 0-9 и _" pattern="^[a-z]{1}[a-z0-9_]{2,19}$" maxlength="20"
+	placeholder="Латинские a-z, A-Z, 0-9 и _" pattern="^[a-zA-Z]{1}[a-zA-Z0-9_]{2,19}$" maxlength="20"
 	<? if($filter['link']!=''){ ?>class="inputok"<? } ?> value="<?=$filter['link']?>" />
 	</td>
   </tr>
-  <tr id="tr_fieldLength" style=";<? if(preg_match("/^double(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
+  <tr id="tr_fieldLength" style=";<? if(
+  		preg_match("/^double(:?|$)/", $filter['datatype'])
+  		|| preg_match("/^virtual(:?|$)/", $filter['datatype'])
+		|| preg_match("/^text(:?|$)/", $filter['datatype'])
+		|| preg_match("/^datetime(:?|$)/", $filter['datatype'])
+  ){ ?>display:none;<? } ?>">
     <td height="30" width="200" valign="top" style="padding-top:10px;">Длина поля</td>
     <td valign="top" style="padding-top:7px;"><input type="text" id="fieldDataLength" style="width:35px;height:25px;padding-left:3px;"
 	placeholder="" pattern="^[0-9]{1,3}$" maxlength="3" value="<?=$filter['datalength']?>" />
 	</td>
   </tr>
-  <tr>
+  <tr id="tr_fieldDefault" style=";<? if(preg_match("/^virtual(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
     <td height="30" width="200" valign="top" style="padding-top:10px;">Значение по умолчанию</td>
     <td valign="top" style="padding-top:7px;">
 	<input type="text" id="fieldDataDefault" style="width:200px;height:25px;padding-left:3px;" value="<?=$filter['datadefault']?>" />
+	</td>
+  </tr>
+  
+  <tr id="tr_fieldVirtualTable" style=";<? if(!preg_match("/^virtual(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
+    <td height="30" width="200" valign="" style="padding-top:5px;">Таблица с данными</td>
+    <td valign="" style="">
+	<? if(is_array($tablesWIthPorts)){ ?><select id="portsTables" style="width:200px;height:25px;" onchange="setConnectors(this.value)">
+	<option></option><? foreach($tablesWIthPorts as $table){ ?>
+		<option value="<?=$table['link']?>:<?=$table['id']?>"
+		<? if($table['link']==$filter['config']['connectors']['table']){?>selected<? } ?> ><?=$table['name']?></option>
+	<? } ?></select><? } ?>
+	</td>
+  </tr>
+  <tr id="tr_fieldVirtual" style=";<? if(!preg_match("/^virtual(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
+    <td width="200" height="30" valign="top" style="padding-top:12px;">Коннекторы &nbsp;&nbsp;
+	<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/plus_whitebg.gif" title="Добавить коннектор"
+	style="cursor:pointer;border-radius:10px;" onclick="addNewConnector()" align="absmiddle"></td>
+	<td height="30" width="200" valign="top">
+		<table width="100%" cellpadding="0" cellspacing="0" border="0" id="connectorsTable"
+		style="display:<? if($panel['external']=='1'){ echo "none"; } ?>" >
+			<? foreach($filter['config']['connectors']['fields'] as $ckey=>$connector){ ?>
+			<tr>
+				<td height="30">
+				<? //echo "<pre>"; print_r($connector); echo "</pre>"; ?>
+				<input type="text" id="connector_<?=$ckey?>" value="<?=$connector['connector']?>"
+				onfocus="this.style.backgroundColor=''" style="width:100px;height:25px;padding-left:3px;" />
+				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/connector.gif" style="position:absolute;margin-left:5px;margin-top:5px;">
+				<? if(is_array($ports)){ ?><select id="portsFields_<?=$ckey?>" onfocus="this.style.backgroundColor=''"
+				style="width:200px;height:25px;margin-left:40px;">
+				<option value=""></option><? foreach($ports as $port){
+				$prega = "/^".$filter['config']['connectors']['table']."\./";
+				if(preg_match($prega, $port['port'])){ ?>
+					<option value="<?=$port['port']?>:<?=$port['id']?>" <? if($port['port']==$connector['port']){?>selected<? }?> ><?=$port['port']?></option>
+				<? }} ?></select><? } ?>
+				</td>
+				<td width="30"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/delete.gif" title="Удалить коннектор"
+				style="cursor:pointer;" onclick="deleteConnector(this)" class="delimg_intable"></td>
+			</tr>
+			<? } ?>
+		</table>
+		<script>inputPreloader(document.getElementById("addNewTable"), 'testUseTable');</script>
 	</td>
   </tr>
   
@@ -289,6 +341,82 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 </div></div>
 <script>
 //*********************************
+function addNewConnector(){
+	var table = document.getElementById("connectorsTable");
+	var newRow = table.insertRow();
+	//console.log(table.rows.length);
+	var has = false;	
+	if(document.getElementById("portsFields_0")){
+		var option = document.getElementById("portsFields_0").getElementsByTagName("option")[1];
+		var selInner = "";
+		selInner = document.getElementById("portsFields_0").innerHTML;
+		cLength = table.rows.length;
+		has = true;
+	}else{
+		cLength = '1';
+	}
+	var inner = "<td height=\"30\"><input type=\"text\" id=\"connector_"+(cLength-1)+"\" ";
+	inner += "style=\"width:100px;height:25px;padding-left:3px;\" onfocus=\"this.style.backgroundColor=''\" /> ";
+	inner += "<img src=\""+(__GLOBALS['adminBase'])+"/template/images/green/icons/connector.gif\" ";
+	inner += "style=\"position:absolute;margin-left:5px;margin-top:5px;\"> ";
+	inner += "<select id=\"portsFields_"+(cLength-1)+"\" style=\"width:200px;height:25px;margin-left:40px;\" ";
+	inner += "onfocus=\"this.style.backgroundColor=''\" > ";
+	if(has){
+		inner += selInner;
+	}
+	inner += "</select>";
+	inner += "</td><td width=\"30\"><img src=\""+(__GLOBALS['adminBase'])+"/template/images/green/icons/delete.gif\" ";
+	inner += " title=\"Удалить коннектор\" style=\"cursor:pointer;\" onclick=\"deleteConnector(this)\" class=\"delimg_intable\"></td>";
+	newRow.innerHTML = inner;
+	if(has){
+		document.getElementById("portsFields_"+(cLength-1)).getElementsByTagName("option")[0].selected = true;
+	}else{
+		setConnectors(document.getElementById("portsTables").value);
+	}
+}
+//*********************************
+function deleteConnector(sobj){
+	var obj = sobj.parentNode.parentNode;
+	obj.parentNode.removeChild(obj);
+}
+//*********************************
+function setConnectors(tableName){
+	tableName = tableName.split(":")[0];
+	var objs = document.getElementById("portsFields").getElementsByTagName("option");
+	var sels = document.getElementById("connectorsTable").getElementsByTagName("select");
+	for(var jj=0; jj<sels.length; jj++){
+		var sel = sels[jj];
+		sel.value = "";
+		var inner = "<option></option>";
+		for(var j=0; j<objs.length; j++){
+			var obj = objs[j];
+			if(obj.value.split(".")[0]==tableName){
+				//console.log(obj.value+"::"+obj.innerHTML);
+				inner += "<option value=\""+obj.value+"\">"+(obj.value.split(":")[0])+"</option>";
+			}
+		}
+		sel.innerHTML = inner;
+	}
+}
+//*********************************
+function getPorts(){
+	var paction =  "ajax=getTablesPorts&fieldId="+<?=$filter['id']?>;
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+		//	console.log(html);
+		//	var data = eval("("+html+")");
+		//	if(data.return=='ok'){
+		//		getData('<?=$GLOBALS['adminBase']?>/?option=filters,parents=<?=$params['parents']?>');
+		//	}else{
+		//		alert("Ошибка редактирования");
+		//	}
+		}
+	});
+}
+//*********************************
 function saveFilterField(){
 	var paction =  "ajax=saveFilterField";
 	paction += "&fieldId=<?=$filter['id']?>";
@@ -304,7 +432,11 @@ function saveFilterField(){
 		return false;
 	}
 	var type = document.getElementById("fieldDataType").value;
+	console.log("type="+type);
 	paction += "&fieldDataType="+type;
+	if(document.getElementById("fieldDataSubype_"+type) && document.getElementById("fieldDataSubype_"+type).value!=""){
+		paction += ":"+document.getElementById("fieldDataSubype_"+type).value;
+	}
 	//********************
 	var dbField = document.getElementById("fieldDBName");
 	if(dbField.className.match(/ ?inputok ?/gi)){
@@ -314,22 +446,47 @@ function saveFilterField(){
 		return false;
 	}
 	//********************
-	if(document.getElementById("fieldDataSubype_"+type).value!=""){
-		paction += ":"+document.getElementById("fieldDataSubype_"+type).value;
-	}
-	//********************
-	if(type!="double" && type!="text"){
+	if(type!="double" && type!="text" && type!="datetime" && type!="virtual"){
 		var lenObj = document.getElementById("fieldDataLength");
 		if(!lenObj.value.match(/^[0-9]{1,3}$/gi) || lenObj.value=='' || lenObj.value=='0'){
 			document.getElementById("fieldDataLength").style.backgroundColor = '#FDDDD9';
 			return false;
 		}
+		paction += "&fieldDataLength="+document.getElementById("fieldDataLength").value;
 	}
 	//********************
-	paction += "&fieldDataLength="+document.getElementById("fieldDataLength").value;
-	paction += "&fieldDataDefault="+encodeURIComponent(document.getElementById("fieldDataDefault").value);
+	if(document.getElementById("tr_fieldDefault").style.display!="none"){
+		paction += "&fieldDataDefault="+encodeURIComponent(document.getElementById("fieldDataDefault").value);
+	}
+	//********************
+	if(type=="virtual"){
+		var json = '{"connectors":{"table":"images","fields":{';
+		var sjson = '';
+		var sels = document.getElementById("connectorsTable").getElementsByTagName("select");
+		for(var j=0; j<sels.length; j++){
+			if(document.getElementById("connector_"+j).value==''){
+				document.getElementById("connector_"+j).style.backgroundColor = '#FDDDD9';
+				return false;
+			}
+			if(document.getElementById("portsFields_"+j).value==''){
+				document.getElementById("portsFields_"+j).style.backgroundColor = '#FDDDD9';
+				return false;
+			}
+			sjson += '"'+j+'":{';
+			sjson += '"connector":"'+document.getElementById("connector_"+j).value+'",';
+			sjson += '"port":"'+document.getElementById("portsFields_"+j).value.split(":")[0]+'"';
+			sjson += '},';
+		}
+		json += sjson.replace(/,$/gi, '');
+		json += '}}}';
+		//"0":{"connector":"table","port":"images.table"},
+		//"1":{"connector":"table.id","port":"images.externalId"}';
+		//paction += "&config="+json;
+		paction += "&config="+encodeURIComponent(json);
+	}
+	//********************
 	
-	startPreloader();
+	//startPreloader();
 	//console.log(paction);
 	//return false;
 	
@@ -363,6 +520,11 @@ function filterTypeProperties(){
 			}
 		}
 	}
+	//*************************
+	document.getElementById("tr_fieldDBName").style.display = "";
+	document.getElementById("tr_fieldDefault").style.display = "";
+	document.getElementById("tr_fieldVirtual").style.display = "none";
+	document.getElementById("tr_fieldVirtualTable").style.display = "none";
 	if(type=="varchar"){
 		document.getElementById("tr_fieldLength").style.display = "";
 	}else if(type=="double"){
@@ -371,6 +533,16 @@ function filterTypeProperties(){
 		document.getElementById("tr_fieldLength").style.display = "";
 	}else if(type=="text"){
 		document.getElementById("tr_fieldLength").style.display = "none";
+	}else if(type=="datetime"){
+		document.getElementById("tr_fieldLength").style.display = "none";
+		document.getElementById("tr_fieldDefault").style.display = "none";
+	}else if(type=="virtual"){
+		document.getElementById("tr_fieldDBName").style.display = "none";
+		document.getElementById("tr_fieldLength").style.display = "none";
+		document.getElementById("tr_fieldDefault").style.display = "none";
+		document.getElementById("tr_fieldVirtual").style.display = "";
+		document.getElementById("tr_fieldVirtualTable").style.display = "";
+		getPorts();
 	}
 	var selObj = document.getElementById("fieldDataType").getElementsByTagName("option")[0];
 	if(selObj.innerHTML==''){

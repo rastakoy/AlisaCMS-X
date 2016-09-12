@@ -111,9 +111,25 @@ function constructBranch(option, data, parent){
 	return inner;
 }
 //************************************************
-
-//************************************************
-
+function toggleVisible(option, itemId){
+	var obj = document.getElementById("glaz_"+itemId);
+	src = obj.getAttribute("src");
+	if(src.match(/glaz\.gif$/gi)){
+		var paction =  "ajax=toggleVisible&option="+option+"&itemId="+itemId+"&value=0";
+		obj.src = obj.src.replace(/glaz\.gif$/gi, 'glaz_no.gif');
+	}else{
+		var paction =  "ajax=toggleVisible&option="+option+"&itemId="+itemId+"&value=1";
+		obj.src = obj.src.replace(/glaz_no\.gif$/gi, 'glaz.gif');
+	}
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			//console.log(html);
+		}
+	});
+}
 //************************************************
 
 //************************************************

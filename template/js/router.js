@@ -698,6 +698,9 @@ function __popup(myStyle){
 		obj_w.style.width = myStyle.width;
 		if(myStyle.height){
 			obj_w.style.height = myStyle.height;
+			if($(obj_w).height()>wwheight - 100){
+				obj_w.style.height = (wwheight - 100)+"px";
+			}
 		}else{
 			obj_w.style.height = (wwheight - 100)+"px";
 		}

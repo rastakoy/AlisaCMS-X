@@ -43,22 +43,22 @@ class Filters extends DatabaseInterface{
 		//echo "<pre>"; print_r($array); echo "</pre>";
 		//******************************
 		if(count($array)=='1' && $array['0']=='filters'){
-			$q = "SELECT * FROM `filters` WHERE `parent`='0' ORDER BY `prior` ASC ";
+			$q = "SELECT * FROM `filters` WHERE `parent`='0' AND `visible`='1' ORDER BY `prior` ASC ";
 		}elseif(count($array)>='2' && $array['0']=='filters' && $array['1']!='editfilter'){
-			$q = "SELECT * FROM `filters` WHERE `link`='$array[1]' AND `parent`='0' LIMIT 0,1 ";
+			$q = "SELECT * FROM `filters` WHERE `link`='$array[1]' AND `parent`='0' AND `visible`='1' LIMIT 0,1 ";
 			//echo $q."\n";
 			$query = $this->query($q);
 			if($query->num_rows=='0'){
-				$q = "SELECT * FROM `filters` WHERE `id`='$array[1]' LIMIT 0,1 ";
+				$q = "SELECT * FROM `filters` WHERE `id`='$array[1]' AND `visible`='1' LIMIT 0,1 ";
 				$query = $this->query($q);
 				$parent = $query->fetch_assoc();
 			}else{
 				$parent = $query->fetch_assoc();
 			}
 			//print_r($parent);
-			$q = "SELECT * FROM `filters` WHERE `parent`='$parent[id]' ORDER BY `prior` ASC ";
+			$q = "SELECT * FROM `filters` WHERE `parent`='$parent[id]' AND `visible`='1' ORDER BY `prior` ASC ";
 		}elseif(count($array)>='2' && $array['0']=='filters' && $array['1']=='editfilter'){
-			$q = "SELECT * FROM `filters` WHERE `parent`='0' ORDER BY `prior` ASC ";
+			$q = "SELECT * FROM `filters` WHERE `parent`='0' AND `visible`='1' ORDER BY `prior` ASC ";
 		}
 		//echo $q;
 		$query = $this->query($q);
@@ -334,6 +334,9 @@ class Filters extends DatabaseInterface{
 		$data .= "`datalength`='$array[fieldDataLength]', ";
 		$data .= "`datadefault`='$array[fieldDataDefault]', ";
 		$data .= "`tmp`='0', ";
+		if($array['fieldDataType']=='virtual'){
+			$data .= "`config`='$array[config]', ";
+		}
 		
 		$data = preg_replace("/, ?$/", "", $data);
 		$q = str_replace("%data%", $data, $q);
@@ -591,37 +594,169 @@ class Filters extends DatabaseInterface{
 	/**
 	
 	*/
-	function testForConformance($array){
+	function testForConformance($array, $json=true){
 		$admin = new Admin();
 		$table = $array['table'];
+		$tableMain = $table;
 		$filter = $array['filter'];
 		//********************
 		$fields = $this->getFieldsFromTable($table);
 		$templateFields = $this->getFilterDataFromId($filter);
-		//print_r($fields);
-		//print_r($templateFields);
+		//echo "<pre>"; print_r($fields); echo "</pre>";
+		//echo "<pre>"; print_r($templateFields); echo "</pre>";
 		$errors = false;
 		foreach($templateFields as $field){
 			$toError = '1';
 			$mass = false;
 			foreach($fields as $tableField){
 				if($field['link']==$tableField['Field']){
-					$prega = "/^$tableField[Field](:|$)/";
-					//echo "$field[link] -- совпало\n";
-					$toError = '-1';
-					//$mass = $field;
+					$toError = '2';
+					$ftype = preg_replace("/\(.*$/", "", $tableField['Type']);
+					$prega = "/^$ftype(:|$)/";
+					if(preg_match($prega, $field['datatype'])){
+						$toError = '-1';
+					}
 				}
 			}
-			if($toError=='1'){
-				$field['conformance'] = '0';
+			//*****************************
+			// Проверка виртуального поля
+			if($toError=='1' && preg_match("/^virtual(:|$)/", $field['datatype'])){
+				//$table = explode(":", $field['datatype']);
+				//$rule = $table['2'];
+				//$table = $table['1'];
+				//$table = $field['id'];
+				$config = json_decode(iconv("CP1251", "UTF-8", $field['config']), true);
+				//echo "<pre>"; print_r($config); echo "</pre>";
+				$table = $config['connectors']['table'];
+				foreach($config['connectors']['fields'] as $conn){
+					//echo "<pre>"; print_r($conn); echo "</pre>";
+					$port = "`".str_replace(".", "`.`", $conn['port'])."`";
+					$data .= " AND $port ";
+				}
+				$data = preg_replace("/^ ?AND/", "", $data);
+				$q = "SELECT * FROM `$table` WHERE $data LIMIT 0,1 ";
+				//echo $q."\n";
+				$query = $this->query($q);
+				if($query){
+					$toError = '-1';
+				}else{
+					$toError = '3';
+				}
+			}
+			//*****************************
+			if($toError>0){
+				$field['conformance'] = $toError;
+				if($toError=='3'){
+					//$field['conformanceError'] = "В указанной таблице не найден один из портов";
+				}
 				$errors[] = $field;
 			}else{
-				$field['conformance'] = '1';
+				$field['conformance'] = '0';
 				$errors[] = $field;
 			}
 		}
-		print_r($errors);
-		//echo "$table:$filter";
+		//echo "<pre>"; print_r($errors); echo "</pre>";
+		if($json){
+			$data = array("table"=>$tableMain, "filter"=>$filter, "data"=>$errors);
+			$data = $admin->iconvArray($data, "CP1251", "UTF-8");
+			$data = json_encode($data);
+			return $data;
+		}
+		return $errors;
+	}
+	
+	/**
+	
+	*/
+	function getTablesHasPorts($array=false){
+		$fieldId = $array['fieldId'];
+		if($fieldId){
+			$query = $this->query("SELECT * FROM `filters` WHERE `id`='$fieldId' ");
+			$field = $query->fetch_assoc();
+			$query = $this->query("SELECT * FROM `filters` WHERE `id`='$field[parent]' ");
+			$parent = $query->fetch_assoc();
+		}
+		$filtersCatalog = $this->getRootFilters();
+		foreach($filtersCatalog as $filter){
+			$hasPort = false;
+			if($filter['id']!=$parent['id'] || !$fieldId){
+				$fields = $this->getFilterDataFromId($filter['id']);
+				foreach($fields as $field){
+					if(preg_match("/:port(:|$)/", $field['datatype'])){
+						$hasPort = true;
+					}
+				}
+				//***************
+				if($hasPort){
+					$return[] = $filter;
+				}
+			}
+		}
+		//print_r($return);
+		return $return;
+	}
+	
+	/**
+	
+	*/
+	function getTablesPorts($array=false){
+		$fieldId = $array['fieldId'];
+		$filterId = $array['filterId'];
+		if($fieldId){
+			$query = $this->query("SELECT * FROM `filters` WHERE `id`='$fieldId' ");
+			$field = $query->fetch_assoc();
+			$query = $this->query("SELECT * FROM `filters` WHERE `id`='$field[parent]' ");
+			$parent = $query->fetch_assoc();
+		}
+		$filtersCatalog = $this->getRootFilters();
+		foreach($filtersCatalog as $filter){
+			if(  (($filter['id']!=$parent['id'] || !$fieldId) && !$filterId)  ||  ($filterId==$filter['id'])  ){
+				$fields = $this->getFilterDataFromId($filter['id']);
+				foreach($fields as $field){
+					if(preg_match("/:port(:|$)/", $field['datatype'])){
+						$field['name'] = $filter['name']." . ".$field['name'];
+						$field['port'] = $filter['link'].".".$field['link'];
+						$return[] = $field;
+					}
+				}
+			}
+		}
+		//print_r($return);
+		return $return;
+	}
+	
+	/**
+	
+	*/
+	function repareTableFields($array){
+		$table = $array['table'];
+		$field = $array['field'];
+		//********************
+		$array = $this->testForConformance($array, false);
+		//echo "<pre>"; print_r($array); echo "</pre>";
+		//********************
+		foreach($array as $error){
+			if($error['conformance']>0){
+				$errors[] = $error;
+			}
+		}
+		//********************
+		//echo "<pre>"; print_r($errors); echo "</pre>";
+		foreach($errors as $error){
+			$type = strtoupper(preg_replace("/:.*$/", "", $error['datatype']));
+			if($error['datalength']){
+				$length = "($error[datalength])";
+			}
+			if($error['conformance']=='2'){
+				$q = "ALTER TABLE  `$table` CHANGE  `$error[link]`  `$error[link]` $type$length NOT NULL";
+				echo $q."\n";
+				$query = $this->query($q);
+			}elseif($error['conformance']=='1'){
+				$q = "ALTER TABLE `$table` ADD `$error[link]` $type$length NOT NULL";
+				echo $q."\n";
+				$query = $this->query($q);
+			}
+		}
 	}
 	
 	/**

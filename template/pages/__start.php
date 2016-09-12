@@ -47,14 +47,14 @@ style="display:<? if($panel['external']=='1'){ echo "none"; } ?>" >
 		<td><select id="internalTableSelect" style="width:150px;height:25px;"><? foreach($freeTables as $ftable){ ?>
 		<option value="<?=$ftable?>" <? if($ftable==$panel['link']){ echo "selected"; } ?> ><?=$ftable?></option>
 		<? } ?></select>
-		<button style="width:150px;height:25px;">Удалить таблицу</button>
+		<button style="width:160px;height:25px;">Управление таблицами</button>
 		</td>
 	</tr>
 	<tr>
 		<td width="150" height="30">&nbsp;</td>
 		<td><input type="text" id="addNewTable" style="width:150px;height:25px;padding-right:20px;padding-left:3px;"
 		placeholder="table name" pattern="^[a-z]{1}[a-z0-9_]{2,19}$" maxlength="20">
-		<button style="width:150px;height:25px;" onclick="addNewTable()">Добавить таблицу</button>
+		<button style="width:160px;height:25px;" onclick="addNewTable()">Добавить таблицу</button>
 		</td>
 	</tr>
 </table>
@@ -74,7 +74,7 @@ style="display:<? if($panel['external']=='0'){ echo "none"; } ?>" >
 		<td><select id="filterSelect" style="width:150px;height:25px;"><? foreach($filters as $filter){ ?>
 		<option value="<?=$filter['id']?>" <? if($panel['filter']==$filter['id']){ echo "selected"; } ?> ><?=$filter['name']?></option>
 		<? } ?></select>
-		<button style="width:150px;height:25px;" onclick="testForConformance()">Проверить таблицу</button>
+		<button style="width:160px;height:25px;" onclick="testForConformance()">Проверить таблицу</button>
 		</td>
 	</tr>
 </table>
@@ -229,21 +229,9 @@ style="display:<? if($panel['external']=='0'){ echo "none"; } ?>" >
 </div>
 <script>
 //*********************************************************
-function testForConformance(){
-	var paction = "ajax=testForConformance";
-	paction += "&table="+document.getElementById("internalTableSelect").value;
-	paction += "&filter="+document.getElementById("filterSelect").value;
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			console.log(html);
-			__popup({"width":"400","height":"300"});
-			document.getElementById("popup_cont").innerHTML = "ASD<br/>asd dsa<br>test";
-		}
-	});
-}
+
+//*********************************************************
+
 //*********************************************************
 function constructTitles(){
 	var titleType = document.getElementById("titleType").value;

@@ -623,6 +623,7 @@ if(is_array($item['0'])){   $item = $item['0'];   }
 //echo "<pre>"; print_r($fields); echo "</pre>";
 //echo "<pre>"; print_r($titles); echo "</pre>";
 if(count($GLOBALS['languages'])>1){ ?>
+<script>var fieldsObject = <?=$fieldsJSON?>;console.log(fieldsObject);</script>
 <div class="languagesTabs"><? foreach($GLOBALS['languages'] as $key=>$lang){ ?>
 	<span <?
 	if((!$params['lang'] && $key==$GLOBALS['language']) || $params['lang']==$key){
@@ -982,7 +983,10 @@ if($item['folder']=='1' && $titles['0']!='static') { //Выписываем дирректорию
 	<div class="div_myitemname" style="padding-top: 0px;">
 		<table id="folder_1" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
 			<td height="34" width="20"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif" id="imgcheck_1" width="16" height="16" border="0" class="items_select_all" style="cursor:pointer" onclick="toggle_item_check(1)"></td>
-			<td height="34" width="20"><a href="javascript:toggle_page_show(1)" title="Отображение страницы в сайте"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/glaz.gif" id="glaz_1" width="16" height="16" border="0"></a></td>
+			<td height="34" width="20"><a href="javascript:" title="Отображение группы"><img
+			src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/glaz<? if($item['visible']=='0'){ ?>_no<? } ?>.gif"
+			id="glaz_<?=$item['id']?>" width="16" height="16" border="0"
+			onclick="toggleVisible('<?=$params['option']?>','<?=$item['id']?>')"></a></td>
 			<? if($option['useimg']=='1'){ ?>
 				<? if($lnk){ ?><td height="34" width="50" align="center" style="background-image:url(<?=$GLOBALS['adminBase']?>/template/images/itemFolder.jpg);background-repeat:no-repeat;">
 					<img src="/loadimages/<?=$lnk?>" width="24" height="18" border="1" class="imggal" align="absmiddle" style="margin-right:5px;margin-top:3px;">
@@ -1010,7 +1014,10 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 	?>background-color:#CCCCCC;<? } ?>">
 		<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
 			<td height="34" width="20"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif" id="imgcheck_105" width="16" height="16" border="0" class="items_select_all" style="cursor:pointer" onclick="toggle_item_check(105)"></td>
-			<td height="34" width="20"><a href="javascript:toggle_page_show(105)" title="Отображение страницы в сайте"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/glaz.gif" id="glaz_105" width="16" height="16" border="0"></a></td>
+			<td height="34" width="20"><a href="javascript:" title="Отображение страницы в сайте"><img
+			src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/glaz<? if($item['visible']=='0'){ ?>_no<? } ?>.gif"
+			id="glaz_<?=$item['id']?>" width="16" height="16" border="0"
+			onclick="toggleVisible('<?=$params['option']?>','<?=$item['id']?>')"></a></td>
 			<? if($option['useimg']=='1'){ ?>
 				<td height="34" width="20">
 				<? if($lnk){ ?>

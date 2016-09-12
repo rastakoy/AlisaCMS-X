@@ -346,6 +346,16 @@ switch($array['ajax']){
 	case 'testForConformance':
 		echo $classFilters->testForConformance($array);
 		break;
+	case 'repareTableFields':
+		echo $classFilters->repareTableFields($array);
+		break;
+	case 'getTablesPorts':
+		echo $classFilters->getTablesPorts($array);
+		break;
+	case 'toggleVisible':
+		$array['field'] = 'visible';
+		echo $classData->toggleData($array);
+		break;
 	default:
 		//Значение параметра ajax по-умолчанию
 		break;

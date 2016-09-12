@@ -140,6 +140,8 @@ class Core extends DatabaseInterface{
 								$filter = $classFilters->getFilterClass($params['itemId']);
 								$options = $classData->getOptions();
 								$filterOption = $classMenuSettings->getMenuItemByName($params['option']);
+								$ports = $classFilters->getTablesPorts();
+								$tablesWIthPorts = $classFilters->getTablesHasPorts();
 								if(is_array($GLOBALS['languages'])){ foreach($GLOBALS['languages'] as $key=>$lang){
 									$dataBases = $classLanguages->getDataBases(array("0"=>$filterOption), $key);
 									//echo "<pre>"; print_r($dataBases); echo "</pre>";
@@ -160,6 +162,7 @@ class Core extends DatabaseInterface{
 								$filter['link'] = $option['filter'];
 							}
 							$fields = $classFilters->getFilters(array("filters",$filter['link']));
+							$fieldsJSON = json_encode($admin->iconvArray($fields, "CP1251", "UTF-8"));
 							//echo "<pre>"; print_r($fields); echo "</pre>";
 						}else{
 							if($classData->isExternal($params['option'])){

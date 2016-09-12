@@ -62,6 +62,7 @@ class DatabaseInterface extends Mysqli{
 		$exceptions[] = "UPDATE";
 		$exceptions[] = "INSERT";
 		$exceptions[] = "CREATE";
+		$exceptions[] = "ALTER";
 		$exceptions[] = "`admins`";
 		$exceptions[] = "`settings`";
 		$exceptions[] = "`menusettings`";

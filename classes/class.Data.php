@@ -633,6 +633,27 @@ class Data extends DatabaseInterface{
 	/**
 	
 	*/
+	function toggleData($array){
+		if(!isset($array['value'])){
+			$q = "SELECT * FROM `$array[option]` WHERE `id`='$array[itemId]' ";
+			$query = $this->query($q);
+			$item = $query->fetch_assoc();
+			if($item[$array['field']]=='1'){
+				$value = '0';
+			}else{
+				$value = '1';
+			}
+		}else{
+			$value = $array['value'];
+		}
+		$q = "UPDATE `$array[option]` SET `$array[field]`='$value' WHERE `id`='$array[itemId]' ";
+		echo $q;
+		$query = $this->query($q);
+	}
+	
+	/**
+	
+	*/
 	//function foo($array){
 	//	
 	//}
