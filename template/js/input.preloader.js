@@ -20,17 +20,17 @@ function inputPreloader(object, ajax, preloaderParams){
 			paction += "&elementId="+this.id;
 			if(typeof preloaderParams=='object'){
 				for(var j in preloaderParams){
-					paction += "&"+j+"="+preloaderParams[j];
+					paction += "&"+j+"="+encodeURIComponent(preloaderParams[j]);
 				}
 			}
-			//console.log(paction);
+			console.log(paction);
 			object.oldValue = this.value;
 			$.ajax({
 				type: "POST",
 				url: __ajax_url,
 				data: paction,
 				success: function(html) {
-					//console.log(html);
+					console.log(html);
 					html = (html=='')?'{}':html;
 					var data = eval("("+html+")");
 					var object = document.getElementById(data.elementId);
@@ -39,6 +39,9 @@ function inputPreloader(object, ajax, preloaderParams){
 						object.className += (object.className=='')?'inputok':' inputok';
 					}else{
 						object.className += (object.className=='')?'inputfalse':' inputfalse';
+					}
+					if(data.callback){
+						data.callback();
 					}
 				}
 			});

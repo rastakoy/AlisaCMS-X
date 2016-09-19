@@ -69,7 +69,7 @@ class Filters extends DatabaseInterface{
 					$filter['default'] = '1';
 				}
 			}
-			$config = json_decode($filter['config'], true);
+			$config = json_decode(iconv("CP1251", "UTF-8", $filter['config']), true);
 			if($config['filtertype']=='8'){
 				$options = MenuSettings::getMenu();
 				foreach($options as $option){if($option['external']=='1'){$externals[$option['id']]=$option;}}
@@ -213,7 +213,7 @@ class Filters extends DatabaseInterface{
 		$filter = $query->fetch_assoc();
 		$itemId = $filter['id'];
 		//**************************
-		$config = json_decode($filter['config'], true);
+		$config = json_decode(iconv("CP1251", "UTF-8", $filter['config']), true);
 		$filter['filtertype'] = $config['filtertype'];
 		$filter['datatype'] = $config['datatype'];
 		$filter['fieldname'] = $config['fieldname'];
@@ -232,10 +232,17 @@ class Filters extends DatabaseInterface{
 	
 	*/
 	function getFilterClass($filterId){
+		$admin = new Admin();
 		$q = "SELECT * FROM `filters` WHERE `id`='$filterId' ";
 		$query = $this->query($q);
 		$filter = $query->fetch_assoc();
-		$config = json_decode($filter['config'], true);
+		$config = $admin->jsonDecode($filter['config']);
+	//	if($admin->testStringFor1251($filter['config'])){
+	//		$config = json_decode(iconv("CP1251", "UTF-8", $filter['config']), true);
+	//		$config = $admin->iconvArray($config, "UTF-8", "CP1251");
+	//	}else{
+	//		$config = json_decode($filter['config'], true);
+	//	}
 		//$filter['filtertype'] = $config['filtertype'];
 		//$filter['datatype'] = $config['datatype'];
 		//$filter['fieldname'] = $config['fieldname'];
@@ -588,7 +595,13 @@ class Filters extends DatabaseInterface{
 			}
 		}
 		//****************************
-		return "{\"return\":\"$return\",\"elementId\":\"$array[elementId]\"}";
+		//echo $array['callback'];
+		$string  = "{\"return\":\"$return\",\"elementId\":\"$array[elementId]\"";
+		if($array['callback']){
+			$string .= ",\"callback\":$array[callback]";
+		}
+		$string .= "}";
+		return $string;
 	}
 	
 	/**
@@ -610,9 +623,11 @@ class Filters extends DatabaseInterface{
 			$mass = false;
 			foreach($fields as $tableField){
 				if($field['link']==$tableField['Field']){
+				//echo "$field[link]==$tableField[Field]\n";
 					$toError = '2';
 					$ftype = preg_replace("/\(.*$/", "", $tableField['Type']);
 					$prega = "/^$ftype(:|$)/";
+					//echo "prega = $prega ($ftype) \n";
 					if(preg_match($prega, $field['datatype'])){
 						$toError = '-1';
 					}
@@ -757,6 +772,79 @@ class Filters extends DatabaseInterface{
 				$query = $this->query($q);
 			}
 		}
+	}
+	
+	/**
+	
+	*/
+	function makeConnectors($filter){
+		$classData = new Data();
+		//******************************
+		if(!$filter['config']['connector']['table']){
+			return $filter;
+		}
+		$table = $filter['config']['connector']['table'];
+		//******************************
+		//echo "<pre>"; print_r($filter['config']['connector']); echo "</pre>";
+		$q = "SELECT * FROM `menusettings` WHERE `link`='$table' LIMIT 0,1 ";
+		//echo $q."<br/>\n";
+		$query = $this->query($q);
+		if(!$query){
+			return $filter;
+		}
+		$option = $query->fetch_assoc();
+		//******************************
+		$titles = $classData->constructTitles($option['title']);
+		//echo "<pre>"; print_r($titles); echo "</pre>";
+		if($titles['0']=='catalog'){
+			$filter['config']['connector']['data'] = "error";
+			return $filter;
+		}
+		$data = false;
+		$default = '0';
+		foreach($titles['1']['0'] as $key=>$value){
+			$data[$key]['name'] = $value;
+			$data[$key]['field'] = $filter['config']['connector']['data'][$key]['field'];
+			$data[$key]['fieldName'] = $filter['config']['connector']['data'][$key]['fieldName'];
+			$data[$key]['default'] = $filter['config']['connector']['data'][$key]['default'];
+			$values = false;
+			if($default!='-1'){
+				$q = "SELECT * FROM `".$filter['config']['connector']['table']."` WHERE `parent`='$default' ORDER BY `prior` ASC ";
+				$query = $this->query($q);
+				if($query){
+					while($value=$query->fetch_assoc()){
+						$values[] = $value;
+					}
+				}
+				$data[$key]['values'] = $values;
+				$default = '-1';
+				if($data[$key]['default']!=''){
+					$default = $data[$key]['default'];
+				}
+			}
+		}
+		$filter['config']['connector']['data'] = $data;
+		//echo "<pre>"; print_r($filter); echo "</pre>";
+		return $filter;
+	}
+	
+	/**
+	
+	*/
+	function changeConnectorTable($array, $json=true){
+		$admin = new Admin();
+		$filter = $this->getFilterClass($array['fieldId']);
+		$filter['config']['connector']['table'] = $array['table'];
+		$filter['config']['connector']['data'] = false;
+		$filter = $this->makeConnectors($filter);
+		if($json){
+			$connector = $filter['config']['connector'];
+			$connector = $admin->iconvArray($connector, "CP1251", "UTF-8");
+			$connector = json_encode($connector['data']);
+			return $connector;
+		}
+		return $filter['config']['connector']['data'];
+		//echo "<pre>"; print_r($filter); echo "</pre>";
 	}
 	
 	/**

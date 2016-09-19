@@ -172,19 +172,22 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 		<option value="virtual" <? if(preg_match("/^virtual(:?|$)/", $filter['datatype'])){ ?>selected<? } ?>>Виртуальное поле</option>
 	</select> <!--<strong>-›</strong>--> 
 	
-		<select onchange="" id="fieldDataSubype_int"
+		<select onchange="filterTypeProperties()" id="fieldDataSubtype_int"
 		style="width:140px;height:25px;<? if(!preg_match("/^int(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>" >
 			<option value="" >Не выбрано</option>
-			<option value="port" >Порт</option>
-			<option value="connector" >Коннектор</option>
+			<option value="port" <? if(preg_match("/:port$/", $filter['datatype'])){ ?>selected<? } ?> >Порт</option>
+			<option value="connector" <? if(preg_match("/:connector$/", $filter['datatype'])){ ?>selected<? } ?> >Коннектор</option>
+			<option value="checkbox" <? if(preg_match("/:checkbox$/", $filter['datatype'])){ ?>selected<? } ?> >Чекбокс (галочка)</option>
+			<option value="parent" <? if(preg_match("/:parent$/", $filter['datatype'])){ ?>selected<? } ?> >Родитель в дереве</option>
 		</select>
-	
-		<select onchange="" id="fieldDataSubype_double"
+		
+		<select onchange="" id="fieldDataSubtype_double"
 		style="width:140px;height:25px;<? if(!preg_match("/^double(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
 			<option value="" >Не выбрано</option>
+			<option value="price" <? if(preg_match("/:price$/", $filter['datatype'])){ ?>selected<? } ?>>Цена</option>
 		</select>
 	
-		<select onchange="" id="fieldDataSubype_varchar"
+		<select onchange="" id="fieldDataSubtype_varchar"
 		style="width:180px;height:25px;<? if(!preg_match("/^varchar(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
 			<option value="" >Не выбрано</option>
 			<option value="colors" <? if(preg_match("/:colors$/", $filter['datatype'])){ ?>selected<? } ?>>Окно выбора цвета</option>
@@ -193,14 +196,70 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 			<option value="connector" >Коннектор</option>
 		</select>
 		
-		<select onchange="" id="fieldDataSubype_text"
+		<select onchange="" id="fieldDataSubtype_text"
 		style="width:180px;height:25px;<? if(!preg_match("/^text(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
 			<option value="" >Не выбрано</option>
 			<option value="tinymce" <? if(preg_match("/:tinymce$/", $filter['datatype'])){ ?>selected<? } ?>>Редактор TinyMCE</option>
 		</select>
 	</td>
   </tr>
-  <tr id="tr_fieldDBName" style=";<? if(preg_match("/^virtual(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
+  
+  <tr id="tr_fieldConnector" style=";<? if(!preg_match("/:connector(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
+	<td colspan="2">
+	<fieldset  style="border:solid 1px #006600;">
+		<legend><b>Настройка коннектора</b></legend>
+		<table width="100%" border="0" cellspacing="1" cellpadding="1" id="table_connectorSettings">
+		<tr>
+			<td height="30" width="75" valign="top" style="padding-top:10px;">Данные из</td>
+			<td valign="top" style="padding-top:5px;"><select onchange="changeConnectorTable(this, '<?=$filter['id']?>')" id="fieldDataSubtype_int_connector"
+				style="width:150px;height:25px;<? if(!preg_match("/:connector(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>" >
+					<option value="" >Не выбрано</option>
+					<? foreach($options as $ctable){ if($ctable['link']!='filters'){ ?>
+						<option value="<?=$ctable['link']?>"
+						<? if($filter['config']['connector']['table']==$ctable['link']){ ?>selected<? } ?> ><?=$ctable['name']?></option>
+					<? }} ?>
+				</select>
+			</td>
+		</tr>
+		<? if(is_array($filter['config']['connector']['data'])){
+				foreach($filter['config']['connector']['data'] as $ckey=>$cmass){ ?>
+			<tr>
+				<td height="30" width="75" valign="top" style="padding-top:10px;"><?=$cmass['name']?></td>
+				<td valign="top" style="padding-top:5px;">
+					<input type="text" value="<?=$cmass['field']?>" id="connectorName_<?=$ckey?>" 
+					<? if(preg_match("/^[a-zA-Z]{1}[a-zA-Z0-9_]{2,20}$/", $cmass['field'])){ ?>class="inputok"<? } ?>
+					style="width:130px;height:25px;padding-left:3px;" placeholder="Название поля" />
+					<input type="text" value="<?=$cmass['fieldName']?>" id="psevdoName_<?=$ckey?>"
+					style="width:130px;height:25px;padding-left:3px;" placeholder="Псевдоним поля" />
+					<select onchange="changeConnectorFields(this)" id="intConnector_<?=$ckey?>"
+					style="width:130px;height:25px;" >
+						<option value="" >Не выбрано</option>
+						<? foreach($cmass['values'] as $cvalue){ ?>
+							<option value="<?=$cvalue['id']?>" <? if($cmass['default']==$cvalue['id']){ ?>selected<? } ?> ><?=$cvalue['name']?></option>
+						<? } ?>
+					</select> условие
+<script>
+	var preloaderParams = false;
+	preloaderParams = {
+		'parentId':'<?=$filter['parent']?>',
+		'callback':function(){
+			alert("Тестирование");
+		}
+	}
+	inputPreloader(document.getElementById("connectorName_<?=$ckey?>"), 'testFilterUseFieldName', preloaderParams);
+</script>
+				</td>
+			</tr>
+		<? }} ?>
+		</table>
+	</fieldset>
+	</td>
+  </tr>
+  
+  <tr id="tr_fieldDBName" style=";<? if(
+  		preg_match("/^virtual(:?|$)/", $filter['datatype'])
+		|| preg_match("/:connector(:?|$)/", $filter['datatype'])
+  ){ ?>display:none;<? } ?>">
     <td height="30" width="200" valign="top" style="padding-top:10px;">Поле в базе данных</td>
     <td valign="top" style="padding-top:7px;"><input type="text" id="fieldDBName" style="width:200px;height:25px;padding-left:3px;"
 	placeholder="Латинские a-z, A-Z, 0-9 и _" pattern="^[a-zA-Z]{1}[a-zA-Z0-9_]{2,19}$" maxlength="20"
@@ -212,13 +271,17 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
   		|| preg_match("/^virtual(:?|$)/", $filter['datatype'])
 		|| preg_match("/^text(:?|$)/", $filter['datatype'])
 		|| preg_match("/^datetime(:?|$)/", $filter['datatype'])
+		|| preg_match("/:connector(:?|$)/", $filter['datatype'])
   ){ ?>display:none;<? } ?>">
     <td height="30" width="200" valign="top" style="padding-top:10px;">Длина поля</td>
     <td valign="top" style="padding-top:7px;"><input type="text" id="fieldDataLength" style="width:35px;height:25px;padding-left:3px;"
 	placeholder="" pattern="^[0-9]{1,3}$" maxlength="3" value="<?=$filter['datalength']?>" />
 	</td>
   </tr>
-  <tr id="tr_fieldDefault" style=";<? if(preg_match("/^virtual(:?|$)/", $filter['datatype'])){ ?>display:none;<? } ?>">
+  <tr id="tr_fieldDefault" style=";<? if(
+  		preg_match("/^virtual(:?|$)/", $filter['datatype'])
+		|| preg_match("/:connector(:?|$)/", $filter['datatype'])
+  ){ ?>display:none;<? } ?>">
     <td height="30" width="200" valign="top" style="padding-top:10px;">Значение по умолчанию</td>
     <td valign="top" style="padding-top:7px;">
 	<input type="text" id="fieldDataDefault" style="width:200px;height:25px;padding-left:3px;" value="<?=$filter['datadefault']?>" />
@@ -341,6 +404,125 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 </div></div>
 <script>
 //*********************************
+function saveFilterField(){
+	var paction =  "ajax=saveFilterField";
+	paction += "&fieldId=<?=$filter['id']?>";
+	//********************
+	if(document.getElementById("fieldName").value==''){
+		document.getElementById("fieldName").style.backgroundColor = '#FDDDD9';
+		return false;
+	}
+	paction += "&fieldName="+encodeURIComponent(document.getElementById("fieldName").value);
+	//********************
+	if(document.getElementById("fieldDataType").value==''){
+		document.getElementById("fieldDataType").style.backgroundColor = '#FDDDD9';
+		return false;
+	}
+	var type = document.getElementById("fieldDataType").value;
+	var subtype = false;
+	console.log("type="+type);
+	paction += "&fieldDataType="+type;
+	if(document.getElementById("fieldDataSubtype_"+type) && document.getElementById("fieldDataSubtype_"+type).value!=""){
+		paction += ":"+document.getElementById("fieldDataSubtype_"+type).value;
+		subtype = document.getElementById("fieldDataSubtype_"+type).value;
+	}
+	//********************
+	var dbField = document.getElementById("fieldDBName");
+	if(document.getElementById("tr_fieldDBName").style.display=="none"){
+		//paction += "&fieldDBName=";
+	}else if(dbField.className.match(/ ?inputok ?/gi)){
+		paction += "&fieldDBName="+document.getElementById("fieldDBName").value;
+	}else{
+		dbField.style.backgroundColor = '#FDDDD9';
+		return false;
+	}
+	//********************
+	if(type!="double" && type!="text" && type!="datetime" && type!="virtual"){
+		var lenObj = document.getElementById("fieldDataLength");
+		if(!lenObj.value.match(/^[0-9]{1,3}$/gi) || lenObj.value=='' || lenObj.value=='0'){
+			document.getElementById("fieldDataLength").style.backgroundColor = '#FDDDD9';
+			return false;
+		}
+		paction += "&fieldDataLength="+document.getElementById("fieldDataLength").value;
+	}
+	//********************
+	if(document.getElementById("tr_fieldDefault").style.display!="none"){
+		paction += "&fieldDataDefault="+encodeURIComponent(document.getElementById("fieldDataDefault").value);
+	}
+	//********************
+	if(type=="virtual"){
+		var json = '{"connectors":{"table":"images","fields":{';
+		var sjson = '';
+		var sels = document.getElementById("connectorsTable").getElementsByTagName("select");
+		for(var j=0; j<sels.length; j++){
+			if(document.getElementById("connector_"+j).value==''){
+				document.getElementById("connector_"+j).style.backgroundColor = '#FDDDD9';
+				return false;
+			}
+			if(document.getElementById("portsFields_"+j).value==''){
+				document.getElementById("portsFields_"+j).style.backgroundColor = '#FDDDD9';
+				return false;
+			}
+			sjson += '"'+j+'":{';
+			sjson += '"connector":"'+document.getElementById("connector_"+j).value+'",';
+			sjson += '"port":"'+document.getElementById("portsFields_"+j).value.split(":")[0]+'"';
+			sjson += '},';
+		}
+		json += sjson.replace(/,$/gi, '');
+		json += '}}}';
+		//"0":{"connector":"table","port":"images.table"},
+		//"1":{"connector":"table.id","port":"images.externalId"}';
+		//paction += "&config="+json;
+		paction += "&config="+encodeURIComponent(json);
+	}
+	//********************
+	if(type=="int" && subtype=="connector"){
+		paction = paction.replace(/&fieldDataLength=[0-9]{1,3}$/gi, "");
+		paction = paction.replace(/&fieldDataLength=[0-9]{1,3}&/gi, "&");
+		if(document.getElementById("fieldDataSubtype_int_connector").value==''){
+			document.getElementById("fieldDataSubtype_int_connector").style.backgroundColor = '#FDDDD9';
+			return false;
+		}
+		var json = '{"connector":{"table":"'+(document.getElementById("fieldDataSubtype_int_connector").value)+'","data":{';
+			var table = document.getElementById("table_connectorSettings");
+			var ajson = "";
+			for(var j=1; j<table.rows.length; j++){
+				ajson += "\""+(j-1)+"\":{";
+				if(!document.getElementById("connectorName_"+(j-1)).className.match(/ ?inputok ?/gi)){
+					document.getElementById("connectorName_"+(j-1)).style.backgroundColor = '#FDDDD9';
+					return false;
+				}
+				ajson += "\"field\":\""+document.getElementById("connectorName_"+(j-1)).value+"\",";
+				ajson += "\"fieldName\":\""+document.getElementById("psevdoName_"+(j-1)).value+"\",";
+				ajson += "\"default\":\""+document.getElementById("intConnector_"+(j-1)).value+"\"";
+				ajson += "},";
+			}
+			ajson = ajson.replace(/,$/gi, '');
+		json += ajson+"}}}";
+		//paction += "&json="+encodeURIComponent(json);
+		paction += "&json="+json;
+	}
+	
+	//startPreloader();
+	console.log(paction);
+	return false;
+	
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			console.log(html);
+			var data = eval("("+html+")");
+			if(data.return=='ok'){
+				getData('<?=$GLOBALS['adminBase']?>/?option=filters,parents=<?=$params['parents']?>');
+			}else{
+				alert("Ошибка редактирования");
+			}
+		}
+	});
+}
+//*********************************
 function addNewConnector(){
 	var table = document.getElementById("connectorsTable");
 	var newRow = table.insertRow();
@@ -417,102 +599,13 @@ function getPorts(){
 	});
 }
 //*********************************
-function saveFilterField(){
-	var paction =  "ajax=saveFilterField";
-	paction += "&fieldId=<?=$filter['id']?>";
-	//********************
-	if(document.getElementById("fieldName").value==''){
-		document.getElementById("fieldName").style.backgroundColor = '#FDDDD9';
-		return false;
-	}
-	paction += "&fieldName="+encodeURIComponent(document.getElementById("fieldName").value);
-	//********************
-	if(document.getElementById("fieldDataType").value==''){
-		document.getElementById("fieldDataType").style.backgroundColor = '#FDDDD9';
-		return false;
-	}
-	var type = document.getElementById("fieldDataType").value;
-	console.log("type="+type);
-	paction += "&fieldDataType="+type;
-	if(document.getElementById("fieldDataSubype_"+type) && document.getElementById("fieldDataSubype_"+type).value!=""){
-		paction += ":"+document.getElementById("fieldDataSubype_"+type).value;
-	}
-	//********************
-	var dbField = document.getElementById("fieldDBName");
-	if(dbField.className.match(/ ?inputok ?/gi)){
-		paction += "&fieldDBName="+document.getElementById("fieldDBName").value;
-	}else{
-		dbField.style.backgroundColor = '#FDDDD9';
-		return false;
-	}
-	//********************
-	if(type!="double" && type!="text" && type!="datetime" && type!="virtual"){
-		var lenObj = document.getElementById("fieldDataLength");
-		if(!lenObj.value.match(/^[0-9]{1,3}$/gi) || lenObj.value=='' || lenObj.value=='0'){
-			document.getElementById("fieldDataLength").style.backgroundColor = '#FDDDD9';
-			return false;
-		}
-		paction += "&fieldDataLength="+document.getElementById("fieldDataLength").value;
-	}
-	//********************
-	if(document.getElementById("tr_fieldDefault").style.display!="none"){
-		paction += "&fieldDataDefault="+encodeURIComponent(document.getElementById("fieldDataDefault").value);
-	}
-	//********************
-	if(type=="virtual"){
-		var json = '{"connectors":{"table":"images","fields":{';
-		var sjson = '';
-		var sels = document.getElementById("connectorsTable").getElementsByTagName("select");
-		for(var j=0; j<sels.length; j++){
-			if(document.getElementById("connector_"+j).value==''){
-				document.getElementById("connector_"+j).style.backgroundColor = '#FDDDD9';
-				return false;
-			}
-			if(document.getElementById("portsFields_"+j).value==''){
-				document.getElementById("portsFields_"+j).style.backgroundColor = '#FDDDD9';
-				return false;
-			}
-			sjson += '"'+j+'":{';
-			sjson += '"connector":"'+document.getElementById("connector_"+j).value+'",';
-			sjson += '"port":"'+document.getElementById("portsFields_"+j).value.split(":")[0]+'"';
-			sjson += '},';
-		}
-		json += sjson.replace(/,$/gi, '');
-		json += '}}}';
-		//"0":{"connector":"table","port":"images.table"},
-		//"1":{"connector":"table.id","port":"images.externalId"}';
-		//paction += "&config="+json;
-		paction += "&config="+encodeURIComponent(json);
-	}
-	//********************
-	
-	//startPreloader();
-	//console.log(paction);
-	//return false;
-	
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			console.log(html);
-			var data = eval("("+html+")");
-			if(data.return=='ok'){
-				getData('<?=$GLOBALS['adminBase']?>/?option=filters,parents=<?=$params['parents']?>');
-			}else{
-				alert("Ошибка редактирования");
-			}
-		}
-	});
-}
-//*********************************
 var defaultType = '<?=$filter['datatype']?>';
 function filterTypeProperties(){
 	var type = document.getElementById("fieldDataType").value;
 	var objs = document.getElementsByTagName("select");
 	for(var j=0; j<objs.length; j++){
 		var obj = objs[j];
-		if(obj.id.match(/^fieldDataSubype_/)){
+		if(obj.id.match(/^fieldDataSubtype_/)){
 			if(obj.id.match(RegExp("_"+type, "gi"))){
 				obj.style.display = "";
 			}else{
@@ -525,12 +618,23 @@ function filterTypeProperties(){
 	document.getElementById("tr_fieldDefault").style.display = "";
 	document.getElementById("tr_fieldVirtual").style.display = "none";
 	document.getElementById("tr_fieldVirtualTable").style.display = "none";
+	document.getElementById("tr_fieldConnector").style.display = "none";
 	if(type=="varchar"){
 		document.getElementById("tr_fieldLength").style.display = "";
 	}else if(type=="double"){
 		document.getElementById("tr_fieldLength").style.display = "none";
 	}else if(type=="int"){
-		document.getElementById("tr_fieldLength").style.display = "";
+		var subtype = document.getElementById("fieldDataSubtype_int").value;
+		if(subtype=="connector"){
+			document.getElementById("tr_fieldDBName").style.display = "none";
+			document.getElementById("tr_fieldLength").style.display = "none";
+			document.getElementById("tr_fieldDefault").style.display = "none";
+			document.getElementById("tr_fieldConnector").style.display = "";
+		}else{
+			document.getElementById("tr_fieldDBName").style.display = "";
+			document.getElementById("tr_fieldLength").style.display = "";
+			document.getElementById("tr_fieldDefault").style.display = "";
+		}
 	}else if(type=="text"){
 		document.getElementById("tr_fieldLength").style.display = "none";
 	}else if(type=="datetime"){

@@ -138,6 +138,7 @@ class Core extends DatabaseInterface{
 							if($params['option']=='filters'){
 								$loadPage = '__filters';
 								$filter = $classFilters->getFilterClass($params['itemId']);
+								$filter = $classFilters->makeConnectors($filter);
 								$options = $classData->getOptions();
 								$filterOption = $classMenuSettings->getMenuItemByName($params['option']);
 								$ports = $classFilters->getTablesPorts();

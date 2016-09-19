@@ -623,7 +623,7 @@ if(is_array($item['0'])){   $item = $item['0'];   }
 //echo "<pre>"; print_r($fields); echo "</pre>";
 //echo "<pre>"; print_r($titles); echo "</pre>";
 if(count($GLOBALS['languages'])>1){ ?>
-<script>var fieldsObject = <?=$fieldsJSON?>;console.log(fieldsObject);</script>
+<script>var fieldsObject = <?=$fieldsJSON?>;</script>
 <div class="languagesTabs"><? foreach($GLOBALS['languages'] as $key=>$lang){ ?>
 	<span <?
 	if((!$params['lang'] && $key==$GLOBALS['language']) || $params['lang']==$key){
@@ -631,13 +631,15 @@ if(count($GLOBALS['languages'])>1){ ?>
 	}else{?>onclick="getData(window.location.pathname+'/<?=$paramsString?>', 'lang', '<?=$key?>')"<? } ?> ><?=$lang['0']?></span>
 <? } ?></div><div style="float:none;clear:both;"></div>
 <div style="background-color:#A9C9A7; padding:15px;"><?
+
 //echo "<pre>"; print_r($folder); echo "</pre>";
 //echo "<pre>"; print_r($fields); echo "</pre>";
+
 if($params['lang']!='' && $params['lang']!=$GLOBALS['language']){
 	$langPrefix = "_".$params['lang'];
 }
-if(is_array($fields)){ foreach($fields as $fileld){ if($fileld['default']=='1'){
-//echo "<pre>"; print_r($fileld); echo "</pre>";
+/*if(is_array($fields)){ foreach($fields as $fileld){ if($fileld['default']=='1'){
+	//echo "<pre>"; print_r($fileld); echo "</pre>";
 	switch($fileld['config']['fieldname']){
 		case 'name': ?>
 			<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
@@ -684,7 +686,7 @@ if(is_array($fields)){ foreach($fields as $fileld){ if($fileld['default']=='1'){
 				onkeyup="__GLOBALS.editing=true;" onchange="__GLOBALS.editing=true;" /></td>
 			</tr></table>
 			<? } break; */
-		case 'images': if($option['external']!='1'){ $initImages=true; ?>
+/*		case 'images': if($option['external']!='1'){ $initImages=true; ?>
 			<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 				<td width="150" height="30">Изображения</td>
 				<td><div id="file-uploader">
@@ -727,15 +729,84 @@ if(is_array($fields)){ foreach($fields as $fileld){ if($fileld['default']=='1'){
 			<? } break;
 	}
 } } }
+*/
 //*********************************************
-if(is_array($fields) && $option['external']!='1'){ foreach($fields as $field){ if($field['default']=='0'){ ?>
-<? //echo "<pre>"; print_r($field); echo "</pre>"; ?>
-<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-	<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
-	<td><input type="<? if($field['config']['datatype']=='1' || $field['config']['datatype']=='2'){ ?>number<? }else{ ?>text<? } ?>" id="<?=$field['link']?>"
-	value="<?=$item[$field['link']]?>" onkeyup="globalEdit=true;" onchange="globalEdit=true;" /></td>
-</tr></table>
-<? }}} ?>
+if(is_array($fields) && $option['external']!='1'){ foreach($fields as $field){
+	$field['datatype'] = explode(":", $field['datatype']);
+	//echo "<pre>"; print_r($field); echo "</pre>";
+	switch($field['datatype']['0']){
+		case 'varchar':
+			switch($field['datatype']['1']){
+				case 'colors': ?>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+						<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
+						<td><input type="color" id="<?=$field['link']?>"
+						value="<?=$item[$field['link']]?>" onkeyup="globalEdit=true;" onchange="globalEdit=true;" style="height:25px;" />
+						<input type="text" style="width:80px;height:25px;" value="<?=$item[$field['link']]?>"></td>
+					</tr></table>
+					<? break;
+				default: ?>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+						<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
+						<td><input type="text" id="<?=$field['link']?>" style="width:100%;height:25px;"
+						value="<?=$item[$field['link']]?>" onkeyup="globalEdit=true;" onchange="globalEdit=true;" /></td>
+					</tr></table>
+				<? break;
+			} ?>
+		<? break;
+		case 'int':
+			switch($field['datatype']['1']){
+				case 'checkbox': ?>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+						<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
+						<td><input type="checkbox" id="<?=$field['link']?>" <? if($item[$field['link']]=='1'){ ?>checked<? } ?>
+						onkeyup="globalEdit=true;" onchange="globalEdit=true;" /></td>
+					</tr></table>
+					<? break;
+				case 'parent': ?>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+						<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
+						<td><input type="checkbox" id="<?=$field['link']?>" <? if($item[$field['link']]=='1'){ ?>checked<? } ?>
+						onkeyup="globalEdit=true;" onchange="globalEdit=true;" /></td>
+					</tr></table>
+					<? break;
+				case 'connector': ?>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+						<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
+						<td>Селектор и его настройки</td>
+					</tr></table>
+					<? break;
+				default: ?>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+						<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
+						<td><input type="number" id="<?=$field['link']?>"
+						value="<?=$item[$field['link']]?>" onkeyup="globalEdit=true;" onchange="globalEdit=true;"
+						style="height:25px;width:100px;" /></td>
+					</tr></table>
+					<? break;
+			} ?>
+		<? break;
+		case 'double':
+			switch($field['datatype']['1']){
+				case 'price': ?>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+						<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
+						<td><input type="number" id="<?=$field['link']?>"
+						value="<?=$item[$field['link']]?>" onkeyup="globalEdit=true;" onchange="globalEdit=true;"
+						style="height:25px;width:100px;" /></td>
+					</tr></table>
+					<? break;
+				default: ?>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+						<td width="150" height="30"><?=$field["name$langPrefix"]?></td>
+						<td><input type="number" id="<?=$field['link']?>"
+						value="<?=$item[$field['link']]?>" onkeyup="globalEdit=true;" onchange="globalEdit=true;"
+						style="height:25px;width:100px;" /></td>
+					</tr></table>
+					<? break;
+			} ?>
+		<? break;
+}}} ?>
 <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 	<td width="150" height="30">&nbsp;</td>
 	<td><button onclick="saveNewLeftMenuItem()">Сохранить</button>  <button onclick="getPage(window.location.pathname)">Отменить</button></td>

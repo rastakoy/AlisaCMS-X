@@ -64,6 +64,32 @@ class Admin extends Core{
 			return "{\"return\":\"error\"}";
 		}
 	}
+	
+	/**
+	
+	*/
+	function jsonDecode($string){
+		if($this->testStringFor1251($string)){
+			$config = json_decode(iconv("CP1251", "UTF-8", $string), true);
+			$array = $this->iconvArray($config, "UTF-8", "CP1251");
+		}else{
+			$array = json_decode($string, true);
+		}
+		return $array;
+	}
+	
+	/**
+	
+	*/
+	function testStringFor1251($string){
+		for($j=0; $j<strlen($string); $j++){
+			//echo mb_detect_encoding($string[$j], array('Windows-1251', 'UTF-8'))." ($string[$j]) <br/>\n";
+			if(mb_detect_encoding($string[$j], array('Windows-1251', 'UTF-8'))=="Windows-1251"){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	

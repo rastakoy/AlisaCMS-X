@@ -36,6 +36,7 @@
 <script type="text/javascript" src="/adminarea/template/js/fileuploader.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/preloader.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/help.js"></script>
+<script type="text/javascript" src="/adminarea/template/js/connectors.js"></script>
 
 <script src="/adminarea/template/js/jquery.ui.core.js"></script>
 <script src="/adminarea/template/js/jquery.ui.widget.js"></script>

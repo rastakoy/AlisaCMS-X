@@ -356,6 +356,9 @@ switch($array['ajax']){
 		$array['field'] = 'visible';
 		echo $classData->toggleData($array);
 		break;
+	case 'changeConnectorTable':
+		echo $classFilters->changeConnectorTable($array);
+		break;
 	default:
 		//Значение параметра ajax по-умолчанию
 		break;
