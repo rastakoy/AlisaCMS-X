@@ -329,10 +329,6 @@ class Filters extends DatabaseInterface{
 	
 	*/
 	function saveFilterField($array){
-		//if(!$array['fieldId']){
-		//	$q = "INSERT INTO `filters` ";
-		//	$q .= "(parent) VALUES ($array[]) ";
-		//}
 		$q = "UPDATE `filters` SET %data% WHERE `id`='$array[fieldId]' ";
 		//print_r($array);
 		$data = "`name`='$array[fieldName]', ";
@@ -344,10 +340,13 @@ class Filters extends DatabaseInterface{
 		if($array['fieldDataType']=='virtual'){
 			$data .= "`config`='$array[config]', ";
 		}
+		if($array['fieldDataType']=='int:connector'){
+			$data .= "`config`='$array[json]', ";
+		}
 		
 		$data = preg_replace("/, ?$/", "", $data);
 		$q = str_replace("%data%", $data, $q);
-		//echo $q;
+		echo $q;
 		$query = $this->query($q);
 		if($query){
 			return "{\"return\":\"ok\"}";
@@ -777,7 +776,7 @@ class Filters extends DatabaseInterface{
 	/**
 	
 	*/
-	function makeConnectors($filter){
+	function makeConnectors($filter, $connectorData=false){
 		$classData = new Data();
 		//******************************
 		if(!$filter['config']['connector']['table']){
@@ -802,6 +801,7 @@ class Filters extends DatabaseInterface{
 		}
 		$data = false;
 		$default = '0';
+		//******************************
 		foreach($titles['1']['0'] as $key=>$value){
 			$data[$key]['name'] = $value;
 			$data[$key]['field'] = $filter['config']['connector']['data'][$key]['field'];
@@ -810,16 +810,21 @@ class Filters extends DatabaseInterface{
 			$values = false;
 			if($default!='-1'){
 				$q = "SELECT * FROM `".$filter['config']['connector']['table']."` WHERE `parent`='$default' ORDER BY `prior` ASC ";
+				//echo $q."\n";
 				$query = $this->query($q);
 				if($query){
-					while($value=$query->fetch_assoc()){
-						$values[] = $value;
+					while($valuess=$query->fetch_assoc()){
+						$values[] = $valuess;
 					}
 				}
 				$data[$key]['values'] = $values;
 				$default = '-1';
 				if($data[$key]['default']!=''){
-					$default = $data[$key]['default'];
+					if(is_array($connectorData)){
+						$default = $connectorData[$key]['default'];
+					}else{
+						$default = $data[$key]['default'];
+					}
 				}
 			}
 		}
@@ -831,20 +836,52 @@ class Filters extends DatabaseInterface{
 	/**
 	
 	*/
-	function changeConnectorTable($array, $json=true){
+	function changeConnectorTable($array, $json=true, $connectorData=false){
 		$admin = new Admin();
 		$filter = $this->getFilterClass($array['fieldId']);
 		$filter['config']['connector']['table'] = $array['table'];
-		$filter['config']['connector']['data'] = false;
-		$filter = $this->makeConnectors($filter);
+		if(is_array($connectorData)){
+			$filter['config']['connector']['data'] = $connectorData;
+		}else{
+			$filter['config']['connector']['data'] = false;
+		}
+		$filter = $this->makeConnectors($filter, $connectorData);
 		if($json){
 			$connector = $filter['config']['connector'];
 			$connector = $admin->iconvArray($connector, "CP1251", "UTF-8");
 			$connector = json_encode($connector['data']);
 			return $connector;
 		}
-		return $filter['config']['connector']['data'];
 		//echo "<pre>"; print_r($filter); echo "</pre>";
+		return $filter['config']['connector'];
+	}
+	
+	/**
+	
+	*/
+	function changeConnectorFields($array){
+		//print_r($array);
+		$admin = new Admin();
+		$filter = $this->getFilterClass($array['fieldId']);
+		$filter = $this->makeConnectors($filter);
+		$data = $filter['config']['connector']['data'];
+		$data[$array['index']]['default'] = $array['indexValue'];
+		$data[$array['index']+1]['values'] = false;
+		$array['table'] = $filter['config']['connector']['table'];
+		//echo "ARRAY:"; print_r($config);
+		$connector = $this->changeConnectorTable($array, false, $data);
+		//echo "FILTER:"; print_r($filter);
+		$connector['index'] = $array['index'];
+		foreach($connector['data'] as $key=>$value){ // Обрезание массива
+			if($key>$array['index']+1){
+				$connector['data'][$key]['values'] = false;
+			}
+		}
+		//echo "CONNECTOR:"; print_r($connector);
+		$connector = $admin->iconvArray($connector, "CP1251", "UTF-8");
+		$connector = json_encode($connector);
+		//echo $connector;
+		return $connector;
 	}
 	
 	/**

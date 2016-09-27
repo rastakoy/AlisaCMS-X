@@ -310,6 +310,8 @@ class Admin extends Core{
 		echo "<pre>"; print_r($array); echo "</pre>";
 	}
 	
+	//function humanizeJson(){}
+	
 	
 }
 ?>

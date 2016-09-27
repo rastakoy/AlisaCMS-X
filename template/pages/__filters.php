@@ -119,15 +119,6 @@ $addItem = true;
 $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 ?>
 
-<? //echo "<pre>"; print_r($GLOBALS['languages']); echo "</pre>"; ?>
-<? //echo "<pre>"; print_r($filter); echo "</pre>"; ?>
-<? //echo "<pre>"; print_r($langFields); echo "</pre>"; ?>
-<? //echo "<pre>"; print_r($GLOBALS); echo "</pre>"; ?>
-<? //echo "<pre>filter:"; print_r($filter); echo "</pre>"; ?>
-<? //echo "<pre>options: "; print_r($options); echo "</pre>"; ?>
-<? //echo "<pre>ports: "; print_r($ports); echo "</pre>"; ?>
-<? //echo "<pre>tablesWIthPorts: "; print_r($tablesWIthPorts); echo "</pre>"; ?>
-
 <? if(is_array($ports)){ ?><select id="portsFields" style="display:none;"><? foreach($ports as $port){ ?>
 <option value="<?=$port['port']?>:<?=$port['id']?>"><?=$port['name']?></option>
 <? } ?></select><? } ?>
@@ -154,6 +145,26 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 <? } ?></div><div style="float:none;clear:both;"></div>
 <div style="background-color:#A9C9A7; padding:15px;">
 <table width="100%" border="0" cellspacing="1" cellpadding="1" id="table_allFilterSettings">
+  
+<? if($GLOBALS['debugMode']=='1'){ ?>
+  <tr>
+    <td height="" colspan="2">
+	<a href="javascript:"
+	onclick="document.getElementById('print_r').style.display=((document.getElementById('print_r').style.display=='none')?'':'none')">
+	<b>Отладка</b></a>
+	<div id="print_r" style="display:none;">
+<? //echo "<pre>"; print_r($GLOBALS['languages']); echo "</pre>"; ?>
+<? //echo "<pre>"; print_r($filter); echo "</pre>"; ?>
+<? //echo "<pre>"; print_r($langFields); echo "</pre>"; ?>
+<? //echo "<pre>"; print_r($GLOBALS); echo "</pre>"; ?>
+<? echo "<pre>filter:"; print_r($filter); echo "</pre>"; ?>
+<? //echo "<pre>options: "; print_r($options); echo "</pre>"; ?>
+<? //echo "<pre>ports: "; print_r($ports); echo "</pre>"; ?>
+<? //echo "<pre>tablesWIthPorts: "; print_r($tablesWIthPorts); echo "</pre>"; ?>
+</div></td>
+  </tr>
+<? } ?>
+  
   <tr>
     <td width="200" height="30">Название</td>
     <td><input type="text" id="fieldName"
@@ -226,12 +237,12 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 			<tr>
 				<td height="30" width="75" valign="top" style="padding-top:10px;"><?=$cmass['name']?></td>
 				<td valign="top" style="padding-top:5px;">
-					<input type="text" value="<?=$cmass['field']?>" id="connectorName_<?=$ckey?>" 
+					<input type="text" value="<?=$cmass['field']?>" id="connectorName_<?=$ckey?>" pattern="^[a-z]{1}[a-z0-9_]{2,19}$" 
 					<? if(preg_match("/^[a-zA-Z]{1}[a-zA-Z0-9_]{2,20}$/", $cmass['field'])){ ?>class="inputok"<? } ?>
 					style="width:130px;height:25px;padding-left:3px;" placeholder="Название поля" />
 					<input type="text" value="<?=$cmass['fieldName']?>" id="psevdoName_<?=$ckey?>"
 					style="width:130px;height:25px;padding-left:3px;" placeholder="Псевдоним поля" />
-					<select onchange="changeConnectorFields(this)" id="intConnector_<?=$ckey?>"
+					<select onchange="changeConnectorFields(this, '<?=$filter['id']?>')" id="intConnector_<?=$ckey?>"
 					style="width:130px;height:25px;" >
 						<option value="" >Не выбрано</option>
 						<? foreach($cmass['values'] as $cvalue){ ?>
@@ -247,6 +258,9 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 		}
 	}
 	inputPreloader(document.getElementById("connectorName_<?=$ckey?>"), 'testFilterUseFieldName', preloaderParams);
+	document.getElementById("psevdoName_<?=$ckey?>").onfocus = function(){
+		document.getElementById("psevdoName_<?=$ckey?>").style.backgroundColor = '';
+	}
 </script>
 				</td>
 			</tr>
@@ -492,6 +506,10 @@ function saveFilterField(){
 					document.getElementById("connectorName_"+(j-1)).style.backgroundColor = '#FDDDD9';
 					return false;
 				}
+				if(document.getElementById("psevdoName_"+(j-1)).value==''){
+					document.getElementById("psevdoName_"+(j-1)).style.backgroundColor = '#FDDDD9';
+					return false;
+				}
 				ajson += "\"field\":\""+document.getElementById("connectorName_"+(j-1)).value+"\",";
 				ajson += "\"fieldName\":\""+document.getElementById("psevdoName_"+(j-1)).value+"\",";
 				ajson += "\"default\":\""+document.getElementById("intConnector_"+(j-1)).value+"\"";
@@ -504,8 +522,8 @@ function saveFilterField(){
 	}
 	
 	//startPreloader();
-	console.log(paction);
-	return false;
+	//console.log(paction);
+	//return false;
 	
 	$.ajax({
 		type: "POST",

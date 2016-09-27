@@ -43,8 +43,42 @@ function changeConnectorTable(obj, fieldId){
 	});
 }
 //************************************************
-function changeConnectorFields(selObj){
-	console.log("changeConnectorFields");
+function changeConnectorFields(selObj, fieldId){
+	//console.log(selObj);
+	var paction = "ajax=changeConnectorFields";
+	paction += "&fieldId="+fieldId;
+	paction += "&index="+selObj.id.replace(/intConnector_/gi, '');
+	paction += "&indexValue="+selObj.value;
+	//console.log(paction);
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			//console.log(html);
+			var data = eval("("+html+")");
+			for(var j in data.data){
+				if(j>data.index){
+					var inner = "<option>Не выбрано</option>";
+					for(var jj in data.data[j].values){
+						inner += "<option value=\""+(data.data[j].values[jj].id)+"\">"+(data.data[j].values[jj].name)+"</option>";
+					}
+					document.getElementById("intConnector_"+j).innerHTML = inner;
+					blinkObject(document.getElementById("intConnector_"+j));
+				}
+			}
+		}
+	});
+}
+//************************************************
+var blinkObjects = {};
+var blinkInterval = 300;
+var blinkCount = 3;
+var blinkColor = "#F99488";
+function blinkObject(obj, count){
+	if(!count) count = 0;
+	obj.style.backgroundColor = ((obj.style.backgroundColor!='')?"":blinkColor);
+	if(count<blinkCount) setTimeout("blinkObject(document.getElementById('"+(obj.id)+"'), "+(count+1)+")", blinkInterval);
 }
 //************************************************
 function toggleSelectorDisable(checkObj){

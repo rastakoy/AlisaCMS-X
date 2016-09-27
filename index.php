@@ -13,6 +13,7 @@
 		$GLOBALS['language'] = 'rus';
 		$GLOBALS['activeInterval'] = '3600';
 		$GLOBALS['onPage'] = '50';
+		$GLOBALS['debugMode'] = '1';
 		
 		ini_set('max_execution_time', 120);
 	}else{

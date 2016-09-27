@@ -359,6 +359,10 @@ switch($array['ajax']){
 	case 'changeConnectorTable':
 		echo $classFilters->changeConnectorTable($array);
 		break;
+	case 'changeConnectorFields':
+		//echo "{".."}";
+		echo $classFilters->changeConnectorFields($array);
+		break;
 	default:
 		//Значение параметра ajax по-умолчанию
 		break;
