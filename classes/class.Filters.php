@@ -867,6 +867,7 @@ class Filters extends DatabaseInterface{
 		}
 		$data = false;
 		$default = '0';
+		$old = true;
 		//******************************
 		foreach($titles['1']['0'] as $key=>$value){
 			$data[$key]['name'] = $value;
@@ -885,9 +886,12 @@ class Filters extends DatabaseInterface{
 				}
 				$data[$key]['values'] = $values;
 				$default = '-1';
-				//echo "connectorData:\n----------"; print_r($connectorData[$key]);
-				//echo "data[key]:\n----------"; print_r($data[$key]);
-				if($data[$key]['default']!='' || $connectorData[$key]['default']!=''){
+				//echo "connectorData:\n----------"; echo "<pre>"; print_r($connectorData[$key]); echo "</pre>";
+				//echo "data[key]:\n----------"; echo "<pre>"; print_r($data[$key]); echo "</pre>";
+				if(
+					($data[$key]['default']!='' && $data[$key]['default']!='0') ||
+					($connectorData[$key]['default']!='' && $connectorData[$key]['default']!='0')
+				){
 					if(is_array($connectorData)){
 						$default = $connectorData[$key]['default'];
 					}else{
@@ -895,6 +899,7 @@ class Filters extends DatabaseInterface{
 					}
 				}
 			}
+			$old = $default;
 		}
 		$filter['config']['connector']['data'] = $data;
 		//echo "<pre>"; print_r($filter); echo "</pre>";

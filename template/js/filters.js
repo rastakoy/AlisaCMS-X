@@ -59,7 +59,7 @@ function testForConformance(table, filter){
 		url: __ajax_url,
 		data: paction,
 		success: function(html) {
-			//console.log(html);
+			console.log(html);
 			//document.getElementById("popup_cont").innerHTML = html;
 			//__popup({"width":"500","height":"auto"});
 			//return false;
@@ -71,7 +71,7 @@ function testForConformance(table, filter){
 			//$("#popup_cont").append(html);
 			__popup({"width":"500","height":"auto"});
 			$("#popup_cont").css("font-size", "12px");
-			
+			stopPreloader();
 		}
 	});
 }
@@ -109,6 +109,39 @@ function constructConformanceTable(data){
 			}else if(tr.conformance=='3'){
 				inner += "<img src=\"/adminarea/template/images/green/input_false.gif\" align=\"absmiddle\" style=\"margin-right:3px;\">";
 				inner += "В указанной таблице не найдено поле порта";
+				inner += "</td><td>";
+				inner += "<img src=\"/adminarea/template/images/green/repare.gif\" ";
+				inner += "style=\"cursor:pointer;\"";
+				
+				inner += " >";
+				inner += "</td>";
+				repare = true;
+				surroundings = true;
+			}else if(tr.conformance=='4'){
+				inner += "<img src=\"/adminarea/template/images/green/input_false.gif\" align=\"absmiddle\" style=\"margin-right:3px;\">";
+				inner += "В указанной таблице не найдено конфигуратора коннектора";
+				inner += "</td><td>";
+				inner += "<img src=\"/adminarea/template/images/green/repare.gif\" ";
+				inner += "style=\"cursor:pointer;\"";
+				
+				inner += " >";
+				inner += "</td>";
+				repare = true;
+				surroundings = true;
+			}else if(tr.conformance=='5'){
+				inner += "<img src=\"/adminarea/template/images/green/input_false.gif\" align=\"absmiddle\" style=\"margin-right:3px;\">";
+				inner += "В указанном конфигураторе не найден коннектор";
+				inner += "</td><td>";
+				inner += "<img src=\"/adminarea/template/images/green/repare.gif\" ";
+				inner += "style=\"cursor:pointer;\"";
+				
+				inner += " >";
+				inner += "</td>";
+				repare = true;
+				surroundings = true;
+			}else if(tr.conformance=='6'){
+				inner += "<img src=\"/adminarea/template/images/green/input_false.gif\" align=\"absmiddle\" style=\"margin-right:3px;\">";
+				inner += "Не хватает полей для связи с коннектором";
 				inner += "</td><td>";
 				inner += "<img src=\"/adminarea/template/images/green/repare.gif\" ";
 				inner += "style=\"cursor:pointer;\"";

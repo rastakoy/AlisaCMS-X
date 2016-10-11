@@ -4,6 +4,23 @@ class Data extends DatabaseInterface{
 	/**
 	
 	*/
+	function getOptionByName($name){
+		$query = $this->query("SELECT * FROM `menusettings` WHERE `link`='$name' ");
+		if($query){
+			if($query->num_rows == 1){
+				return $query->fetch_assoc();
+			}elseif($query->num_rows > 1){
+				while($option = $query->fetch_assoc()){
+					$options[] = $option;
+				}
+				return $option;
+			}
+		}
+	}
+	
+	/**
+	
+	*/
 	function getOptions(){
 		$q = "SELECT * FROM `menusettings` WHERE `active`='1' ORDER BY `prior` ASC ";
 		$query = $this->query($q);
@@ -453,9 +470,13 @@ class Data extends DatabaseInterface{
 					$asql = preg_replace("/^,/", '', $asql);
 					$sql .= $asql." WHERE `id`='$item[id]' ";
 					$asql = "";
-					echo $sql."\n";
+					//echo $sql."\n";
 					$query = $this->query($sql);
 					//*********************************
+					if(!$query){
+						$option = $this->getOptionByName($array['option']);
+						return "{\"error\":\"1\",\"filterId\":\"$option[filter]\",\"parents\":\"$parents\",\"itemId\":\"$item[id]\",\"option\":\"$array[option]\"}";
+					}
 				}
 			}
 			return "{\"parents\":\"$parents\",\"itemId\":\"$item[id]\",\"option\":\"$array[option]\"}";

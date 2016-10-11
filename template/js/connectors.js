@@ -47,9 +47,29 @@ function changeConnectorFields(selObj, fieldId){
 	//console.log(selObj);
 	var paction = "ajax=changeConnectorFields";
 	paction += "&fieldId="+fieldId;
-	paction += "&index="+selObj.id.replace(/intConnector_/gi, '');
-	paction += "&indexValue="+selObj.value;
+	paction += "&objectId="+selObj.id;
+	if(selObj.className=="connectorPositionIndex_"+fieldId){
+		var objs = document.getElementsByClassName("connectorPositionIndex_"+fieldId);
+		var indexes = "{";
+		for(var j=0; j<objs.length; j++){
+			var obj = objs[j];
+			indexes += "\""+j+"\":\""+obj.value+"\",";
+			if(obj==selObj) break;
+		}
+		indexes = indexes.replace(/,$/gi, '')+"}";
+		paction += "&indexes="+indexes;
+	}else{
+		var indexes = "{";
+		for(var j=0; j<selObj.id.replace(/intConnector_/gi, '')*1+1; j++){
+			//console.log("intConnector_"+j);
+			indexes += "\""+j+"\":\""+document.getElementById("intConnector_"+j).value+"\",";
+		}
+		indexes = indexes.replace(/,$/gi, '')+"}";
+		paction += "&indexes="+indexes;
+	}
+	//paction += "&indexValue="+selObj.value;
 	//console.log(paction);
+	//return false;
 	$.ajax({
 		type: "POST",
 		url: __ajax_url,
@@ -57,14 +77,26 @@ function changeConnectorFields(selObj, fieldId){
 		success: function(html) {
 			//console.log(html);
 			var data = eval("("+html+")");
+			//console.log(data);
 			for(var j in data.data){
 				if(j>data.index){
-					var inner = "<option>Не выбрано</option>";
+					if(document.getElementById(data.data[j].field)){
+						var inner = "<option value=\"\">--"+data.data[j].fieldName+"--</option>";
+					}else{
+						var inner = "<option value=\"\">Не выбрано</option>";
+					}
 					for(var jj in data.data[j].values){
 						inner += "<option value=\""+(data.data[j].values[jj].id)+"\">"+(data.data[j].values[jj].name)+"</option>";
 					}
-					document.getElementById("intConnector_"+j).innerHTML = inner;
-					blinkObject(document.getElementById("intConnector_"+j));
+					//console.log(data.data[j].field);
+					//console.log(inner);
+					if(document.getElementById(data.data[j].field)){
+						document.getElementById(data.data[j].field).innerHTML = inner;
+						blinkObject(document.getElementById(data.data[j].field));
+					}else{
+						document.getElementById("intConnector_"+j).innerHTML = inner;
+						blinkObject(document.getElementById("intConnector_"+j));
+					}
 				}
 			}
 		}
