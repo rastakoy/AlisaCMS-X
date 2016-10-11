@@ -329,8 +329,8 @@ class Filters extends DatabaseInterface{
 	
 	*/
 	function saveFilterField($array){
-		$q = "UPDATE `filters` SET %data% WHERE `id`='$array[fieldId]' ";
 		//print_r($array);
+		$q = "UPDATE `filters` SET %data% WHERE `id`='$array[fieldId]' ";
 		$data = "`name`='$array[fieldName]', ";
 		$data .= "`link`='$array[fieldDBName]', ";
 		$data .= "`datatype`='$array[fieldDataType]', ";
@@ -346,7 +346,7 @@ class Filters extends DatabaseInterface{
 		
 		$data = preg_replace("/, ?$/", "", $data);
 		$q = str_replace("%data%", $data, $q);
-		echo $q;
+		//echo $q;
 		$query = $this->query($q);
 		if($query){
 			return "{\"return\":\"ok\"}";
@@ -617,7 +617,7 @@ class Filters extends DatabaseInterface{
 		//echo "<pre>"; print_r($fields); echo "</pre>";
 		//echo "<pre>"; print_r($templateFields); echo "</pre>";
 		$errors = false;
-		foreach($templateFields as $field){
+		foreach($templateFields as $fcount=>$field){
 			$toError = '1';
 			$mass = false;
 			foreach($fields as $tableField){
@@ -658,6 +658,45 @@ class Filters extends DatabaseInterface{
 				}
 			}
 			//*****************************
+			// Проверка коннектора
+			if($toError=='1' && preg_match("/^int:connector(:|$)/", $field['datatype'])){
+				$config = json_decode(iconv("CP1251", "UTF-8", $field['config']), true);
+				$field['config'] = $admin->iconvArray($config);
+				if(!$field['config']){
+					$toError = '4'; // Отсутствует массив конфигуратора
+					$field['conformance'] = '4';
+				}elseif(!$field['config']['connector']){
+					$toError = '5'; // Отсутствует массив коннектора в конфигураторе
+					$field['conformance'] = '5';
+				}else{
+					$connector = $field['config']['connector'];
+					//print_r($connector);
+					$c = array();
+					$yes = true;
+					foreach($connector['data'] as $key=>$con){
+						$c[$key] = false;
+						foreach($fields as $field2){
+							if($field2['Field']==$con['field']){
+								$c[$key] = true;
+							}
+						}
+					}
+					foreach($c as $cvalue){
+						if($cvalue==false){
+							$yes = false;
+						}
+					}
+					if(!$yes){
+						$toError = '6'; // Отсутствуют поля указанные в массиве коннектора
+						$field['conformance'] = '6';
+					}else{
+						$toError = '0';
+						$field['conformance'] = '0';
+					}
+					//$errors[] = $field;
+				}
+			}
+			//*****************************
 			if($toError>0){
 				$field['conformance'] = $toError;
 				if($toError=='3'){
@@ -668,6 +707,7 @@ class Filters extends DatabaseInterface{
 				$field['conformance'] = '0';
 				$errors[] = $field;
 			}
+			//*****************************
 		}
 		//echo "<pre>"; print_r($errors); echo "</pre>";
 		if($json){
@@ -769,6 +809,29 @@ class Filters extends DatabaseInterface{
 				$q = "ALTER TABLE `$table` ADD `$error[link]` $type$length NOT NULL";
 				echo $q."\n";
 				$query = $this->query($q);
+			}elseif($error['conformance']=='6'){ // Добавление и исправление полей коннектора
+				$fields = $this->getFieldsFromTable($table);
+				//print_r($error['config']['connector']['data']);
+				//print_r($fields);
+				foreach($error['config']['connector']['data'] as $conField){
+					$add = true;
+					foreach($fields as $field){
+						if($conField['field']==$field['Field']){
+							if(!preg_match("/^int/", $field['Type'])){
+								$q = "ALTER TABLE `$table` CHANGE `$field[Field]`  `$field[Field]` int(11) NOT NULL";
+								//echo $q."\n";
+								$query = $this->query($q);
+							}
+							$add = false;
+							break;
+						}
+					}
+					if($add){
+						$q = "ALTER TABLE `$table` ADD `$conField[field]` int(11) NOT NULL";
+						//echo $q."\n";
+						$query = $this->query($q);
+					}
+				}
 			}
 		}
 	}
@@ -779,6 +842,9 @@ class Filters extends DatabaseInterface{
 	function makeConnectors($filter, $connectorData=false){
 		$classData = new Data();
 		//******************************
+		if(!$filter['config']){
+			return $filter;
+		}
 		if(!$filter['config']['connector']['table']){
 			return $filter;
 		}
@@ -819,7 +885,9 @@ class Filters extends DatabaseInterface{
 				}
 				$data[$key]['values'] = $values;
 				$default = '-1';
-				if($data[$key]['default']!=''){
+				//echo "connectorData:\n----------"; print_r($connectorData[$key]);
+				//echo "data[key]:\n----------"; print_r($data[$key]);
+				if($data[$key]['default']!='' || $connectorData[$key]['default']!=''){
 					if(is_array($connectorData)){
 						$default = $connectorData[$key]['default'];
 					}else{
@@ -865,15 +933,21 @@ class Filters extends DatabaseInterface{
 		$filter = $this->getFilterClass($array['fieldId']);
 		$filter = $this->makeConnectors($filter);
 		$data = $filter['config']['connector']['data'];
-		$data[$array['index']]['default'] = $array['indexValue'];
-		$data[$array['index']+1]['values'] = false;
+		$indexes = json_decode($array['indexes'], true);
+		//print_r($indexes);
+		foreach($indexes as $key=>$index){
+			$data[$key]['default'] = $index;
+		}
+		//print_r($data);
+		$data[count($indexes)]['values'] = false;
 		$array['table'] = $filter['config']['connector']['table'];
 		//echo "ARRAY:"; print_r($config);
 		$connector = $this->changeConnectorTable($array, false, $data);
 		//echo "FILTER:"; print_r($filter);
-		$connector['index'] = $array['index'];
+		$connector['index'] = count($indexes)-1;
+		$connector['objectId'] = $array['objectId'];
 		foreach($connector['data'] as $key=>$value){ // Обрезание массива
-			if($key>$array['index']+1){
+			if($key>count($indexes)+1){
 				$connector['data'][$key]['values'] = false;
 			}
 		}
@@ -882,6 +956,43 @@ class Filters extends DatabaseInterface{
 		$connector = json_encode($connector);
 		//echo $connector;
 		return $connector;
+	}
+	
+	/**
+	
+	*/
+	function showFilterSnippet($array){
+		//print_r($array);
+		$type = strtolower($array['type']);
+		$fieldType = $array['fieldType'];
+		$ext = ".php";
+		if($array['ext']){
+			$ext = ".".$array['ext'];
+		}
+		if(file_exists("snippets/$type-$fieldType-".($array['fieldId']).$ext)){
+			$file = file_get_contents("snippets/$type-$fieldType-".($array['fieldId']).$ext, true);
+		}elseif(file_exists("snippets/$type-$fieldType$ext")){
+			$file = file_get_contents("snippets/$type-$fieldType$ext", true);
+		}else{
+			$file =  "Сниппет не найден";
+		}
+		return $file;
+	}
+	
+	/**
+	
+	*/
+	function saveFilterSnippet($array){
+		$type = strtolower($array['type']);
+		$fieldType = $array['fieldType'];
+		//$txt = str_replace("\\\\", "\\", $array['text']);
+		//$txt = str_replace("\\'", "'", $array['text']);
+		$txt = stripslashes($array['text']);
+		if(file_exists("snippets/$type-$fieldType-".($array['fieldId']).".php")){
+			unlink("snippets/$type-$fieldType-".($array['fieldId']).".php");
+		}
+		file_put_contents("snippets/$type-$fieldType-".($array['fieldId']).".php", $txt);
+		//echo "snippets/$type-$fieldType-".($array['fieldId']).".php";
 	}
 	
 	/**

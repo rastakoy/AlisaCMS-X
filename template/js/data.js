@@ -111,7 +111,7 @@ function constructBranch(option, data, parent){
 	return inner;
 }
 //************************************************
-function toggleVisible(option, itemId){
+function toggleVisible(option, itemId, fieldName){
 	var obj = document.getElementById("glaz_"+itemId);
 	src = obj.getAttribute("src");
 	if(src.match(/glaz\.gif$/gi)){
@@ -121,6 +121,10 @@ function toggleVisible(option, itemId){
 		var paction =  "ajax=toggleVisible&option="+option+"&itemId="+itemId+"&value=1";
 		obj.src = obj.src.replace(/glaz_no\.gif$/gi, 'glaz.gif');
 	}
+	if(fieldName){
+		paction += "&field="+fieldName;
+	}
+	//console.log(paction);
 	$.ajax({
 		type: "POST",
 		url: __ajax_url,

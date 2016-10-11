@@ -1,129 +1,3 @@
-<? if($filter['parent']=='0'){ ?>
-<?
-//echo "<pre>TITLES"; print_r($titles); echo "</pre>";
-$addItem = true;
-$addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
-?>
-<div class="admintitle" style="padding:0px; margin:0px;" >
-	<a href="javascript:getData('<?=$GLOBALS['adminBase']?>/?action=editItem,option=filter')" id="add_item_to_cat_button"
-		style="width:85px;"><?=$addItemTitle?></a>
-	<a href="javascript:showHelp('catalog');" id="outerhelp">?</a>
-	<span style="padding-top:5px; display:block;">&nbsp;<?=$version?></span>
-	<?  //echo $__page_title; ?>
-</div>
-<div style="float:none; clear:both;"></div>
-<div class="manageadminforms" id="edit_content" style="display:;padding-top:10px;">
-<b style="text-transform:uppercase;" id="titlePanel">Управление шаблоном «<?=$filter['name']?>»</b>
-<div style="height:20px;"></div>
-<? //echo "<pre>"; print_r($GLOBALS['languages']); echo "</pre>"; ?>
-<? //echo "<pre>"; print_r($filter); echo "</pre>"; ?>
-<? //echo "<pre>"; print_r($langFields); echo "</pre>"; ?>
-<div style="float:none;clear:both;"></div>
-<div style="background-color:#A9C9A7; padding:15px;">
-<table width="100%" border="0" cellspacing="1" cellpadding="1">
-  <? if(is_array($GLOBALS['languages'])){ foreach($GLOBALS['languages'] as $key=>$lang){
-  $langPrefix = "";
-  if($GLOBALS['language']!=$key){ $langPrefix="_$key"; }
-  	foreach($langFields as $langField){
-  		if($key==$langField['filters']['0']['currentLang']){
-			if($langField['filters']['0']['hasLang']=='1' || $GLOBALS['language']==$langField['filters']['0']['currentLang']){
-  //if($GLOBALS['language']==$key || )?>
-	<tr>
-		<td width="150" height="30">Название <? if($GLOBALS['language']!=$key){ ?>(<?=$lang['1']?>)<? } ?></td>
-		<td><input type="text" id="filterName<?=$langPrefix?>" value="<?=$filter["name$langPrefix"]?>" /></td>
-	</tr>
-  <? }}}}} ?>
-  <tr>
-    <td width="150" height="30">Путь</td>
-    <td><input type="text" id="filterLink" value="<?=$filter['link']?>" /></td>
-  </tr>
-  <tr>
-    <td height="30">&nbsp;</td>
-    <td><button onclick="saveFilterClass()">Сохранить</button>&nbsp;&nbsp;
-	<button onclick="__css_itemShowCSS_close()">Отменить</button></td>
-  </tr>
-</table>
-</div></div>
-<script>
-var classLangs = new Array();
-<?
-if(is_array($GLOBALS['languages'])){ $count=0; foreach($GLOBALS['languages'] as $key=>$lang){
-	$langPrefix = "";
-	if($GLOBALS['language']!=$key){ $langPrefix="_$key"; }
-  		foreach($langFields as $langField){
-  			if($key==$langField['filters']['0']['currentLang']){
-				if($langField['filters']['0']['hasLang']=='1' || $GLOBALS['language']==$langField['filters']['0']['currentLang']){
-					echo "classLangs[$count] = '$langPrefix';\n";
-					$count++;
-}}}}}
-?>
-//alert(classLangs);
-//*********************************
-function getFilterFieldType(type){
-	paction =  "ajax=getFilterFieldType&type="+type+"&parent=<?=$filter['parent']?>&id=<?=$filter['id']?>";
-	//alert(paction);
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			//alert(html);
-			var data = eval("("+html+")");
-			document.getElementById("sel_fieldname").innerHTML = "";
-			var inner = "";
-			for(var j in data){
-				inner += "<option value=\""+data[j]+"\">"+data[j]+"</option>";
-			}
-			document.getElementById("sel_fieldname").innerHTML = inner;
-		}
-	});
-}
-//*********************************
-function saveFilterClass(){
-	var paction =  "ajax=saveFilterClass";
-	paction += "&filterId=<?=$filter['id']?>";
-	for(var j=0; j<classLangs.length; j++){
-		paction += "&filterName"+classLangs[j]+"="+encodeURIComponent(document.getElementById("filterName"+classLangs[j]).value);
-	}
-	paction += "&filterLink="+document.getElementById("filterLink").value;
-	//console.log(paction);
-	//return false;
-	startPreloader();
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			//alert(html);
-			var data = eval("("+html+")");
-			if(data.return=='ok'){
-				getData('<?=$GLOBALS['adminBase']?>/?option=filters');
-			}else{
-				console.log("Ошибка редактирования");
-			}
-			stopPreloader();
-		}
-	});
-}
-//*********************************
-
-//*********************************
-
-//*********************************
-</script>
-
-<? }else{ ?>
-<?
-//echo "<pre>TITLES"; print_r($titles); echo "</pre>";
-$addItem = true;
-$addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
-?>
-
-<? if(is_array($ports)){ ?><select id="portsFields" style="display:none;"><? foreach($ports as $port){ ?>
-<option value="<?=$port['port']?>:<?=$port['id']?>"><?=$port['name']?></option>
-<? } ?></select><? } ?>
-
-
 <div class="admintitle" style="padding:0px; margin:0px;" >
 	<a href="javascript:getData('<?=$GLOBALS['adminBase']?>/?action=editItem,option=filter,parents=<?=$params['params']?>')" id="add_item_to_cat_button"
 		style="width:85px;"><?=$addItemTitle?></a>
@@ -142,7 +16,14 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 	if((!$params['lang'] && $key==$GLOBALS['language']) || $params['lang']==$key){
 		echo "class=\"active\"";
 	}else{?>onclick="getData(window.location.pathname+'<?=$paramsString?>', 'lang', '<?=$key?>')"<? } ?> ><?=$lang['0']?></span>
-<? } ?></div><div style="float:none;clear:both;"></div>
+<? } ?></div><div class="languagesTabs">
+				<span style="margin-left:20px;"
+				onclick="getData(window.location.pathname+'<?=$paramsString?>', 'coder', 'init')">init</span>
+				<span
+				onclick="getData(window.location.pathname+'<?=$paramsString?>', 'coder', 'sender')">sender</span>
+				<span
+				onclick="getData(window.location.pathname+'<?=$paramsString?>', 'coder', 'recipient')">recipient</span>
+</div><div style="float:none;clear:both;"></div>
 <div style="background-color:#A9C9A7; padding:15px;">
 <table width="100%" border="0" cellspacing="1" cellpadding="1" id="table_allFilterSettings">
   
@@ -414,68 +295,6 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
     <td><button onclick="saveFilterField()" style="height:25px;">Сохранить</button>&nbsp;&nbsp;
 	<button onclick="getData('<?=$GLOBALS['adminBase']?>/?option=filters,parents=<?=$params['parents']?>')" style="height:25px;">Отменить</button></td>
   </tr>
-  
-  <tr id="" class="">
-	<td colspan="2" style="text-transform:uppercase;" height="40"><b>Программное управление шаблоном поля</b>
-	</td>
-  </tr>
-  
-  <tr id="tr_fieldInit" class="tr_fieldset">
-	<td colspan="2">
-	<fieldset id="fsInit" style="border:solid 1px #006600;border:none;">
-		<legend><img id="imgInit" src="/adminarea/template/tree/plus.jpg" style="cursor:pointer;" onclick="showSnippet('Init')">
-		<b>Инициализация блока</b></legend>
-		<table width="100%" border="0" cellspacing="1" cellpadding="1" id="table_fieldInit" style="display:none;">
-			<tr><td id="td_codeInit"></td></tr>
-			<tr><td><button onclick="saveSnippet('Init')">Сохранить</button>
-			<button onclick="showSnippet('Init')">Закрыть</button></td></tr>
-		</table>
-	</fieldset>
-	</td>
-  </tr>
-  
-  <tr id="tr_fieldSender" class="tr_fieldset">
-	<td colspan="2">
-	<fieldset id="fsSender" style="border:solid 1px #006600;border:none;">
-		<legend><img id="imgSender" src="/adminarea/template/tree/plus.jpg" style="cursor:pointer;" onclick="showSnippet('Sender', 'js')">
-		<b>Отправка данных на сервер</b></legend>
-		<table width="100%" border="0" cellspacing="1" cellpadding="1" id="table_fieldSender" style="display:none;">
-			<tr><td id="td_codeSender"></td></tr>
-			<tr><td><button onclick="saveSnippet('Sender')">Сохранить</button>
-			<button onclick="showSnippet('Sender')">Закрыть</button></td></tr>
-		</table>
-	</fieldset>
-	</td>
-  </tr>
-  
-  <tr id="tr_fieldRecipient" class="tr_fieldset">
-	<td colspan="2">
-	<fieldset id="fsRecipient" style="border:solid 1px #006600;border:none;">
-		<legend><img id="imgRecipient" src="/adminarea/template/tree/plus.jpg" style="cursor:pointer;" onclick="showSnippet('Recipient')">
-		<b>Прием данных на сервере</b></legend>
-		<table width="100%" border="0" cellspacing="1" cellpadding="1" id="table_fieldRecipient" style="display:none;">
-			<tr><td id="td_codeRecipient"></td></tr>
-			<tr><td><button onclick="saveSnippet('Recipient')">Сохранить</button>
-			<button onclick="showSnippet('Recipient')">Закрыть</button></td></tr>
-		</table>
-	</fieldset>
-	</td>
-  </tr>
-  
-  <tr id="tr_fieldCustom" class="tr_fieldset">
-	<td colspan="2">
-	<fieldset id="fsCustom" style="border:solid 1px #006600;border:none;">
-		<legend><img id="imgCustom" src="/adminarea/template/tree/plus.jpg" style="cursor:pointer;" onclick="showSnippet('Custom')">
-		<b>Дополнительный код управления</b></legend>
-		<table width="100%" border="0" cellspacing="1" cellpadding="1" id="table_fieldCustom" style="display:none;">
-			<tr><td id="td_codeCustom"></td></tr>
-			<tr><td><button onclick="saveSnippet('Custom')">Сохранить</button>
-			<button onclick="showSnippet('Custom')">Закрыть</button></td></tr>
-		</table>
-	</fieldset>
-	</td>
-  </tr>
-  
 </table>
 </div></div>
 <script>
@@ -584,7 +403,7 @@ function saveFilterField(){
 	}
 	
 	//startPreloader();
-	//console.log(paction);
+	console.log(paction);
 	//return false;
 	
 	$.ajax({
@@ -599,88 +418,6 @@ function saveFilterField(){
 			}else{
 				alert("Ошибка редактирования");
 			}
-		}
-	});
-}
-//*********************************
-function saveSnippet(sType){
-	var frame = document.getElementById("aceEditorFrame"+sType);
-	var editor = frame.contentWindow.document.getElementById("editor");
-	//console.log(editor.env.editor.getValue());
-	var txt = encodeURIComponent(editor.env.editor.getValue());
-	var paction = "ajax=saveFilterSnippet";
-	paction += "&type="+sType;
-	paction += "&option=<?=$params['option']?>";
-	paction += "&fieldId=<?=$filter['id']?>";
-	var type = document.getElementById("fieldDataType").value;
-	paction += "&fieldType="+type;
-	if(document.getElementById("fieldDataSubtype_"+type) && document.getElementById("fieldDataSubtype_"+type).value!=""){
-		paction += "-"+document.getElementById("fieldDataSubtype_"+type).value;
-	}
-	paction += "&text="+txt;
-	//console.log(paction);
-	startPreloader();
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			console.log(html);
-			stopPreloader();
-		}
-	});
-}
-//*********************************
-function showSnippet(sType, pLang){
-	var img = document.getElementById("img"+sType);
-	if(img.getAttribute("src").match(/plus\.jpg$/gi)){
-		startPreloader();
-		document.getElementById("tr_field"+sType).className = "tr_fieldsetOpen";
-		document.getElementById("table_field"+sType).style.display = "";
-		document.getElementById("fs"+sType).style.border = "solid 1px #006600";
-		img.setAttribute("src", img.getAttribute("src").replace(/plus\.jpg$/gi, "minus.jpg"));
-		var inner = "<iframe src=\"<?=$GLOBALS['adminBase']?>/ace-editor-save/demo/autocompletion.html\" ";
-		inner += "id=\"aceEditorFrame"+sType+"\" width=\"100%\" height=\"300\" frameborder=\"0\" style=\"display:;\" />";
-		document.getElementById("td_code"+sType).innerHTML = inner;
-	}else{
-		document.getElementById("tr_field"+sType).className = "tr_fieldset";
-		document.getElementById("table_field"+sType).style.display = "none";
-		document.getElementById("fs"+sType).style.border = "none";
-		img.setAttribute("src", img.getAttribute("src").replace(/minus\.jpg$/gi, "plus.jpg"));
-		var inner = "";
-		document.getElementById("td_code"+sType).innerHTML = inner;
-		return false;
-	}
-	var paction = "ajax=showFilterSnippet";
-	paction += "&type="+sType;
-	paction += "&option=<?=$params['option']?>";
-	paction += "&fieldId=<?=$filter['id']?>";
-	var mode = "php";
-	if(pLang){
-		paction += "&ext="+pLang;
-		if(pLang=='js'){
-			mode = 'javascript';
-		}
-	}
-	var type = document.getElementById("fieldDataType").value;
-	paction += "&fieldType="+type;
-	if(document.getElementById("fieldDataSubtype_"+type) && document.getElementById("fieldDataSubtype_"+type).value!=""){
-		paction += "-"+document.getElementById("fieldDataSubtype_"+type).value;
-	}
-	//console.log(paction);
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			//console.log(html);
-			var frame = document.getElementById("aceEditorFrame"+sType);
-			var editor = frame.contentWindow.document.getElementById("editor");
-			editor.env.editor.setValue(html, 1);
-			if(pLang){
-				editor.env.editor.getSession().setMode("ace/mode/"+mode);
-			}
-			stopPreloader();
 		}
 	});
 }
@@ -949,4 +686,8 @@ function addDBField(){
 
 //*********************************
 </script>
-<? } ?>
+
+
+<iframe src="<?=$GLOBALS['adminBase']?>/ace-editor-save/demo/autocompletion.html"
+id="aceEditorFrame" width="100%" height="300" frameborder="0" style="display:;" />
+<div id="aceEditorCode" style="display:none;">any text<?=$aceEditorCode?></div>

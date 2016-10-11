@@ -353,15 +353,22 @@ switch($array['ajax']){
 		echo $classFilters->getTablesPorts($array);
 		break;
 	case 'toggleVisible':
-		$array['field'] = 'visible';
+		if(!$array['field']){
+			$array['field'] = 'visible';
+		}
 		echo $classData->toggleData($array);
 		break;
 	case 'changeConnectorTable':
 		echo $classFilters->changeConnectorTable($array);
 		break;
 	case 'changeConnectorFields':
-		//echo "{".."}";
 		echo $classFilters->changeConnectorFields($array);
+		break;
+	case 'showFilterSnippet':
+		echo $classFilters->showFilterSnippet($array);
+		break;
+	case 'saveFilterSnippet':
+		echo $classFilters->saveFilterSnippet($array);
 		break;
 	default:
 		//Значение параметра ajax по-умолчанию

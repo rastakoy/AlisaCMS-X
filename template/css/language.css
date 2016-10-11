@@ -74,6 +74,10 @@ div.languagesTabs span{
 	padding-right: 15px;
 	background-color:#99AF78;
 	border-left: 1px solid #999999;
+	transition: background-color .35s ease;
+}
+div.languagesTabs span:hover{
+	background-color:#9DC598;
 }
 div.languagesTabs span.active{
 	background-color:#A9C9A7;

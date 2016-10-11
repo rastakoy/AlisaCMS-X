@@ -497,6 +497,7 @@ function addNewTable(){
 	<div id="adminGlobalSettings" class="adminGlobalSettings" style="display:;">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<tr>
+			<th class="tdGlobalSettings" width="20" align="left">&nbsp;</th>
 			<th class="tdGlobalSettings" width="150" align="left">Название</th>
 			<th class="tdGlobalSettings" width="70" align="center">Таблица</th>
 			<th class="tdGlobalSettings" width="100" align="center">Ресурс</th>
@@ -510,6 +511,10 @@ function addNewTable(){
 	<tbody id="globalMenus">
 		<? foreach($menus as $k=>$menu){ ?>
 		<tr bgcolor="#FFFFFF" id="menus_<?=$menu['id']?>" class="trGlobalSettings" <? if($menu['link']=='filters'){ ?>noclick="1" <? } ?>>
+			<td class="tdGlobalSettings" height="34" width="20"><a href="javascript:" title="Отображение в меню слева"><img
+			src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/glaz<? if($menu['active']=='0'){ ?>_no<? } ?>.gif"
+			id="glaz_<?=$menu['id']?>" width="16" height="16" border="0"
+			onclick="toggleVisible('menusettings','<?=$menu['id']?>', 'active')"></a></td>
 			<td class="tdGlobalSettings" width="150"><?=$menu['name']?></td>
 			<td class="tdGlobalSettings" width="70" align="center"><?=$menu['link']?></td>
 			<td class="tdGlobalSettings" width="100" align="center"><?=$menu['external']?></td>
@@ -559,6 +564,7 @@ $( ".trGlobalSettings" ).dblclick(function () {
 	getData('<?=$GLOBALS['adminBase']?>/?action=editMenus,menuId='+menuId)
 });
 //*********************************************************
+
 </script>
 
 <div style="line-height:25px; margin-top:15px;margin-right:15px;float:left;">

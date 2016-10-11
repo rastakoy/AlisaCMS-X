@@ -732,9 +732,22 @@ if($params['lang']!='' && $params['lang']!=$GLOBALS['language']){
 */
 //*********************************************
 if(is_array($fields) && $option['external']!='1'){ foreach($fields as $field){
+	//echo "<pre>"; print_r($field); echo "</pre>";
+	$fileName = str_replace(":", "-", $field['datatype']);
+	if(file_exists("snippets/init-$fileName-".($field['id']).".php")){
+		require("snippets/init-$fileName-".($field['id']).".php");
+	}elseif(file_exists("snippets/init-$fileName.php")){
+		require("snippets/init-$fileName.php");
+	}else{
+		if($GLOBALS['debugMode']=='1'){
+			echo "<div style=\"padding:8px;\"><b>Сниппет «".$field["name$langPrefix"]."» не найден</b> ".$GLOBALS['adminBase'];
+			echo "/snippets/init-$fileName.php </div>";
+		}
+	}
+	
 	$field['datatype'] = explode(":", $field['datatype']);
 	//echo "<pre>"; print_r($field); echo "</pre>";
-	switch($field['datatype']['0']){
+	/*switch($field['datatype']['0']){
 		case 'varchar':
 			switch($field['datatype']['1']){
 				case 'colors': ?>
@@ -806,7 +819,7 @@ if(is_array($fields) && $option['external']!='1'){ foreach($fields as $field){
 					<? break;
 			} ?>
 		<? break;
-}}} ?>
+}*/}} ?>
 <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 	<td width="150" height="30">&nbsp;</td>
 	<td><button onclick="saveNewLeftMenuItem()">Сохранить</button>  <button onclick="getPage(window.location.pathname)">Отменить</button></td>
@@ -817,7 +830,7 @@ if(is_array($fields) && $option['external']!='1'){ foreach($fields as $field){
 	$myParent = '0';
 } ?>
 <script>
-var currentItem = <?=json_encode($item)?>;
+//var currentItem = <?=json_encode($item)?>;
 //alert(JSON.stringify(currentItem));
 function saveNewLeftMenuItem(){
 	var paction = "ajax=saveItem";
@@ -826,8 +839,19 @@ function saveNewLeftMenuItem(){
 	paction += "&id=<?=$item['id']?>";
 	paction += "&lang=<?=$langPrefix?>";
 	paction += "&parents=<?=$params['parents']?>";
+		<? if(is_array($fields) && $option['external']!='1'){ foreach($fields as $field){
+				$fileName = str_replace(":", "-", $field['datatype']);
+				if(file_exists("snippets/sender-$fileName-".($field['id']).".js")){
+					require("snippets/sender-$fileName-".($field['id']).".js");
+				}elseif(file_exists("snippets/sender-$fileName.js")){
+					require("snippets/sender-$fileName.js");
+				}else{
+					echo "console.log('Файл сниппета «".$field["name$langPrefix"]."» не найден');";
+				}
+		}} ?>
+	
 	//console.log(currentItem);
-	for(var jj in currentItem){
+	/*for(var jj in currentItem){
 		if(document.getElementById(jj)){
 			var obj = document.getElementById(jj);
 			if(obj.tagName.toLowerCase()=='input'){
@@ -854,7 +878,8 @@ function saveNewLeftMenuItem(){
 		}else if(jj=='tmp'){
 			paction += "&tmp=0";
 		}
-	}
+	}*/
+	
 	//console.log(__PARAMS);
 	console.log(paction);
 	//return false;
@@ -864,14 +889,15 @@ function saveNewLeftMenuItem(){
 		url: __ajax_url,
 		data: paction,
 		success: function(html) {
-			//console.log(html);
-			__GLOBALS.editing = false;
-			getData('<?=$GLOBALS['adminBase']?>/?option=<?=$params['option']?>,parents=<?=$params['parents']?>');
-			//__css_itemShowCSS();
-			//var obj = document.getElementById("show_cssblock_cont");
-			//$(obj).empty();
-			//$(obj).append(html);
-			
+			console.log(html);
+			data = eval("("+html+")");
+			if(data.error=='1'){
+				//alert("error");
+				testForConformance(data.option, data.filterId);
+			}else{
+				__GLOBALS.editing = false;
+				getData('<?=$GLOBALS['adminBase']?>/?option=<?=$params['option']?>,parents=<?=$params['parents']?>');
+			}
 		}
 	});
 }
