@@ -153,6 +153,7 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 	onclick="document.getElementById('print_r').style.display=((document.getElementById('print_r').style.display=='none')?'':'none')">
 	<b>Отладка</b></a>
 	<div id="print_r" style="display:none;">
+<? //echo "langPrefix = $langPrefix<br/>"; ?>
 <? //echo "<pre>"; print_r($GLOBALS['languages']); echo "</pre>"; ?>
 <? //echo "<pre>"; print_r($filter); echo "</pre>"; ?>
 <? //echo "<pre>"; print_r($langFields); echo "</pre>"; ?>
@@ -168,7 +169,7 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
   <tr>
     <td width="200" height="30">Название</td>
     <td><input type="text" id="fieldName"
-	value="<?=$filter["name$prefix"]?>" style="width:350px;height:25px;padding-left:3px;" /></td>
+	value="<?=$filter["name$langPrefix"]?>" style="width:350px;height:25px;padding-left:3px;" /></td>
   </tr>
 
   <tr>
@@ -483,6 +484,7 @@ $addItemTitle = "Добавить<br/>".$titles['1']['2'][count($parents)];
 function saveFilterField(){
 	var paction =  "ajax=saveFilterField";
 	paction += "&fieldId=<?=$filter['id']?>";
+	paction += "&langPrefix=<?=$langPrefix?>";
 	//********************
 	if(document.getElementById("fieldName").value==''){
 		document.getElementById("fieldName").style.backgroundColor = '#FDDDD9';

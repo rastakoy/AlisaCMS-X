@@ -28,6 +28,7 @@
 <script type="text/javascript" src="/adminarea/template/js/detect.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/router.js"></script>
+<script type="text/javascript" src="/adminarea/template/js/popup.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/leftMenu.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/data.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/dop_popup_v_01.js"></script>

@@ -21,8 +21,11 @@ class Data extends DatabaseInterface{
 	/**
 	
 	*/
-	function getOptions(){
+	function getOptions($ignore=false){
 		$q = "SELECT * FROM `menusettings` WHERE `active`='1' ORDER BY `prior` ASC ";
+		if($ignore){
+			$q = "SELECT * FROM `menusettings` ORDER BY `prior` ASC ";
+		}
 		$query = $this->query($q);
 		while($option=$query->fetch_assoc()){
 			$options[] = $option;
@@ -425,9 +428,14 @@ class Data extends DatabaseInterface{
 	function saveItem($array){
 		//print_r($array);
 		if($array['parents']){
+			if($array['parent']){
+				$array['parents'] = $this->getParentsWay($array['option'], $array['parent']);
+			}
 			$parent = explode("->", $array['parents']);
 			$parent = $parent[count($parent)-1];
-			$array['parent'] = $parent;
+			if(!$array['parent']){
+				$array['parent'] = $parent;
+			}
 			$parents = $array['parents'];
 			unset($array['parents']);
 		}
@@ -443,7 +451,7 @@ class Data extends DatabaseInterface{
 				//echo "MY: ".$q."\n";
 				$query = $this->query($q);
 				$item = $query->fetch_assoc();
-				$q = "UPDATE `$array[option]` SET `tmp`='1' WHERE `id`='$item[id]' ";
+				$q = "UPDATE `$array[option]` SET `tmp`='1', `visible`='1' WHERE `id`='$item[id]' ";
 				$query = $this->query($q);
 			}else{
 				//echo $array['option']."\n\n";
@@ -467,6 +475,14 @@ class Data extends DatabaseInterface{
 							}
 						}
 					}
+					$asql .= ", `tmp`='0'";
+					if($array['parent']){
+						$query = $this->query("SELECT * FROM `$array[option]` WHERE `id`='$array[parent]' ");
+						$parentFolder = $query->fetch_assoc();
+						if($parentFolder['letters']){
+							$asql .= ", `letters`='$parentFolder[letters]'";
+						}
+					}
 					$asql = preg_replace("/^,/", '', $asql);
 					$sql .= $asql." WHERE `id`='$item[id]' ";
 					$asql = "";
@@ -481,6 +497,32 @@ class Data extends DatabaseInterface{
 			}
 			return "{\"parents\":\"$parents\",\"itemId\":\"$item[id]\",\"option\":\"$array[option]\"}";
 		}
+	}
+	
+	/**
+	
+	*/
+	function setNewItemParent($array){
+		$parent = $array['parent'];
+		$table = $array['table'];
+		print_r($array);
+		//$query = $this->query("UPDATE `$array[table]` SET `parent`='$array[newParent]' WHERE `id`=$array[itemId] ");
+		//$query = $this->query("SELECT * FROM `$array[table]` WHERE `id`='$array[parent]' ");
+		//$parent = $query->fetch_assoc();
+		//$query = $this->query("UPDATE `$array[table]` SET `letters`='$parent[letters]' WHERE `id`=$array[itemId] ");
+		$parents = $array['parents'];
+		$parents = explode("->", $parents);
+		foreach($parents as $par){
+			if($par==$array['oldParent']){
+				$new[] = $array['parent'];
+			}else{
+				$new[] = $par;
+			}
+		}
+		$parents = implode("->", $new);
+		echo $parents;
+		//$return['parents']
+		//print_r($parent);
 	}
 	
 	/**
@@ -505,14 +547,20 @@ class Data extends DatabaseInterface{
 		$letters = $folder['letters'];
 		if($folder['parent']!='0'){
 			$query = $this->query("SELECT * FROM `$table` WHERE `id`='$folder[parent]' ");
-			$parentFolder = $query->fetch_assoc();
+			if($query->num_rows > 0){
+				$parentFolder = $query->fetch_assoc();
+			}
 		}
-		if(!$letters && !$parentFolder){
+		if((!$letters || $letters=='') && !$parentFolder){
 			$letters = "AAA";
-			$query = $this->query("UPDATE * FROM `$table` SET `letters`='$foo' WHERE `id`='$id' ");
+			$q = "UPDATE `$table` SET `letters`='$letters' WHERE `id`='$id' ";
+			echo $q;
+			$query = $this->query($q);
 		}elseif(!$letters && $parentFolder['letters']!=''){
 			$letters = $parentFolder['letters']."AAA";
-			$query = $this->query("UPDATE * FROM `$table` SET `letters`='$foo' WHERE `id`='$id' ");
+			$q = "UPDATE `$table` SET `letters`='$letters' WHERE `id`='$id' ";
+			echo $q;
+			$query = $this->query($q);
 		}elseif($letters!=''){
 			echo "letters=".$letters."\n";
 			preg_match("/[A-Z]{3}$/", $letters, $matches);
@@ -552,7 +600,9 @@ class Data extends DatabaseInterface{
 			echo "foo = $foo\n";
 			$foo = $prefix1.$lettersArray[$count_1].$lettersArray[$count_2].$lettersArray[$count_3];
 			echo "foo = $foo\n";
-			$query = $this->query("UPDATE * FROM `$table` SET `letters`='$foo' WHERE `id`='$id' ");
+			$q = "UPDATE `$table` SET `letters`='$foo' WHERE `id`='$id' ";
+			echo $q."\n";
+			$query = $this->query($q);
 		}
 	}
 	
@@ -670,6 +720,39 @@ class Data extends DatabaseInterface{
 		$q = "UPDATE `$array[option]` SET `$array[field]`='$value' WHERE `id`='$array[itemId]' ";
 		echo $q;
 		$query = $this->query($q);
+	}
+	
+	/**
+	
+	*/
+	function getAllFoldersTree($array){
+		$parent = $array['parent'];
+		$table = $array['table'];
+		$folders = array();
+		$q = "SELECT * FROM `$table` WHERE `folder`='1' AND `parent`='$parent' ORDER BY `prior` ASC ";
+		if($array['visible']=='1'){
+			$q = "SELECT * FROM `$table` WHERE `folder`='1' AND `parent`='$parent' AND `visible`='1' ORDER BY `prior` ASC ";
+		}
+		//echo $q."\n";
+		$query = $this->query($q);
+		if($query){
+			while($folder=$query->fetch_assoc()){
+				$array['parent'] = $folder['id'];
+				if($folder['id']==$array['folderId']){
+					$folder['selected'] = '1';
+				}
+				$folder['children'] = $this->getAllFoldersTree($array);
+				if(count($folder['children'])<1){
+					unset($folder['children']);
+				}
+				//print_r($folder);
+				$folders[] = $folder;
+			}
+		}
+		//if($array['parent']=='0'){
+		//	print_r($folders);
+		//}
+		return $folders;
 	}
 	
 	/**

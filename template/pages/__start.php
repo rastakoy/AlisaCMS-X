@@ -222,6 +222,13 @@ style="display:<? if($panel['external']=='0'){ echo "none"; } ?>" >
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 	<tr>
+		<td width="150" height="30">Комментарии</td>
+		<td><input id="commentsActive" type="checkbox" id="comments" onchange="__GLOBALS.editing=true;"  <? if($panel['comments']=='1') echo "checked"; ?> ></td>
+	</tr>
+</table>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+	<tr>
 		<td width="150" height="30">&nbsp;</td>
 		<td><button onclick="savePanel()">Сохранить</button>  <button onclick="getData(window.location.pathname)">Отменить</button></td>
 	</tr>
@@ -271,6 +278,7 @@ function savePanel(){
 	}
 	paction += "&filter="+document.getElementById("filterSelect").value;
 	paction += "&active="+((document.getElementById("panelActive").checked)?"1":"0");
+	paction += "&comments="+((document.getElementById("commentsActive").checked)?"1":"0");
 	paction += "&titleType="+document.getElementById("titleType").value;
 	paction += "&titles="+encodeURIComponent(constructTitles());
 	__GLOBALS.editing = false;
@@ -514,7 +522,7 @@ function addNewTable(){
 			<td class="tdGlobalSettings" height="34" width="20"><a href="javascript:" title="Отображение в меню слева"><img
 			src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/glaz<? if($menu['active']=='0'){ ?>_no<? } ?>.gif"
 			id="glaz_<?=$menu['id']?>" width="16" height="16" border="0"
-			onclick="toggleVisible('menusettings','<?=$menu['id']?>', 'active')"></a></td>
+			onclick="toggleVisible('menusettings','<?=$menu['id']?>', 'active');document.location.href=document.location.href;"></a></td>
 			<td class="tdGlobalSettings" width="150"><?=$menu['name']?></td>
 			<td class="tdGlobalSettings" width="70" align="center"><?=$menu['link']?></td>
 			<td class="tdGlobalSettings" width="100" align="center"><?=$menu['external']?></td>
@@ -567,15 +575,19 @@ $( ".trGlobalSettings" ).dblclick(function () {
 
 </script>
 
-<div style="line-height:25px; margin-top:15px;margin-right:15px;float:left;">
+<div style="line-height:25px; margin-top:15px;margin-right:15px;float:left;" id="gsAll">
 	<b style="text-transform:uppercase;">Основные настройки</b>
-	<div id="adminGlobalSettings" class="adminGlobalSettings" style="display:;">
+		<div class="languagesTabs" id="languagesTabs">
+			<span class="active">Основное</span>
+			<span onclick="">Магазин</span>
+			<span onclick="">Склад</span>
+			<span onclick="">Обратная связь</span>
+			<span onclick="">Пользователи</span>
+			<span onclick="">Почта</span>
+		</div>
+	<!--<div id="myitems_sortable" class="" style="display:;">-->
+	<div id="gs-0" class="adminGlobalSettings" style="display:;">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
-		<tbody><tr>
-						<td class="tdGlobalSettings" width="300">Включить/выключить учет остатков на складе</td>
-			<td class="tdGlobalSettings" width=""><input type="checkbox" id="restsOnOff_id" onclick="restsOnOff()"></td>
-			<td class="tdGlobalSettings">&nbsp;</td>
-		</tr>
 		<tr>
 						<td class="tdGlobalSettings" width="300">Ваш е-mail для уведомлений</td>
 			<td class="tdGlobalSettings" width=""><input type="text" style="width: 200px;height:24px;" value="0066aa@mail.ru, lev-arsenal@mail.ru" id="updateSiteSettingsEmail"></td>
@@ -586,43 +598,8 @@ $( ".trGlobalSettings" ).dblclick(function () {
 			<td class="tdGlobalSettings" width=""><input type="text" style="width: 200px;height:24px;" value="(050)304-60-82" id="updateSiteSettingsPhone" placeholder="+38(0__) ___-__-__" required="required" pattern="^\+38\(0\d\d\) \d\d\d\-\d\d\-\d\d$"></td>
 			<td class="tdGlobalSettings"><a href="javascript:updateSiteSettingsPhone()">ok</a></td>
 		</tr>
-				<tr>
-						<td class="tdGlobalSettings" width="300"><b>Уведомлять меня о покупке по SMS</b></td>
-			<td class="tdGlobalSettings" width=""><input type="checkbox" id="sendGoodInfo_id" onclick="sendGoodInfo()" checked  /></td>
-			<td class="tdGlobalSettings">&nbsp;</td>
-		</tr>
-				<tr>
-						<td class="tdGlobalSettings" width="300">Тело счета</td>
-			<td class="tdGlobalSettings" width=""><a href="javascript:get_fast_order_cont()">Изменить</a></td>
-			<td class="tdGlobalSettings">&nbsp;</td>
-		</tr>
 		<tr>
-						<td class="tdGlobalSettings" width="300">Автоматически отправлять счет клиенту после покупки</td>
-			<td class="tdGlobalSettings" width=""><input type="checkbox" id="sendGoodOrder_id" onclick="sendGoodOrder()" checked  /></td>
-			<td class="tdGlobalSettings">&nbsp;</td>
-		</tr>
-		<tr>
-						<td class="tdGlobalSettings" width="300">Активировать «Тип платежа»</td>
-			<td class="tdGlobalSettings" width=""><input type="checkbox" id="sendBasketPayType_id" onclick="sendBasketPayType()" checked  /></td>
-			<td class="tdGlobalSettings">&nbsp;</td>
-		</tr>
-		<tr>
-						<td class="tdGlobalSettings" width="300">Активировать пользовательское соглашение</td>
-			<td class="tdGlobalSettings" width=""><input type="checkbox" id="offertOnOff_id" onclick="offertOnOff()"> <a href="javascript:get_fast_offert_cont()">Изменить</a></td>
-			<td class="tdGlobalSettings">&nbsp;</td>
-		</tr>
-		<tr>
-						<td class="tdGlobalSettings" width="300">Активировать комментарии к товарам</td>
-			<td class="tdGlobalSettings" width=""><input type="checkbox" id="reviewsOnOff_id" onclick="reviewsOnOff()" checked=""></td>
-			<td class="tdGlobalSettings">&nbsp;</td>
-		</tr>
-		<tr>
-						<td class="tdGlobalSettings" width="300">Хранение заказов в корзине</td>
-			<td class="tdGlobalSettings" width=""><input type="number" style="width:45px;height:24px;" value="12" id="updateSiteSettingsOrdersKeep"> часов</td>
-			<td class="tdGlobalSettings"><a href="javascript:__updateSiteSettingsOrdersKeep()">ok</a></td>
-		</tr>
-		<tr>
-						<td class="tdGlobalSettings" width="300">META TITLE по умолчанию</td>
+			<td class="tdGlobalSettings" width="300">META TITLE по умолчанию</td>
 			<td class="tdGlobalSettings" width=""><input type="text" style="width: 200px;height:24px;" value="Мототехника в Полтаве" id="updateSiteSettingsMetaTitleCont"></td>
 			<td class="tdGlobalSettings"><a href="javascript:updateSiteSettingsMetaTitle()">ok</a></td>
 		</tr>
@@ -685,6 +662,93 @@ $( ".trGlobalSettings" ).dblclick(function () {
 			<td class="tdGlobalSettings" width=""><input type="number" style="width: 75px;height:24px;" value="25" id="updateSiteSettingsDollarCont"></td>
 			<td class="tdGlobalSettings"><a href="javascript:updateSiteSettingsDollar()">ok</a></td>
 		</tr>
-	</tbody></table></div>
+	</table></div>
+	
+	<div id="gs-1" class="adminGlobalSettings" style="display:none;">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+			<td class="tdGlobalSettings" width="300">Включить/выключить учет остатков на складе</td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="restsOnOff_id" onclick="restsOnOff()"></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="tdGlobalSettings" width="300"><b>Уведомлять меня о покупке по SMS</b></td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="sendGoodInfo_id" onclick="sendGoodInfo()" checked  /></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="tdGlobalSettings" width="300">Тело счета</td>
+			<td class="tdGlobalSettings" width=""><a href="javascript:get_fast_order_cont()">Изменить</a></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="tdGlobalSettings" width="300">Автоматически отправлять счет клиенту после покупки</td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="sendGoodOrder_id" onclick="sendGoodOrder()" checked  /></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="tdGlobalSettings" width="300">Активировать «Тип платежа»</td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="sendBasketPayType_id" onclick="sendBasketPayType()" checked  /></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="tdGlobalSettings" width="300">Активировать пользовательское соглашение</td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="offertOnOff_id" onclick="offertOnOff()"> <a href="javascript:get_fast_offert_cont()">Изменить</a></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="tdGlobalSettings" width="300">Активировать комментарии к товарам</td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="reviewsOnOff_id" onclick="reviewsOnOff()" checked=""></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		
+		<!-- 00000000000000000000  -->
+		<tr>
+			<td class="tdGlobalSettings" width="300">Активировать комментарии к товарам</td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="reviewsOnOff_id" onclick="reviewsOnOff()" checked=""></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="tdGlobalSettings" width="300">Хранение заказов в корзине</td>
+			<td class="tdGlobalSettings" width=""><input type="number" style="width:45px;height:24px;" value="12" id="updateSiteSettingsOrdersKeep"> часов</td>
+			<td class="tdGlobalSettings"><a href="javascript:__updateSiteSettingsOrdersKeep()">ok</a></td>
+		</tr>
+		</table>
 	</div>
+	<div id="gs-5" class="adminGlobalSettings" style="display:;">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+						<td class="tdGlobalSettings" width="300">Ваш е-mail для уведомлений</td>
+			<td class="tdGlobalSettings" width=""><input type="text" style="width: 200px;height:24px;" value="0066aa@mail.ru, lev-arsenal@mail.ru" id="updateSiteSettingsEmail"></td>
+			<td class="tdGlobalSettings"><a href="javascript:updateSiteSettingsEmail()">ok</a></td>
+		</tr>
+	</table>
+	</div>
+	
+	
+</div>
+
+<script>
+//********************************
+var objs = document.getElementById("languagesTabs").getElementsByTagName("span");
+for(var j=0; j<objs.length; j++){
+	var obj = objs[j];
+	obj.onclick = function(){
+		var objs = document.getElementById("gsAll").getElementsByClassName("adminGlobalSettings");
+		var sobjs = document.getElementById("languagesTabs").getElementsByTagName("span");
+		for(var j=0; j<objs.length; j++){
+			var obj = document.getElementById("gs-"+j);
+			if(obj){
+				obj.style.display = "none";
+				sobjs[j].className = "";
+				if(sobjs[j]==this){
+					obj.style.display = "";
+					sobjs[j].className = "active";
+				}
+			}
+		}
+	}
+}
+</script>
+
 <? } ?>

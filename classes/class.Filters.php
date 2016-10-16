@@ -331,7 +331,7 @@ class Filters extends DatabaseInterface{
 	function saveFilterField($array){
 		//print_r($array);
 		$q = "UPDATE `filters` SET %data% WHERE `id`='$array[fieldId]' ";
-		$data = "`name`='$array[fieldName]', ";
+		$data = "`name$array[langPrefix]`='$array[fieldName]', ";
 		$data .= "`link`='$array[fieldDBName]', ";
 		$data .= "`datatype`='$array[fieldDataType]', ";
 		$data .= "`datalength`='$array[fieldDataLength]', ";
@@ -735,11 +735,11 @@ class Filters extends DatabaseInterface{
 			$hasPort = false;
 			if($filter['id']!=$parent['id'] || !$fieldId){
 				$fields = $this->getFilterDataFromId($filter['id']);
-				foreach($fields as $field){
+				if(is_array($fields)){ foreach($fields as $field){
 					if(preg_match("/:port(:|$)/", $field['datatype'])){
 						$hasPort = true;
 					}
-				}
+				}}
 				//***************
 				if($hasPort){
 					$return[] = $filter;
@@ -766,13 +766,13 @@ class Filters extends DatabaseInterface{
 		foreach($filtersCatalog as $filter){
 			if(  (($filter['id']!=$parent['id'] || !$fieldId) && !$filterId)  ||  ($filterId==$filter['id'])  ){
 				$fields = $this->getFilterDataFromId($filter['id']);
-				foreach($fields as $field){
+				if(is_array($fields)){ foreach($fields as $field){
 					if(preg_match("/:port(:|$)/", $field['datatype'])){
 						$field['name'] = $filter['name']." . ".$field['name'];
 						$field['port'] = $filter['link'].".".$field['link'];
 						$return[] = $field;
 					}
-				}
+				}}
 			}
 		}
 		//print_r($return);
@@ -993,10 +993,14 @@ class Filters extends DatabaseInterface{
 		//$txt = str_replace("\\\\", "\\", $array['text']);
 		//$txt = str_replace("\\'", "'", $array['text']);
 		$txt = stripslashes($array['text']);
-		if(file_exists("snippets/$type-$fieldType-".($array['fieldId']).".php")){
-			unlink("snippets/$type-$fieldType-".($array['fieldId']).".php");
+		$ext = "php";
+		if($type=="sender"){
+			$ext = "js";
 		}
-		file_put_contents("snippets/$type-$fieldType-".($array['fieldId']).".php", $txt);
+		if(file_exists("snippets/$type-$fieldType-".($array['fieldId']).".$ext")){
+			unlink("snippets/$type-$fieldType-".($array['fieldId']).".$ext");
+		}
+		file_put_contents("snippets/$type-$fieldType-".($array['fieldId']).".$ext", $txt);
 		//echo "snippets/$type-$fieldType-".($array['fieldId']).".php";
 	}
 	

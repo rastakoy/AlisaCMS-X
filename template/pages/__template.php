@@ -103,6 +103,7 @@ onclick="help_sver_menu_toggle(this)" />
 
 <div id="popup_bg" style="display:none;"></div>
 <div id="popup_cont" style="display:none;"></div>
+<div id="popup_title" style="display:none;"></div>
 <div id="popup_close" style="display:none;"></div>
 
 <script>

@@ -69,3 +69,23 @@ div.submenu{
 	border-bottom:none;
 	padding-top: 5px;
 }
+
+
+/*    change parent   */
+.ulChangeParent{
+	margin:0;
+	padding:0;
+	padding-left: 16px;
+}
+.ulChangeParent li{
+	list-style-type:none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.ulChangeParent li:first-child{
+	padding-top: 10px;
+}
+.ulChangeParent li:last-child{
+	padding-bottom: 0px;
+}
+/*    //change parent   */

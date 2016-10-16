@@ -840,13 +840,16 @@ function saveNewLeftMenuItem(){
 	paction += "&lang=<?=$langPrefix?>";
 	paction += "&parents=<?=$params['parents']?>";
 		<? if(is_array($fields) && $option['external']!='1'){ foreach($fields as $field){
+				echo "//snippets/sender-$fileName-".($field['id']).".js\n";
 				$fileName = str_replace(":", "-", $field['datatype']);
 				if(file_exists("snippets/sender-$fileName-".($field['id']).".js")){
 					require("snippets/sender-$fileName-".($field['id']).".js");
+					echo "\n";
 				}elseif(file_exists("snippets/sender-$fileName.js")){
 					require("snippets/sender-$fileName.js");
+					echo "\n";
 				}else{
-					echo "console.log('Τΰιλ ρνθοοεςΰ «".$field["name$langPrefix"]."» νε νΰιδεν');";
+					echo "console.log('Τΰιλ ρνθοοεςΰ «".$field["name$langPrefix"]."» νε νΰιδεν');\n";
 				}
 		}} ?>
 	
@@ -881,7 +884,7 @@ function saveNewLeftMenuItem(){
 	}*/
 	
 	//console.log(__PARAMS);
-	console.log(paction);
+	//console.log(paction);
 	//return false;
 	startPreloader();
 	$.ajax({
@@ -889,14 +892,18 @@ function saveNewLeftMenuItem(){
 		url: __ajax_url,
 		data: paction,
 		success: function(html) {
-			console.log(html);
+			//console.log(html);
 			data = eval("("+html+")");
 			if(data.error=='1'){
 				//alert("error");
 				testForConformance(data.option, data.filterId);
 			}else{
 				__GLOBALS.editing = false;
-				getData('<?=$GLOBALS['adminBase']?>/?option=<?=$params['option']?>,parents=<?=$params['parents']?>');
+				if(data.parents){
+					getData('<?=$GLOBALS['adminBase']?>/?option=<?=$params['option']?>,parents='+data.parents);
+				}else{
+					getData('<?=$GLOBALS['adminBase']?>/?option=<?=$params['option']?>,parents=<?=$params['parents']?>');
+				}
 			}
 		}
 	});

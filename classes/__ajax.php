@@ -370,6 +370,17 @@ switch($array['ajax']){
 	case 'saveFilterSnippet':
 		echo $classFilters->saveFilterSnippet($array);
 		break;
+	case 'getAllFoldersTree':
+		$folders = $classData->getAllFoldersTree($array);
+		$folders['data'] = $folders;
+		$folders['elId'] = $array['elId'];
+		$folders = $admin->iconvArray($folders, "CP1251", "UTF-8");
+		$json = json_encode($folders);
+		echo $json;
+		break;
+	case 'setNewItemParent':
+		echo $classData->setNewItemParent($array);
+		break;
 	default:
 		//Значение параметра ajax по-умолчанию
 		break;

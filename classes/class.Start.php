@@ -155,7 +155,7 @@ class Start extends DatabaseInterface{
 			$submenu = '0';
 		}
 		$q = "UPDATE `menusettings` SET `name`='$array[name]', `link`='$array[link]', `active`='$array[active]', `external`='$array[external]', ";
-		$q .= "`filter`='$array[filter]', `submenu`='$submenu', `title`='$titles' WHERE `id`='$array[id]' ";
+		$q .= "`filter`='$array[filter]', `submenu`='$submenu', `title`='$titles', `comments`='$array[comments]' WHERE `id`='$array[id]' ";
 		//echo $q."\n";
 		$query = $this->query($q);
 	}

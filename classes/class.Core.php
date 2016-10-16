@@ -26,6 +26,10 @@ class Core extends DatabaseInterface{
 			$array[$key] = str_replace("'", "\\'", $value);
 		}
 		//*************************************
+		if($params['lang']!='' && $params['lang']!=$GLOBALS['language']){
+			$langPrefix='_'.$params['lang'];
+		}
+		//*************************************
 		$showTemplate = false;
 		$loadPage = false;
 		$itemTemplate = false;
@@ -139,7 +143,7 @@ class Core extends DatabaseInterface{
 								$loadPage = '__filters';
 								$filter = $classFilters->getFilterClass($params['itemId']);
 								$filter = $classFilters->makeConnectors($filter);
-								$options = $classData->getOptions();
+								$options = $classData->getOptions(true);
 								$filterOption = $classMenuSettings->getMenuItemByName($params['option']);
 								$ports = $classFilters->getTablesPorts();
 								$tablesWIthPorts = $classFilters->getTablesHasPorts();
@@ -151,7 +155,6 @@ class Core extends DatabaseInterface{
 								//$filter = $classFilters->getFilterOption($params['itemId']);
 								break;
 							}
-							if($params['lang']!='' && $params['lang']!=$GLOBALS['language']){ $langPrefix='_'.$params['lang']; }
 							if($params['itemId']==''){
 								//echo "addNew";
 							}

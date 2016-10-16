@@ -35,6 +35,7 @@ div#show_cssblock_cont{
 	z-index:901;
 }
 
+/*  POPUP   */
 div#popup_bg{
 	background-color: #666666;
 	position: absolute;
@@ -59,7 +60,7 @@ div#popup_close{
 	-moz-opacity: 0.8; /* код для движков Mozilla */
 	opacity:.80;  /*свойство из спецификации CSS3, которое поддерживается не всеми браузерами*/
 	filter: alpha(opacity=80); /* код для IE */
-	z-index:902;
+	z-index:903;
 }
 div#popup_cont{
 	background-color: #FFFFFF;
@@ -71,6 +72,20 @@ div#popup_cont{
 	overflow: auto;
 	z-index:901;
 }
+div#popup_title{
+	background-color: #DADADA;
+	position: absolute;
+	border: 1px solid #006600;
+	width: 100px;
+	padding: 7px;
+	z-index:902;
+	text-transform:uppercase;
+	font-weight:bold;
+	text-align:center;
+	transition:left .35s ease;
+}
+/*  /POPUP   */
+
 h2#h2_imgeProperties{
 	padding:0;
 	margin:0;
