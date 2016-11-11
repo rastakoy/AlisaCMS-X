@@ -3,10 +3,10 @@
 <div class="menuitem" style="float:none;clear:both;"><strong>
 <img src="/adminarea/template/images/green/icons/briffing.gif" align="absmiddle">
 <a href="/adminarea/" class="amenu">Общие настройки</a></strong></div>
-<!--  -------------------------------------------------------------------- -->
+<!--  --------------------------------------------------------------------
 <div class="menuitem" style="float:none;clear:both;"><strong>
 <img src="/adminarea/template/images/green/icons/briffing.gif" align="absmiddle">
-<a href="/adminarea/scheme" class="amenu">Схема сайта</a></strong></div>
+<a href="/adminarea/scheme" class="amenu">Схема сайта</a></strong></div> -->
 <? foreach($leftMenu as $option){ ?>
 <div class="menuitem" id="root<?=$option['link']?>menu">
 <? if($option['submenu']){ ?><img src="/adminarea/template/tree/plus.jpg" style="cursor:pointer;"
@@ -29,9 +29,9 @@ $(document).ready(function(){
 <!--  -------------------------------------------------------------------- -->
 <div class="menuitem" style="float:none;clear:both;"><strong>
 <a href="?option=trash" class="amenu">Утилизация</a></strong></div>
-<!--  -------------------------------------------------------------------- -->
+<!--  --------------------------------------------------------------------
 <div class="menuitem" style="float:none;clear:both;"><strong>
-<a href="/adminarea/exit/" class="amenu">! Выход</a></strong></div>
+<a href="/adminarea/exit/" class="amenu">! Выход</a></strong></div> -->
 <!--  -------------------------------------------------------------------- -->
 <div class="menuitem" style="transition:none;background:url(/adminarea/template/images/green/menu_hr_static_long.jpg); background-repeat:no-repeat;">&nbsp;</div> 
 <!--  -------------------------------------------------------------------- -->

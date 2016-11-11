@@ -61,6 +61,7 @@ function getData(url, newParam, newValue){
 		}
 	}
 	closeHelpWindow();
+	destructTiny();
 	if(!url || url=='false'){ url=window.location.pathname; }
 	var test = url.split('?');
 	var params = false;
@@ -173,6 +174,7 @@ function getData(url, newParam, newValue){
 			success: function(html) {
 				//html = (html=='')?'{}':html;
 				//alert(html);
+				//console.log(html);
 				loading = false;
 				obj = document.getElementById("adminarearight");
 				obj.style.display = "";
@@ -464,7 +466,7 @@ function initItems(){
 		//__css_itemShowCSS();
 	});
 	
-	if(init_dop_popup_v_01_var && __PARAMS['option']!='trash'){
+	if(init_dop_popup_v_01_var && __PARAMS['option']!='trash' && __PARAMS['option']!='orders' ){
 	$( "#myitems_sortable" ).sortable({
 			cursorAt: { left: -20 },
 			//items: "div:not(.dmulti2)",
@@ -673,4 +675,14 @@ function getRootFilters(){
 	});
 }
 //************************************************
-
+function destructTiny(){
+	var objs = document.getElementsByTagName("textarea");
+	for(var j=0; j<objs.length; j++){
+		var obj = objs[j];
+		if(obj.id!=''){
+			tinyMCE.execCommand('mceRemoveControl',true, obj.id);
+			//console.log("Текстовый блок "+obj.id+" отключен");
+		}
+	}
+}
+//************************************************

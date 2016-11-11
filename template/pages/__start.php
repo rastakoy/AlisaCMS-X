@@ -580,10 +580,11 @@ $( ".trGlobalSettings" ).dblclick(function () {
 		<div class="languagesTabs" id="languagesTabs">
 			<span class="active">Основное</span>
 			<span onclick="">Магазин</span>
+			<span onclick="">Почта</span>
 			<span onclick="">Склад</span>
 			<span onclick="">Обратная связь</span>
 			<span onclick="">Пользователи</span>
-			<span onclick="">Почта</span>
+			
 		</div>
 	<!--<div id="myitems_sortable" class="" style="display:;">-->
 	<div id="gs-0" class="adminGlobalSettings" style="display:;">
@@ -672,6 +673,11 @@ $( ".trGlobalSettings" ).dblclick(function () {
 			<td class="tdGlobalSettings">&nbsp;</td>
 		</tr>
 		<tr>
+			<td class="tdGlobalSettings" width="300">Управление статусами заказов</td>
+			<td class="tdGlobalSettings" width=""><button onclick="getOrderStatuses()" style="width:150px;">Настроить</button></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
 			<td class="tdGlobalSettings" width="300"><b>Уведомлять меня о покупке по SMS</b></td>
 			<td class="tdGlobalSettings" width=""><input type="checkbox" id="sendGoodInfo_id" onclick="sendGoodInfo()" checked  /></td>
 			<td class="tdGlobalSettings">&nbsp;</td>
@@ -715,11 +721,17 @@ $( ".trGlobalSettings" ).dblclick(function () {
 		</tr>
 		</table>
 	</div>
-	<div id="gs-5" class="adminGlobalSettings" style="display:;">
+	
+	<div id="gs-2" class="adminGlobalSettings" style="display:none;">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 		<tr>
-						<td class="tdGlobalSettings" width="300">Ваш е-mail для уведомлений</td>
+			<td class="tdGlobalSettings" width="300">Ваш е-mail для уведомлений</td>
 			<td class="tdGlobalSettings" width=""><input type="text" style="width: 200px;height:24px;" value="0066aa@mail.ru, lev-arsenal@mail.ru" id="updateSiteSettingsEmail"></td>
+			<td class="tdGlobalSettings"><a href="javascript:updateSiteSettingsEmail()">ok</a></td>
+		</tr>
+		<tr>
+			<td class="tdGlobalSettings" width="300">Ваш е-mail для уведомлений</td>
+			<td class="tdGlobalSettings" width=""><button>Добавить ящик</button></td>
 			<td class="tdGlobalSettings"><a href="javascript:updateSiteSettingsEmail()">ok</a></td>
 		</tr>
 	</table>
@@ -729,6 +741,216 @@ $( ".trGlobalSettings" ).dblclick(function () {
 </div>
 
 <script>
+//********************************
+function saveOrderStatus(){
+	var paction = "ajax=saveOrderStatus";
+	paction += "&id="+document.getElementById("newOrderStatusId").value;
+	paction += "&name="+encodeURIComponent(document.getElementById("newOrderStatusName").value);
+	paction += "&link="+encodeURIComponent(document.getElementById("newOrderStatusLink").value);
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			console.log(html);
+		}
+	});
+}
+//********************************
+function getOrderStatuses(){
+	var paction = "ajax=getOrderStatuses";
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			console.log(html);
+			var allData = eval("("+html+")");
+			var data = allData['data'];
+			var inner = "";
+			inner += "<div style=\"padding:10px;\" id=\"\">";
+			inner += "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"  width=\"100%\" >";
+			inner += "<tr style=\"background-color:#FFF;\">";
+				inner += "<td style=\"padding-left:5px;\" width=\"150\"><b>Название</b></td>";
+				inner += "<td colspan=\"2\" width=\"120\"><b>Убрать со склада</b></td>";
+				inner += "<td><b>Вернуть<br/>на склад</b></td>";
+				inner += "<td width=\"100\">&nbsp;</td>";
+				inner += "<td>&nbsp;</td>";
+			inner += "</tr></table></div>";
+			inner += "<div style=\"padding:10px;\" id=\"divGetOrderStatuses\">";
+			for(var j in data){
+				//console.log(data[j]);
+				inner += "<div style=\"height:32px;\" id=\"\">";
+				inner += "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"  width=\"100%\" >";
+				inner += "<tr style=\"background-color:#FFF;\">";
+					inner += "<td class=\"tdGlobalSettings\" width=\"150\">"+data[j].name+"</td>";
+					inner += "<td class=\"tdGlobalSettings\" width=\"100\">";
+					inner += "<img onclick=\"setGoodFromStoreToTMP(this)\" id=\"sgfstTMP_"+data[j].id+"\" ";
+					inner += " src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif\" align=\"absmiddle\" />&nbsp;";
+					inner += "временно</td>";
+					inner += "<td class=\"tdGlobalSettings\" width=\"100\">";
+					inner += "<img onclick=\"setGoodFromTMPToClient(this)\" id=\"sgfTMPtc_"+data[j].id+"\" ";
+					inner += " src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif\" align=\"absmiddle\" />&nbsp;";
+					inner += "постоянно</td>";
+					inner += "<td class=\"tdGlobalSettings\" width=\"100\">";
+					inner += "<img onclick=\"setGoodFromClientToStore(this)\" id=\"sgfctc_"+data[j].id+"\" ";
+					inner += " src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif\" align=\"absmiddle\" />&nbsp;";
+					inner += "вернуть</td>";
+					inner += "<td class=\"tdGlobalSettings\">&nbsp;</td>";
+					inner += "<td class=\"tdGlobalSettings\" width=\"30\"><a href=\"javascrip:\">";
+					inner += "<img src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/delete_item.gif\" align=\"absmiddle\" />";
+					inner += "</a></td>";
+					
+				inner += "</tr></table></div>";
+			}
+			inner += "</div>";
+			inner += "<div style=\"padding:10px;\" id=\"\">";
+			inner += "<input type=\"hidden\" id=\"newOrderStatusId\" />";
+			inner += "<input type=\"text\" style=\"width:150px;height:25px;\" placeholder=\"Название\" id=\"newOrderStatusName\" />&nbsp;&nbsp;";
+			inner += "<input type=\"text\" style=\"width:150px;height:25px;\" placeholder=\"Идентификатор\" id=\"newOrderStatusLink\" />&nbsp;&nbsp;";
+			inner += "<button style=\"width:150px;height:25px;\" id=\"newOrderStatusButton\" onclick=\"saveOrderStatus()\">Добавить состояние</button>";
+			inner += "</div>";
+			document.getElementById("popup_cont").innerHTML = inner;
+			document.getElementById("popup_title").innerHTML = "Управление статусами заказов";
+			
+			var preloaderParams = false;
+			preloaderParams = {
+				'callback':function(){
+					//alert("Тестирование");
+				}
+			}
+			inputPreloader(document.getElementById("newOrderStatusName"), 'testNewOrderStatusName', preloaderParams);
+			
+			var preloaderParams = false;
+			preloaderParams = {
+				'callback':function(){
+					//alert("Тестирование");
+				}
+			}
+			inputPreloader(document.getElementById("newOrderStatusLink"), 'testNewOrderStatusLink', preloaderParams);
+			
+			var myStyle = {
+				"width":"600"
+			}
+			__popup(myStyle);
+			$( "#divGetOrderStatuses" ).sortable({
+				//cursorAt: { left: -20 },
+				//items: "div:not(.dmulti2)",
+				//cancel: ".dmulti2",
+				start: function(){
+					//$(".dmulti2").css("display","none");
+					//$(".dmulti").css("border-bottom-left-radius","15px");
+					//$(".dmulti").css("border-bottom-right-radius","15px");
+					//alert(this.firstChild.firstChild.className);
+				},
+				update: function() {
+				//	testChanger();
+				//	var mURL = gurl.replace(/\/{1,10}$/, "");
+				//	mURL = mURL.replace(/^\/adminarea\//, "");
+				//	//mURL = explode("/", mURL);
+				//	savePriors(mURL);
+				//	//save_myitems_prior();
+				//	//$("#items_left_menu a").hover("destroy");
+				//	//$("#rootfoldermenu a").hover("destroy");
+				//	$("#items_left_menu a").off( "mouseenter mouseleave" );
+				//	$("#rootfoldermenu a").off( "mouseenter mouseleave" );
+				//	$("#rootfoldermenu a").css("background-color", "");
+				//	rowToFolderDragNDrop = false;
+				//	itemToFolderDragNDrop = false;
+				//	//document.querySelector("#prm_*");
+				},
+				sort: function() {
+				//	//alert(this.items);
+				//	$("#items_left_menu a").hover(function() {
+				//		$(this).css("background-color", "#FF0000");
+				//		rowToFolderDragNDrop = this;
+				//	}, function() {
+				//		this.style.backgroundColor = "";
+				//		rowToFolderDragNDrop = false;
+				//	});
+				//	$("#rootfoldermenu a").hover(function() {
+				//		$(this).css("background-color", "#FF0000");
+				//		rowToFolderDragNDrop = {"href":"javascript:show_ritems(0"};
+				//	}, function() {
+				//		$(this).css("background-color", "");
+				//		rowToFolderDragNDrop = false;
+				//	});
+				},
+				stop: function( event, ui ) {
+				//	//$(".dmulti2").css("display","");
+				//	$(".dmulti2").css("display","");
+				//	$(".dmulti").css("height","");
+				//	$(".dmulti").css("border-bottom-left-radius","0");
+				//	$(".dmulti").css("border-bottom-right-radius","0");
+				//	if(rowToFolderDragNDrop){
+				//		hpp = itemToFolderDragNDrop.id.replace(/^div_myitemname_/, "");
+				//		hrr = rowToFolderDragNDrop.href.replace(/^javascript:show_ritems\(/, "");
+				//		hrr = hrr.replace(/\)$/, "");
+				//		change_item_parent_dnd(hpp, hrr);
+				//		//$("#items_left_menu a").hover("destroy");
+				//		//$("#rootfoldermenu a").hover("destroy");
+				//		$("#items_left_menu a").off( "mouseenter mouseleave" );
+				//		$("#rootfoldermenu a").off( "mouseenter mouseleave" );
+				//		$("#rootfoldermenu a").css("background-color", "");
+				//		rowToFolderDragNDrop = false;
+				//		itemToFolderDragNDrop = false;
+				//	}
+				}
+			});
+		}
+	});
+}
+//********************************
+function setGoodFromStoreToTMP(obj){
+	var idPrefix = obj.id.replace(/_[0-9]*$/gi, '_');
+	var aobjs = document.querySelectorAll( 'img[id^="' + idPrefix );
+	for(var j=0; j<aobjs.length; j++){
+		var aobj = aobjs[j];
+		if(aobj!=obj){
+			aobj.src = aobj.src.replace(/_checked\.gif$/gi, '.gif');
+		}
+	}
+	//console.log(aobjs);
+	if(obj.src.match(/_checked\.gif$/)){
+		obj.src = obj.src.replace(/_checked\.gif$/gi, '.gif');
+	}else{
+		obj.src = obj.src.replace(/\.gif$/gi, '_checked.gif');
+	}
+}
+//********************************
+function setGoodFromTMPToClient(obj){
+	var idPrefix = obj.id.replace(/_[0-9]*$/gi, '_');
+	var aobjs = document.querySelectorAll( 'img[id^="' + idPrefix );
+	for(var j=0; j<aobjs.length; j++){
+		var aobj = aobjs[j];
+		if(aobj!=obj){
+			aobj.src = aobj.src.replace(/_checked\.gif$/gi, '.gif');
+		}
+	}
+	//console.log(aobjs);
+	if(obj.src.match(/_checked\.gif$/)){
+		obj.src = obj.src.replace(/_checked\.gif$/gi, '.gif');
+	}else{
+		obj.src = obj.src.replace(/\.gif$/gi, '_checked.gif');
+	}
+}
+//********************************
+function setGoodFromClientToStore(obj){
+	var idPrefix = obj.id.replace(/_[0-9]*$/gi, '_');
+	var aobjs = document.querySelectorAll( 'img[id^="' + idPrefix );
+	for(var j=0; j<aobjs.length; j++){
+		var aobj = aobjs[j];
+		if(aobj!=obj){
+			aobj.src = aobj.src.replace(/_checked\.gif$/gi, '.gif');
+		}
+	}
+	//console.log(aobjs);
+	if(obj.src.match(/_checked\.gif$/)){
+		obj.src = obj.src.replace(/_checked\.gif$/gi, '.gif');
+	}else{
+		obj.src = obj.src.replace(/\.gif$/gi, '_checked.gif');
+	}
+}
 //********************************
 var objs = document.getElementById("languagesTabs").getElementsByTagName("span");
 for(var j=0; j<objs.length; j++){

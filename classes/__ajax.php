@@ -381,6 +381,21 @@ switch($array['ajax']){
 	case 'setNewItemParent':
 		echo $classData->setNewItemParent($array);
 		break;
+	case 'getOrderStatuses':
+		$statuses = $classOrders->getOrderStatuses();
+		$statuses = $admin->iconvArray($statuses, "CP1251", "UTF-8");
+		$json = json_encode($statuses);
+		echo $json;
+		break;
+	case 'testNewOrderStatusName':
+		echo $classOrders->testNewOrderStatusName($array);
+		break;
+	case 'testNewOrderStatusLink':
+		echo $classOrders->testNewOrderStatusLink($array);
+		break;
+	case 'saveOrderStatus':
+		echo $classOrders->saveOrderStatus($array);
+		break;
 	default:
 		//Значение параметра ajax по-умолчанию
 		break;

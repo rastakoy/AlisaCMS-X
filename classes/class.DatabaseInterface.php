@@ -64,6 +64,7 @@ class DatabaseInterface extends Mysqli{
 		$exceptions[] = "CREATE";
 		$exceptions[] = "ALTER";
 		$exceptions[] = "`admins`";
+		$exceptions[] = "`comments`";
 		$exceptions[] = "`settings`";
 		$exceptions[] = "`menusettings`";
 		$exceptions[] = "`images`";
@@ -100,6 +101,10 @@ class DatabaseInterface extends Mysqli{
 			//	'stackTrace' => $e->getTrace()
 			//));
 		}
+	}
+	
+	function okamaBlade($q){
+		
 	}
 
 }

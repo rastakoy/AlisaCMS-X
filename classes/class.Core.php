@@ -45,6 +45,8 @@ class Core extends DatabaseInterface{
 		
 		$classTrash = new Trash();
 		$classStart = new Start();
+		$classBarcode = new Barcode();
+		$classOrders = new Orders();
 		
 		$externalData = new ExternalData(); //класс для работы с данными из внешних источников
 		
@@ -96,6 +98,31 @@ class Core extends DatabaseInterface{
 					$trash = $classTrash->constructor($trash);
 					$showTemplate = true;
 					$loadPage = '__trash';
+					break;
+				case 'orders':
+					$optionName = $params['option'];
+					//$optionName = preg_replace("/\/.*$/", "", $array['url']);
+					$query = $this->query("SELECT * FROM `menusettings` WHERE `link`='$params[option]' ");
+					$option = $query->fetch_assoc();
+					if($classData->isExternal($params['option'])){
+						$parents = $classData->getExternalParents($params);
+					}else{
+						$parents = $classData->getParents($params);
+					}
+					$titles = $classData->constructTitles($option['title'], $parents);
+					$folder = $classData->getFolder($parents[count($parents)-1]['id'], $optionName);
+					//if(count($parents)=='0'){
+					//	//$items = $classMenuSettings->getOptions($params['option'], '0', '');
+					//	$items = $classData->getItems($params['option'], '0', '');
+					//}else{
+					//	$items = $classData->getItems($params['option'], $parents[count($parents)-1]['id'], '');
+					//}
+					$items = $classOrders->getOrders();
+					$items = $items['data'];
+					
+					
+					$showTemplate = true;
+					$loadPage = '__orders';
 					break;
 				default:
 					//echo count($url);

@@ -89,7 +89,7 @@ function openLeftBranch(option, parent){
 }
 //************************************************
 function constructBranch(option, data, parent){
-	//alert(option);
+	alert(option);
 	//alert(JSON.stringify(data));
 	var inner = "<ul>";
 	for(var j in data){

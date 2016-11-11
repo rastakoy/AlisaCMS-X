@@ -23,16 +23,17 @@ function inputPreloader(object, ajax, preloaderParams){
 					paction += "&"+j+"="+encodeURIComponent(preloaderParams[j]);
 				}
 			}
-			console.log(paction);
+			//console.log(paction);
 			object.oldValue = this.value;
 			$.ajax({
 				type: "POST",
 				url: __ajax_url,
 				data: paction,
 				success: function(html) {
-					console.log(html);
+					//console.log(html);
 					html = (html=='')?'{}':html;
 					var data = eval("("+html+")");
+					//console.log(data);
 					var object = document.getElementById(data.elementId);
 					object.className.replace(/( ?inputpreloader ?| ?inputok ?| ?inputfalse ?)/gi, '');
 					if(data.return=='1'){

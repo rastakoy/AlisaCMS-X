@@ -138,6 +138,7 @@ class Data extends DatabaseInterface{
 		while($option=$query->fetch_assoc()){
 			$option['children'] = $this->testItemForChildren($tableName, $option['id'], '1');
 			$option['parents'] = $this->getParentsWay($tableName, $option['id']);
+			$option['includeComments'] = $this->hasComments($tableName, $option);
 			$option['tumb'] = $this->getImages($tableName, $option['id']);
 			//echo $url."\n";
 			//echo "optionName=$tableName:::".$option['href']."\nurl=$url\n";
@@ -753,6 +754,33 @@ class Data extends DatabaseInterface{
 		//	print_r($folders);
 		//}
 		return $folders;
+	}
+	
+	/**
+	
+	*/
+	function hasComments($tableName, $item){
+		$q = "SELECT * FROM `menusettings` WHERE `link`='$tableName' ";
+		$query = $this->query($q);
+		if(!$query) return '0';
+		$option = $query->fetch_assoc();
+		if($option['comments']=='0') return '0';
+		if($item['folder']=='1'){
+			$q = "SELECT * FROM `comments` WHERE `option`='$tableName' AND `letters` LIKE('$item[letters]%') ";
+		}else{
+			$q = "SELECT * FROM `comments` WHERE `option`='$tableName' AND `parent`='$item[id]' ";
+		}
+		//echo $q."\n";
+		$query = $this->query($q);
+		if($query){
+			if($query->num_rows>0){
+				return '1';
+			}else{
+				return '0';
+			}
+		}else{
+			return '0';
+		}
 	}
 	
 	/**

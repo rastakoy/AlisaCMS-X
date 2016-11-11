@@ -820,10 +820,7 @@ if(is_array($fields) && $option['external']!='1'){ foreach($fields as $field){
 			} ?>
 		<? break;
 }*/}} ?>
-<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-	<td width="150" height="30">&nbsp;</td>
-	<td><button onclick="saveNewLeftMenuItem()">Сохранить</button>  <button onclick="getPage(window.location.pathname)">Отменить</button></td>
-</tr></table></div>
+</div>
 <? if($parents[count($parents)-1]['id']){
 	$myParent = $parents[count($parents)-1]['id'];
 }else{
@@ -849,7 +846,9 @@ function saveNewLeftMenuItem(){
 					require("snippets/sender-$fileName.js");
 					echo "\n";
 				}else{
-					echo "console.log('Файл сниппета «".$field["name$langPrefix"]."» не найден');\n";
+					if($fileName!='virtual-saveblock'){
+						echo "console.log('Файл сниппета «".$field["name$langPrefix"]."» не найден');\n";
+					}
 				}
 		}} ?>
 	
@@ -1102,6 +1101,7 @@ if($item['folder']=='1' && $titles['0']!='static') { //Выписываем дирректорию
 			<td height="34" width="20">&nbsp;</td>
 			<td height="34" width="20"><a href="javascript:" title="Внимание: незаполненные поля">&nbsp;</a></td>
 			<td height="34" width="20">&nbsp;</td>
+			<td height="34" width="20">&nbsp;</td>
 			<td height="34" width="20"><a href="javascript:" title="<?=strip_tags($editFolderTitle)?>"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/edit_item.gif" id="imgoptions_1" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="getData('<?=$GLOBALS['adminBase']?>/?option=<?=$params['option']?>,action=editFolder,folderId=<?=$item['id']?>,parents=<?=$params['parents']."->".$item['id']?>')"></a></td>
 			<td height="34" width="20"><a href="javascript:" title="Удалить запись"><img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/delete_item.gif" id="imgoptions_1" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="addToTrash('<?=$item['id']?>')"></a></td>
 		</tr></table>
@@ -1138,6 +1138,10 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 			<td height="34" width="20">&nbsp;</td>
 			<td height="34" width="20"><a href="javascript:" title="Внимание: незаполненные поля">&nbsp;</a></td>
 			<!--<td height="34" width="20"><a href="javascript:" title="Клонировать запись"><img src="/adminarea/template/images/green/icons/copy.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="clone_myitemblock('105')"></a></td>-->
+			<td height="34" width="20"><? if($item['includeComments']=='1'){ ?>
+				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/comments.gif"
+				id="imgcomments_<?=$item['id']?>" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"><? } ?>
+			</td>
 			<td height="34" width="20"><a href="javascript:" title="Редактировать запись"><img src="/adminarea/template/images/green/myitemname_popup/edit_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"></a></td>
 			<td height="34" width="20"><a href="javascript:" title="Удалить запись"><img src="/adminarea/template/images/green/myitemname_popup/delete_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="addToTrash('<?=$item['id']?>')"></a></td>
 		</tr></table>

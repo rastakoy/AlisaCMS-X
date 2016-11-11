@@ -70,6 +70,7 @@ function openLeftBranch(option, parent){
 }
 //************************************************
 function constructBranch(option, data, parent){
+	//alert("test");
 	//console.log(JSON.stringify(data));
 	var inner = "<ul>";
 	for(var j in data){
@@ -81,6 +82,9 @@ function constructBranch(option, data, parent){
 				inner += "<img src=\"/adminarea/template/tree/minus.jpg\" align=\"absmiddle\"></a>";
 			}else{
 				inner += "<img src=\"/adminarea/template/tree/plus.jpg\" align=\"absmiddle\"></a>";
+			}
+			if(data[j].includeComments=='1'){
+				inner += "YES";
 			}
 			inner += "<a onclick=\"getData('/adminarea/?option="+option+",parents="+data[j].parents+"');addLeftBranchRed(this);return false;\" ";
 			inner += "href=\"/adminarea/?option="+option+",parents="+data[j].parents+"\">"+data[j].name+"</a>";
