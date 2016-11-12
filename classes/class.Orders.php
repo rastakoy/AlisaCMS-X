@@ -25,21 +25,6 @@ class Orders extends DatabaseInterface{
 		}
 		$query = $this->query($q);
 		while($option=$query->fetch_assoc()){
-			//$option['children'] = $this->testItemForChildren($tableName, $option['id'], '1');
-		//	$option['parents'] = $this->getParentsWay($tableName, $option['id']);
-		//	$option['includeComments'] = $this->hasComments($tableName, $option);
-		//	$option['tumb'] = $this->getImages($tableName, $option['id']);
-			//echo $url."\n";
-			//echo "optionName=$tableName:::".$option['href']."\nurl=$url\n";
-		//	$prega = "/".str_replace("/", "\\/", $option['href'])."/";
-			//echo "prega=$prega\n";
-		//	if(preg_match($prega, $url) && $option['children']>0){
-		//		//echo "prega=$prega\n";
-		//		$option['openBranch'] = $this->getItems($tableName, $option['id'], true, $url);
-		//	}else{
-		//		$option['openBranch'] = false;
-		//	}
-		//	//echo $notice['href'];
 			$options[] = $option;
 		}
 		$return['data'] = $options;
@@ -53,9 +38,14 @@ class Orders extends DatabaseInterface{
 	
 	*/
 	function getOrderStatuses(){
+		$exceptions[] = "new";
+		$exceptions[] = "working";
+		$exceptions[] = "sended";
+		$exceptions[] = "cancel";
 		$q = "SELECT * FROM `orderstatuses` ORDER BY `prior` ASC ";
 		$query = $this->query($q);
 		while($status=$query->fetch_assoc()){
+			foreach($exceptions as $exception) if($status['link']==$exception) $status['exception'] = '1';
 			$statuses[] = $status;
 		}
 		$return['data'] = $statuses;
@@ -130,6 +120,73 @@ class Orders extends DatabaseInterface{
 		}
 		$string .= "}";
 		return $string;
+	}
+	
+	/**
+	
+	*/
+	function saveOrderStatus($array){
+		//print_r($array);
+		$query = $this->query("SELECT * FROM `orderstatuses` ORDER BY `prior` DESC LIMIT 0,1 ");
+		$status = $query->fetch_assoc();
+		$newPrior = $status['prior']+10;
+		if(!$array['id']){
+			$query = $this->query("INSERT INTO `orderstatuses` (`prior`) VALUES ('$newPrior') ");
+			$query = $this->query("SELECT * FROM `orderstatuses` ORDER BY `id` DESC LIMIT 0,1 ");
+			$status = $query->fetch_assoc();
+		}else{
+			$query = $this->query("SELECT * FROM `orderstatuses` WHERE `id`='$array[id]' ");
+			$status = $query->fetch_assoc();
+		}
+		$q = "UPDATE `orderstatuses` SET `name`='$array[name]', `link`='$array[link]' WHERE  `id`='$status[id]' ";
+		//echo $q;
+		$query = $this->query($q);
+		$this->setStoreStatusesAndPriors();
+	}
+	
+	/**
+	
+	*/
+	function setStoreStatusesAndPriors(){
+		$query = $this->query("SELECT * FROM `orderstatuses` WHERE `link`='new' LIMIT 0,1 ");
+		$statusNew = $query->fetch_assoc();
+		$query = $this->query("SELECT * FROM `orderstatuses` WHERE `link`='cancel' LIMIT 0,1 ");
+		$statusNew = $query->fetch_assoc();
+		//******************************
+		$query = $this->query("SELECT * FROM `orderstatuses` ORDER BY `prior` ASC ");
+		$prior = 20;
+		while($item=$query->fetch_assoc()){
+			if($item['link']!='new' && $item['link']!='cancel'){
+				$subQuery = $this->query("UPDATE `orderstatuses` SET `prior`='$prior' WHERE  `id`='$item[id]' ");
+				$prior += 10;
+			}
+		}
+		//******************************
+		$query = $this->query("UPDATE `orderstatuses` SET `prior`='10' WHERE `link`='new' ");
+		$query = $this->query("UPDATE `orderstatuses` SET `prior`='$prior' WHERE `link`='cancel' ");
+	}
+	
+	/**
+	
+	*/
+	function editOrderStatus($array){
+		$query = $this->query("SELECT * FROM `orderstatuses` WHERE `id`='$array[id]' LIMIT 0,1 ");
+		$status = $query->fetch_assoc();
+		return "{\"id\":\"$status[id]\",\"name\":\"$status[name]\",\"link\":\"$status[link]\"}";
+	}
+	
+	/**
+	
+	*/
+	function saveOrderStatusesPriors($array){
+		//print_r($array); //saveOrderStatusesPriors
+		$prior = 10;
+		$array['priors'] = explode(",", $array['priors']);
+		foreach($array['priors'] as $id){
+			$query = $this->query("UPDATE `orderstatuses` SET `prior`='$prior' WHERE `id`='$id' ");
+			$prior += 10;
+		}
+		$this->setStoreStatusesAndPriors();
 	}
 	
 }

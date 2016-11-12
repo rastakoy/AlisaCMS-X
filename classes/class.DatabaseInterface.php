@@ -57,7 +57,7 @@ class DatabaseInterface extends Mysqli{
 	 * @version 	1.0
 	 */
 	function query($query, $resultmode = MYSQLI_STORE_RESULT){
-		$exceptions[] = "INFORMATION_SCHEMA";	
+		$exceptions[] = "INFORMATION_SCHEMA";
 		$exceptions[] = "SHOW FIELDS";
 		$exceptions[] = "UPDATE";
 		$exceptions[] = "INSERT";

@@ -396,6 +396,12 @@ switch($array['ajax']){
 	case 'saveOrderStatus':
 		echo $classOrders->saveOrderStatus($array);
 		break;
+	case 'editOrderStatus':
+		echo $classOrders->editOrderStatus($array);
+		break;
+	case 'saveOrderStatusesPriors':
+		echo $classOrders->saveOrderStatusesPriors($array);
+		break;
 	default:
 		//Значение параметра ajax по-умолчанию
 		break;

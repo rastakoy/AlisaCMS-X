@@ -745,7 +745,17 @@ $( ".trGlobalSettings" ).dblclick(function () {
 function saveOrderStatus(){
 	var paction = "ajax=saveOrderStatus";
 	paction += "&id="+document.getElementById("newOrderStatusId").value;
+	if(document.getElementById("newOrderStatusName").value=='' ||
+	!document.getElementById("newOrderStatusName").className.match(/ ?inputok ?/gi)){
+		document.getElementById("newOrderStatusName").style.backgroundColor = '#FDDDD9';
+		return false;
+	}
 	paction += "&name="+encodeURIComponent(document.getElementById("newOrderStatusName").value);
+	if(document.getElementById("newOrderStatusLink").value=='' ||
+	!document.getElementById("newOrderStatusLink").className.match(/ ?inputok ?/gi)){
+		document.getElementById("newOrderStatusLink").style.backgroundColor = '#FDDDD9';
+		return false;
+	}
 	paction += "&link="+encodeURIComponent(document.getElementById("newOrderStatusLink").value);
 	$.ajax({
 		type: "POST",
@@ -753,54 +763,115 @@ function saveOrderStatus(){
 		data: paction,
 		success: function(html) {
 			console.log(html);
+			document.getElementById("newOrderStatusId").value = '';
+			document.getElementById("newOrderStatusName").className = '';
+			document.getElementById("newOrderStatusName").value = '';
+			document.getElementById("newOrderStatusLink").className = '';
+			document.getElementById("newOrderStatusLink").value = '';
+			getOrderStatuses();
 		}
 	});
 }
 //********************************
-function getOrderStatuses(){
-	var paction = "ajax=getOrderStatuses";
+function editOrderStatus(statusId){
+	var paction = "ajax=editOrderStatus";
+	paction += "&id="+statusId;
 	$.ajax({
 		type: "POST",
 		url: __ajax_url,
 		data: paction,
 		success: function(html) {
 			console.log(html);
+			var data = eval("("+html+")");
+			
+			document.getElementById("newOrderStatusButton").value = 'Изменить состояние';
+			document.getElementById("newOrderStatusId").value = data['id'];
+			
+			var nameObj = document.getElementById("newOrderStatusName");
+			nameObj.className = (nameObj.className=='')?'inputpreloader inputok':' inputpreloader inputok';
+			nameObj.value = data['name'];
+			
+			var linkObj = document.getElementById("newOrderStatusLink");
+			linkObj.className = (linkObj.className=='')?'inputpreloader inputok':' inputpreloader inputok';
+			linkObj.value = data['link'];
+			
+			//document.getElementById("newOrderStatusName").value = '';
+			//document.getElementById("newOrderStatusLink").className = '';
+			//document.getElementById("newOrderStatusLink").value = '';
+			//getOrderStatuses();
+		}
+	});
+}
+//********************************
+function saveOrderStatusesPriors(){
+	var priors = $('#divGetOrderStatuses').sortable('toArray');
+	priors = priors.join(',').replace(/subOS_/gi, '');
+	var paction = "ajax=saveOrderStatusesPriors";
+	paction += "&priors="+priors;
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			//console.log(html);
+			getOrderStatuses();
+		}
+	});
+}
+//********************************
+function getOrderStatuses(){
+	var paction = "ajax=getOrderStatuses";
+	startPreloader();
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			//console.log(html);
 			var allData = eval("("+html+")");
 			var data = allData['data'];
 			var inner = "";
 			inner += "<div style=\"padding:10px;\" id=\"\">";
 			inner += "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"  width=\"100%\" >";
 			inner += "<tr style=\"background-color:#FFF;\">";
-				inner += "<td style=\"padding-left:5px;\" width=\"150\"><b>Название</b></td>";
-				inner += "<td colspan=\"2\" width=\"120\"><b>Убрать со склада</b></td>";
-				inner += "<td><b>Вернуть<br/>на склад</b></td>";
+				inner += "<td style=\"padding-left:5px;\" width=\"200\"><b>Название</b></td>";
+				inner += "<td width=\"250\"><b>Убрать из временного хранилища</b></td>";
 				inner += "<td width=\"100\">&nbsp;</td>";
+				
 				inner += "<td>&nbsp;</td>";
+				inner += "<td>&nbsp;</td>";
+			
 			inner += "</tr></table></div>";
 			inner += "<div style=\"padding:10px;\" id=\"divGetOrderStatuses\">";
 			for(var j in data){
 				//console.log(data[j]);
-				inner += "<div style=\"height:32px;\" id=\"\">";
+				inner += "<div style=\"height:32px;\" id=\"subOS_"+data[j].id+"\">";
 				inner += "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"  width=\"100%\" >";
 				inner += "<tr style=\"background-color:#FFF;\">";
-					inner += "<td class=\"tdGlobalSettings\" width=\"150\">"+data[j].name+"</td>";
-					inner += "<td class=\"tdGlobalSettings\" width=\"100\">";
-					inner += "<img onclick=\"setGoodFromStoreToTMP(this)\" id=\"sgfstTMP_"+data[j].id+"\" ";
-					inner += " src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif\" align=\"absmiddle\" />&nbsp;";
-					inner += "временно</td>";
-					inner += "<td class=\"tdGlobalSettings\" width=\"100\">";
-					inner += "<img onclick=\"setGoodFromTMPToClient(this)\" id=\"sgfTMPtc_"+data[j].id+"\" ";
-					inner += " src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif\" align=\"absmiddle\" />&nbsp;";
-					inner += "постоянно</td>";
-					inner += "<td class=\"tdGlobalSettings\" width=\"100\">";
-					inner += "<img onclick=\"setGoodFromClientToStore(this)\" id=\"sgfctc_"+data[j].id+"\" ";
-					inner += " src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif\" align=\"absmiddle\" />&nbsp;";
-					inner += "вернуть</td>";
+					inner += "<td class=\"tdGlobalSettings\" width=\"200\">"+data[j].name+"</td>";
+					//**********************
+					inner += "<td class=\"tdGlobalSettings\" width=\"250\">";
+					if(data[j].link!='new' && data[j].link!='cancel'){
+						inner += "<img onclick=\"setGoodFromTMPToClient(this)\" id=\"sgfTMPtc_"+data[j].id+"\" ";
+						inner += " src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif\" align=\"absmiddle\" />";
+					}
+					inner += "&nbsp;</td>";
+					//**********************
 					inner += "<td class=\"tdGlobalSettings\">&nbsp;</td>";
-					inner += "<td class=\"tdGlobalSettings\" width=\"30\"><a href=\"javascrip:\">";
-					inner += "<img src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/delete_item.gif\" align=\"absmiddle\" />";
-					inner += "</a></td>";
-					
+					//**********************
+					inner += "<td class=\"tdGlobalSettings\" width=\"30\">";
+					if(!data[j].exception){
+						inner += "<img src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/edit_item.gif\" align=\"absmiddle\" ";
+						inner += "style=\"cursor:pointer;\" onclick=\"editOrderStatus('"+(data[j].id)+"')\" />";
+					}
+					inner += "&nbsp;</td>";
+					//**********************
+					inner += "<td class=\"tdGlobalSettings\" width=\"30\">";
+					if(!data[j].exception){
+						inner += "<img src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/delete_item.gif\" align=\"absmiddle\" />";
+					}
+					inner += "&nbsp;</td>";
+					//**********************
 				inner += "</tr></table></div>";
 			}
 			inner += "</div>";
@@ -808,7 +879,8 @@ function getOrderStatuses(){
 			inner += "<input type=\"hidden\" id=\"newOrderStatusId\" />";
 			inner += "<input type=\"text\" style=\"width:150px;height:25px;\" placeholder=\"Название\" id=\"newOrderStatusName\" />&nbsp;&nbsp;";
 			inner += "<input type=\"text\" style=\"width:150px;height:25px;\" placeholder=\"Идентификатор\" id=\"newOrderStatusLink\" />&nbsp;&nbsp;";
-			inner += "<button style=\"width:150px;height:25px;\" id=\"newOrderStatusButton\" onclick=\"saveOrderStatus()\">Добавить состояние</button>";
+			inner += "<input type=\"button\" style=\"width:150px;height:25px;\" id=\"newOrderStatusButton\" onclick=\"saveOrderStatus()\"";
+			inner += "value=\"Добавить состояние\" />";
 			inner += "</div>";
 			document.getElementById("popup_cont").innerHTML = inner;
 			document.getElementById("popup_title").innerHTML = "Управление статусами заказов";
@@ -832,7 +904,9 @@ function getOrderStatuses(){
 			var myStyle = {
 				"width":"600"
 			}
+			stopPreloader();
 			__popup(myStyle);
+			
 			$( "#divGetOrderStatuses" ).sortable({
 				//cursorAt: { left: -20 },
 				//items: "div:not(.dmulti2)",
@@ -844,6 +918,7 @@ function getOrderStatuses(){
 					//alert(this.firstChild.firstChild.className);
 				},
 				update: function() {
+					saveOrderStatusesPriors();
 				//	testChanger();
 				//	var mURL = gurl.replace(/\/{1,10}$/, "");
 				//	mURL = mURL.replace(/^\/adminarea\//, "");

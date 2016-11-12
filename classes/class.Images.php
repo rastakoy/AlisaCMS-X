@@ -209,5 +209,12 @@ class Images extends DatabaseInterface{
 		}
 	}
 	
+	/**
+	
+	*/
+	function imageDegrees($folder, $file, $source){
+		
+	}
+	
 }
 ?>
