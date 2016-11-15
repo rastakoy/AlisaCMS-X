@@ -38,6 +38,8 @@
 <script type="text/javascript" src="/adminarea/template/js/preloader.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/help.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/connectors.js"></script>
+<script type="text/javascript" src="/adminarea/template/js/orders.statuses.js"></script>
+<script type="text/javascript" src="/adminarea/template/js/orders.js"></script>
 
 <script src="/adminarea/template/js/jquery.ui.core.js"></script>
 <script src="/adminarea/template/js/jquery.ui.widget.js"></script>
@@ -47,7 +49,7 @@
 <link href="/adminarea/template/css/demos.css" rel="stylesheet" type="text/css" />
 
 <script src="/adminarea/template/js/input.preloader.js"></script>
-
+<script type="text/javascript" src="/adminarea/template/js/keys.js"></script>
 <!--<script src="/adminarea/template/tinymce/tinymce.min.js"></script>-->
 
 <?  require_once("__tiny.php"); ?>

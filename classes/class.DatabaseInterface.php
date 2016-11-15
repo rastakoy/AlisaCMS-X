@@ -69,6 +69,7 @@ class DatabaseInterface extends Mysqli{
 		$exceptions[] = "`menusettings`";
 		$exceptions[] = "`images`";
 		$exceptions[] = "`trash`";
+		$exceptions[] = "`users`";
 		//********************************
 		$paste = true;
 		foreach($exceptions as $exception){

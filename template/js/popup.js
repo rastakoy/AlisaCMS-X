@@ -58,7 +58,10 @@ function __popup(myStyle){
 	}
 	obj_c.style.display="";
 	obj_c.onclick = function(){
-		__popup_close();
+		//if(myStyle && myStyle.onclose){
+		//	eval(myStyle.onclose+"()");
+		//}
+		__popup_close(myStyle.onclose);
 	}
 	//*******************************
 	obj_t = document.getElementById("popup_title");
@@ -75,7 +78,10 @@ function __popup(myStyle){
 	}
 }
 //************************************************
-function __popup_close(){
+function __popup_close(data){
+	if(data){
+		data();
+	}
 	document.getElementById("popup_bg").style.display = "none";
 	document.getElementById("popup_cont").style.display = "none";
 	document.getElementById("popup_cont").innerHTML = "";

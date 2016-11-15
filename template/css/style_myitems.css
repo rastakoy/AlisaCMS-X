@@ -141,3 +141,9 @@ div.items_nodatafield .ndf_span_2{
 	margin: 0px;
 	margin-top: -1px;
 }
+.rightPanelBorder{
+	border: 4px solid #A9C9A7;
+	background-color:#FFFFFF;
+	margin-bottom: 20px;
+	min-height:30px;
+}

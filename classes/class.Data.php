@@ -454,6 +454,11 @@ class Data extends DatabaseInterface{
 				$item = $query->fetch_assoc();
 				$q = "UPDATE `$array[option]` SET `tmp`='1', `visible`='1' WHERE `id`='$item[id]' ";
 				$query = $this->query($q);
+				if($array['isAdmin']=='1'){
+					//if($array['option']=='orders'){ $isOrder = ", `name`='".($)."'"; }
+					$q = "UPDATE `$array[option]` SET `isAdmin`='1' WHERE `id`='$item[id]' ";
+					$query = $this->query($q);
+				}
 			}else{
 				//echo $array['option']."\n\n";
 				$item['id'] = $array['id'];

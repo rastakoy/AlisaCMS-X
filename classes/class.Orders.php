@@ -9,25 +9,48 @@ class Orders extends DatabaseInterface{
 		//echo $q;
 		$query = $this->query($q);
 		$option = $query->fetch_assoc();
-		$option['tumb'] = $this->getImages($optionName, $option['id']);
+		return $option;
+	}
+	function getOrderById($id){
+		$q = "SELECT * FROM `orders` WHERE `id`='$id' ";
+		//echo $q;
+		$query = $this->query($q);
+		$option = $query->fetch_assoc();
 		return $option;
 	}
 	
 	/**
 	
 	*/
-	function getOrders($status=false){
+	function getOrders($array=false){
 		$classData = new Data();
-		if($status){
-			$q = "SELECT * FROM `orders` WHERE `parent`='$parent' AND `folder`='1' ORDER BY `addDate` DESC ";
-		}else{
-			$q = "SELECT * FROM `orders` ORDER BY `addDate` DESC ";
+		$classUsers = new Users();
+		//******************************
+		$filters[] = 'orderStatus';
+		foreach($array as $key=>$aValue){
+			foreach($filters as $filter){
+				if($filter==$key){
+					if($aValue=='all'){
+						$dQuery .= " AND`$key`!='' ";
+					}else{
+						$dQuery .= " AND`$key`='$aValue' ";
+					}
+				}
+			}
 		}
+		//******************************
+		$q = "SELECT * FROM `orders` WHERE `id`!='' $dQuery ORDER BY `addDate` DESC ";
+		//echo $q;
 		$query = $this->query($q);
-		while($option=$query->fetch_assoc()){
-			$options[] = $option;
+		while($order=$query->fetch_assoc()){
+			$order['name'] = "¹".$this->addZeros($order['id'], 6);
+			if($order['userId']){
+				$users = $classUsers->getUsersByAttribute("id", $order['userId']);
+				$order['user'] = $users['0'];
+			}
+			$orders[] = $order;
 		}
-		$return['data'] = $options;
+		$return['data'] = $orders;
 		$return['option'] = $tableName;
 		$return['parent'] = $parent;
 		//print_r($options);
@@ -37,16 +60,21 @@ class Orders extends DatabaseInterface{
 	/**
 	
 	*/
-	function getOrderStatuses(){
+	function getOrderStatuses($needID=false){
 		$exceptions[] = "new";
 		$exceptions[] = "working";
 		$exceptions[] = "sended";
 		$exceptions[] = "cancel";
+		$exceptions[] = "adding";
 		$q = "SELECT * FROM `orderstatuses` ORDER BY `prior` ASC ";
 		$query = $this->query($q);
 		while($status=$query->fetch_assoc()){
 			foreach($exceptions as $exception) if($status['link']==$exception) $status['exception'] = '1';
-			$statuses[] = $status;
+			if($needID){
+				$statuses[$status['id']] = $status;
+			}else{
+				$statuses[] = $status;
+			}
 		}
 		$return['data'] = $statuses;
 		return $return;
@@ -154,7 +182,7 @@ class Orders extends DatabaseInterface{
 		$statusNew = $query->fetch_assoc();
 		//******************************
 		$query = $this->query("SELECT * FROM `orderstatuses` ORDER BY `prior` ASC ");
-		$prior = 20;
+		$prior = 30;
 		while($item=$query->fetch_assoc()){
 			if($item['link']!='new' && $item['link']!='cancel'){
 				$subQuery = $this->query("UPDATE `orderstatuses` SET `prior`='$prior' WHERE  `id`='$item[id]' ");
@@ -162,7 +190,8 @@ class Orders extends DatabaseInterface{
 			}
 		}
 		//******************************
-		$query = $this->query("UPDATE `orderstatuses` SET `prior`='10' WHERE `link`='new' ");
+		$query = $this->query("UPDATE `orderstatuses` SET `prior`='10' WHERE `link`='adding' ");
+		$query = $this->query("UPDATE `orderstatuses` SET `prior`='20' WHERE `link`='new' ");
 		$query = $this->query("UPDATE `orderstatuses` SET `prior`='$prior' WHERE `link`='cancel' ");
 	}
 	
@@ -187,6 +216,67 @@ class Orders extends DatabaseInterface{
 			$prior += 10;
 		}
 		$this->setStoreStatusesAndPriors();
+	}
+	
+	/**
+	
+	*/
+	function setGoodFromTMPToClient($array){
+		$query = $this->query("UPDATE `orderstatuses` SET `tmpStore`='0' ");
+		$query = $this->query("UPDATE `orderstatuses` SET `tmpStore`='$array[value]' WHERE `id`='$array[id]' ");
+	}
+	
+	/**
+	
+	*/
+	function setOrderStatusColor($array){
+		$query = $this->query("UPDATE `orderstatuses` SET `color`='$array[color]' WHERE `id`='$array[id]' ");
+	}
+	
+	/**
+	
+	*/
+	function addZeros($string, $count=7){
+		if(strlen($string) < $count){
+			$rstring = $string;
+			for($j=0; $j<($count-strlen($string)); $j++){
+				$rstring = "0".$rstring;
+			}
+		}
+		return $rstring;
+	}
+	
+	/**
+	
+	*/
+	function getGoods($array){
+		$classData = new Data();
+		$q = "SELECT * FROM `assembly` WHERE `orderId`='$array[orderId]' ORDER BY `id` DESC ";
+		$query = $this->query($q);
+		while($good=$query->fetch_assoc()){
+			//$query = $this->query("SELECT * FROM `$array[shopDirectory]` WHERE `id`='$good[itemId]' ");
+			//$good['item'] = $query->fetch_assoc();
+			$good['item'] = $classData->getItemById($array['shopDirectory'], $good['itemId']);
+			$goods[] = $good;
+		}
+		return $goods;
+	}
+	
+	/**
+	
+	*/
+	function showAssembly($array){
+		print_r($array);
+	//	$classData = new Data();
+	//	$q = "SELECT * FROM `assembly` WHERE `orderId`='$array[orderId]' ORDER BY `id` DESC ";
+	//	$query = $this->query($q);
+	//	while($good=$query->fetch_assoc()){
+	//		//$query = $this->query("SELECT * FROM `$array[shopDirectory]` WHERE `id`='$good[itemId]' ");
+	//		//$good['item'] = $query->fetch_assoc();
+	//		$good['item'] = $classData->getItemById($array['shopDirectory'], $good['itemId']);
+	//		$goods[] = $good;
+	//	}
+	//	return $goods;
 	}
 	
 }

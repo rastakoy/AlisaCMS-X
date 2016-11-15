@@ -17,7 +17,9 @@ class Core extends DatabaseInterface{
 			$array['url'] = preg_replace("/\/$/", "", $params['0']);
 			$paramsString = "?".$params['1'];
 			$params = $this->constructParams($params['1']);
-			//echo "<pre>"; print_r($params); echo "</pre>";
+			//echo "<pre>params:"; print_r($params); echo "</pre>";
+			$siteSettings = $this->constructSiteSettings();
+			//echo "<pre>siteSettings:"; print_r($siteSettings); echo "</pre>";
 			//$string = explode('/', $string);
 		}
 		//*************************************
@@ -47,6 +49,7 @@ class Core extends DatabaseInterface{
 		$classStart = new Start();
 		$classBarcode = new Barcode();
 		$classOrders = new Orders();
+		$classUsers = new Users();
 		
 		$externalData = new ExternalData(); //класс для работы с данными из внешних источников
 		
@@ -100,8 +103,10 @@ class Core extends DatabaseInterface{
 					$loadPage = '__trash';
 					break;
 				case 'orders':
+					if(!$params['orderStatus']){
+						$params['orderStatus'] = 'all';
+					}
 					$optionName = $params['option'];
-					//$optionName = preg_replace("/\/.*$/", "", $array['url']);
 					$query = $this->query("SELECT * FROM `menusettings` WHERE `link`='$params[option]' ");
 					$option = $query->fetch_assoc();
 					if($classData->isExternal($params['option'])){
@@ -111,18 +116,13 @@ class Core extends DatabaseInterface{
 					}
 					$titles = $classData->constructTitles($option['title'], $parents);
 					$folder = $classData->getFolder($parents[count($parents)-1]['id'], $optionName);
-					//if(count($parents)=='0'){
-					//	//$items = $classMenuSettings->getOptions($params['option'], '0', '');
-					//	$items = $classData->getItems($params['option'], '0', '');
-					//}else{
-					//	$items = $classData->getItems($params['option'], $parents[count($parents)-1]['id'], '');
-					//}
-					$items = $classOrders->getOrders();
+					$items = $classOrders->getOrders($params);
 					$items = $items['data'];
-					
-					
+					$orderStatuses = $classOrders->getOrderStatuses(true);
 					$showTemplate = true;
 					$loadPage = '__orders';
+					break;
+				case 'assembly':
 					break;
 				default:
 					//echo count($url);
@@ -344,6 +344,17 @@ class Core extends DatabaseInterface{
 			}
 		}}
 		return $return;
+	}
+	
+	/**
+	
+	*/
+	function constructSiteSettings(){
+		$query = $this->query("SELECT * FROM `settings` ORDER BY `id` ASC ");
+		while($item=$query->fetch_assoc()){
+			$settings[$item['arrayName']] = $item['value'];
+		}
+		return $settings;
 	}
 	
 	//function testLanguage($language){

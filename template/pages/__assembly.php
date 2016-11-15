@@ -69,6 +69,7 @@ END OF MANUAL
 //echo "<pre>item:"; print_r($item); echo "</pre>";
 //echo "<pre>parents:"; print_r($parents); echo "</pre>";
 //echo "<pre>orderStatuses:"; print_r($orderStatuses); echo "</pre>";
+//echo "<pre>order:"; print_r($order); echo "</pre>";
 
 //echo "<pre>paramsString = '$paramsString'</pre>";
 //echo "<pre>optionName = '$optionName'</pre>";
@@ -141,6 +142,8 @@ if($titles['0']=='catalog'){
 		href="javascript:" id="deletefolderbutton"><?=$deleteFolderTitle?></a>
 		<? } ?>
 		
+		<a href="javascript:getData('/adminarea/?ajax=addGoodIntoOrder,orderId=<?=$params['orderId']?>')" id="add_item_to_cat_button"
+		style="width:130px; margin-right:150px;">Добавить товар</a>
 		<a href="javascript:showHelp('catalog');" id="outerhelp">?</a>
 		<a href="javascript:getOrderStatuses();" id="fastSettings">&nbsp;</a>
 		<span style="padding-top:5px; display:block;">&nbsp;<?=$version?></span>
@@ -156,39 +159,8 @@ if($titles['0']=='catalog'){
 <? //echo "<pre>"; print_r($params); echo "</pre>"; ?>
 <? //echo "<pre>"; print_r($titles); echo "</pre>"; ?>
 <!--  ------------------------------------------------------------- -->
-<div class="folders_all"><? if($params['action']=='addNewFolder'){ ?><b>Добавить <?=$titles['2'][count($url)-1]?></b><?
-}elseif($params['action']=='editFolder'){ ?><b>Редактировать <?=$titles['2'][count($url)-1]?></b><?
-}elseif($params['action']=='addNewItem'){ ?><b>Добавить <?=$titles['2'][count($url)-1]?></b><?
-}else{ ?>Просмотр <?=$titles['1']['1'][count($url)-1]?><? } ?>
-			<h1 id="folders_title"><?=$option['name']?> <? if(count($parents)>='1'){ ?>
-			<? if(is_array($parents)){ foreach($parents as $key=>$parentItem){
-				if($params['action']!='editFolder'){
-					echo " -› $parentItem[name]";
-				}elseif($params['action']=='editFolder' && $key!=count($parents)-1){
-					echo " -› $parentItem[name]";
-				}elseif($params['action']=='editFolder' && $key==count($parents)-1){
-					echo " -› ";
-				}
-			}}} if($params['action']=='addNewFolder'){ echo " -› "; } ?></h1>
-			<? if(!$params['action']) { ?><div id="folders_count_items">Элементов: <?=count($items)?></div><? } ?>
-			<div id="all_show_items" style="margin-top:20px;"></div>
-		</div>
 <script>
-	var defaultFolderTitle = document.getElementById("folders_title").innerHTML;
-	<? if($params['action']=='editFolder'){ ?>
-	document.getElementById("folders_title").innerHTML += "<font style=\"color:#CCCCCC;\"><?=$parents[count($parents)-1]['name']?></font>";
-	<? } ?>
 	globalEdit = false;
-	if($("#folders_title").height()>40){
-		var obj = document.getElementById("folders_title");
-		var mass = obj.innerHTML.trim();
-		mass = obj.innerHTML.split('-›');
-		//console.log(mass);
-		var inner = "... ";
-		inner += " -› " + mass[mass.length-2];
-		inner += " -› " + mass[mass.length-1];
-		obj.innerHTML = inner;
-	}
 </script>
 
 
@@ -204,61 +176,94 @@ if($params['action']=='addNewFolder') { ?>
 
 <div class="languagesTabs">
 	<span <?
-	if($params['orderStatus']=='all'){
+	if($order['manual']=='0'){
 		echo "class=\"active\"";
 	}else{?>onclick="getData(window.location.pathname+'/<?=$paramsString?>', <?
-	?>'orderStatus', 'all')"<? } ?> >Все</span>
-			<? foreach($orderStatuses['data'] as $oStatus){ if($oStatus['visible']=='1'){ ?>
-			<span <?
-			if($params['orderStatus']==$oStatus['id']){
-				echo "class=\"active\"";
-			}else{?>onclick="getData(window.location.pathname+'/<?=$paramsString?>', <?
-			?>'orderStatus', '<?=$oStatus['id']?>')"<? } ?> ><?=$oStatus['name']?></span>
-<? }} ?></div>
+	?>'orderStatus', 'all')"<? } ?> >Режим автоматический</span>
+	<span <?
+	if($order['manual']=='1'){
+		echo "class=\"active\"";
+	}else{?>onclick="getData(window.location.pathname+'/<?=$paramsString?>', <?
+	?>'orderStatus', 'all')"<? } ?> >Режим ручной</span>
+</div>
 <div style="float:none;clear:both;"></div>
 
 <div class="ui-state-default-3 ui-sortable" id="myitems_sortable">
+
+	<div class="ui-state-default-2 connectedSortable" id="">
+	<div class="div_myitemname" style="padding-top: 0px;">
+		<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+			<td height="34" width="20" style="font-weight:bold;">№</td>
+			<td height="34" width="50">&nbsp;</td>
+			<td height="34" width="180" style="font-weight:bold;">Название</td>
+			<td height="34" width="100" style="font-weight:bold;" align="center">
+			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/price.gif"
+			width="16" height="16" border="0" align="center" style="margin-right:5px;cursor:pointer;margin-top:5px;" />
+			</td>
+			<td height="34" width="50" style="font-weight:bold;" align="center">
+			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/inbasket.gif"
+			width="16" height="16" border="0" align="center" style="margin-right:5px;cursor:pointer;margin-top:5px;" />
+			</td>
+			<td height="34" width="70" style="font-weight:bold;" align="center">%</td>
+			<td height="34" width="100" style="font-weight:bold;" align="center">
+			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/price-discount.gif"
+			width="16" height="16" border="0" align="center" style="margin-right:5px;cursor:pointer;margin-top:5px;" />
+			</td>
+			<td height="34" width="100" align="center">
+			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/sum.gif"
+			width="16" height="16" border="0" align="center" style="margin-right:5px;cursor:pointer;margin-top:5px;" />
+			</td>
+			<td height="34" width="">&nbsp;</td>
+			<td height="34" width="20">&nbsp;</td>
+			<td height="34" width="20"><a href="javascript:" title="Внимание: незаполненные поля">&nbsp;</a></td>
+			<!--<td height="34" width="20"><a href="javascript:" title="Клонировать запись"><img src="/adminarea/template/images/green/icons/copy.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="clone_myitemblock('105')"></a></td>-->
+			<td height="34" width="20"><? if($item['includeComments']=='1'){ ?>
+				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/comments.gif"
+				id="imgcomments_<?=$item['id']?>" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"><? } ?>
+			</td>
+			<td height="34" width="20"><a href="javascript:" title="Редактировать запись"><img src="/adminarea/template/images/green/myitemname_popup/edit_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"></a></td>
+			<td height="34" width="20"><a href="javascript:" title="Удалить запись"><img src="/adminarea/template/images/green/myitemname_popup/delete_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="addToTrash('<?=$item['id']?>')"></a></td>
+		</tr></table>
+	</div></div>
 <? //echo "<pre>"; print_r($items); echo "</pre>"; ?>
 <? //echo "<pre>"; print_r($parentNotice); echo "</pre>"; ?>
 <? //echo "<pre>orderStatuses:"; print_r($orderStatuses); echo "</pre>"; ?>
-<? if(is_array($items)){ foreach($items as $item){
+<? if(is_array($items)){ $count=0; foreach($items as $item){
 $lnk = false;
-if($item['folder']=='1' && $titles['0']!='static') { //Выписываем дирректорию
-	if($item['tumb']['0']['name']){
-		$lnk = $classImages->createImageLink("../loadimages", "44x33", $item['tumb']['0']['name']);
-	}
-?>
+if($item['folder']=='1' && $titles['0']!='static') { //Выписываем дирректорию  ?>
 
 <? }else{ //Выписываем элемент
-if($item['tumb']['0']['name']){
-	$lnk = $classImages->createImageLink("../loadimages", "44x33", $item['tumb']['0']['name']);
+if($item['item']['tumb']['0']['name']){
+	$lnk = $classImages->createImageLink("../loadimages", "44x33", $item['item']['tumb']['0']['name']);
 }
-
-//echo "OS=".$orderStatuses[$item['orderStatus']]['color'];
-//echo "<pre>"; print_r($orderStatuses['12']); echo "</pre>";
 ?>
 <div class="ui-state-default-2 connectedSortable"
-id="prm_<?=$item['name']?>">
-	<div class="div_myitemname" style="padding-top: 0px;<?
-	if($orderStatuses['data'][$item['orderStatus']]){ 
-		?>background-color:<?=$orderStatuses['data'][$item['orderStatus']]['color']?>;<?
-	}elseif($item['tmp']=='1'){ 
-		?>background-color:#CCCCCC;<?
-	} ?>">
+id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['parents']?>,itemId=<?=$item['id']?>">
+	<div class="div_myitemname" style="padding-top: 0px;height:56px;<? if($item['tmp']=='1'){ 
+	?>background-color:#CCCCCC;<? } ?>">
 		<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
-			<td height="34" width="25" align="center" style="font-weight:bold;"><? if($item['isAdmin']=='1'){ ?>
-			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/admin-icon.gif" width="16" height="16" border="0" />
-			<? }else{ ?>
-			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/user-icon.gif" width="16" height="16" border="0" />
-			<? } ?></td>
-			<td height="34" width="90" style="font-weight:bold;" align="center">
-			<span id="itemName_<?=$item['id']?>"><?=$item['name']?></span></td>
-			<td height="34" width="150"><select style="width:140px;height:26px;" onchange="__ao_cangeOrderStatus(9, this.value, 'take', '1')">
-			<? foreach($orderStatuses['data'] as $oStatus){ if($oStatus['visible']=='1'){ ?>
-				<option value="<?=$oStatus['id']?>" <? if($oStatus['id']==$item['orderStatus']) { echo "selected"; } ?> ><?=$oStatus['name']?></option>
-			<? }} ?></select></td>
-			<td height="34" width="200"><?=$item['user']['fio']?><br/><?=$item['user']['email']?></td>
+			<td height="54" width="20"><?=$count?></td>
+			<? if($option['useimg']=='1'){ ?>
+				<td height="34" width="50">
+				<? if($lnk){ ?>
+				<img src="/loadimages/<?=$lnk?>" width="44" height="33"
+				border="1" class="imggal" align="absmiddle" style="">
+				<? }else{ ?>
+				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/no_img.gif" width="44" height="33"
+				border="1" class="imggal" align="absmiddle" style="">
+				<? } ?>
+				</td>
+			<? } ?>
+			<td height="34" width="180" style="font-weight:bold;"><span
+			id="itemName_<?=$item['id']?>"><?=$item['item']['name']?></span></td>
+			<td height="34" width="100" align="center"><?=$item['item']['price']?></td>
+			<td height="34" width="50" align="center"><input type="number" style="width:45px;height:30px;" min="1" step="1"
+			max="1000" id="qtty_<?=$item['id']?>" value="<?=$item['qtty']?>" onchange="__ao_changeQtty(this)"></td>
+			<td height="34" width="70" style="font-weight:bold;" align="center">---</td>
+			<td height="34" width="100" style="font-weight:bold;" align="center"><?=$item['item']['priceDiscount']?></td>
+			<td height="34" width="100" style="font-weight:bold;" align="center"><?=$item['item']['sum']?></td>
 			<td height="34" width="">&nbsp;</td>
+			<td height="34" width="20">&nbsp;</td>
 			<td height="34" width="20"><a href="javascript:" title="Внимание: незаполненные поля">&nbsp;</a></td>
 			<!--<td height="34" width="20"><a href="javascript:" title="Клонировать запись"><img src="/adminarea/template/images/green/icons/copy.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="clone_myitemblock('105')"></a></td>-->
 			<td height="34" width="20"><? if($item['includeComments']=='1'){ ?>
@@ -270,10 +275,9 @@ id="prm_<?=$item['name']?>">
 		</tr></table>
 	</div>
 </div>
-<? }}} ?>
+<? $count++; }}} ?>
 </div>
 <script>
-//*********************************************************
 var restoreObject = {};
 function addToTrash(itemId){
 	var name = document.getElementById("itemName_"+itemId).innerText;

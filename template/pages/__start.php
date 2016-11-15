@@ -678,6 +678,11 @@ $( ".trGlobalSettings" ).dblclick(function () {
 			<td class="tdGlobalSettings">&nbsp;</td>
 		</tr>
 		<tr>
+			<td class="tdGlobalSettings" width="300">Вертикальный формат фото</td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="restsOnOff_id" onclick="restsOnOff()"></td>
+			<td class="tdGlobalSettings">&nbsp;</td>
+		</tr>
+		<tr>
 			<td class="tdGlobalSettings" width="300"><b>Уведомлять меня о покупке по SMS</b></td>
 			<td class="tdGlobalSettings" width=""><input type="checkbox" id="sendGoodInfo_id" onclick="sendGoodInfo()" checked  /></td>
 			<td class="tdGlobalSettings">&nbsp;</td>
@@ -741,6 +746,22 @@ $( ".trGlobalSettings" ).dblclick(function () {
 </div>
 
 <script>
+//********************************
+function setOrderStatusColor(obj){
+	var id = obj.id.replace(/^.*_/gi, '');
+	var paction = "ajax=setOrderStatusColor";
+	paction += "&color="+obj.value;
+	paction += "&id="+id;
+	//console.log(paction);
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			//console.log(html);
+		}
+	});
+}
 //********************************
 function saveOrderStatus(){
 	var paction = "ajax=saveOrderStatus";
@@ -819,181 +840,7 @@ function saveOrderStatusesPriors(){
 	});
 }
 //********************************
-function getOrderStatuses(){
-	var paction = "ajax=getOrderStatuses";
-	startPreloader();
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			//console.log(html);
-			var allData = eval("("+html+")");
-			var data = allData['data'];
-			var inner = "";
-			inner += "<div style=\"padding:10px;\" id=\"\">";
-			inner += "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"  width=\"100%\" >";
-			inner += "<tr style=\"background-color:#FFF;\">";
-				inner += "<td style=\"padding-left:5px;\" width=\"200\"><b>Название</b></td>";
-				inner += "<td width=\"250\"><b>Убрать из временного хранилища</b></td>";
-				inner += "<td width=\"100\">&nbsp;</td>";
-				
-				inner += "<td>&nbsp;</td>";
-				inner += "<td>&nbsp;</td>";
-			
-			inner += "</tr></table></div>";
-			inner += "<div style=\"padding:10px;\" id=\"divGetOrderStatuses\">";
-			for(var j in data){
-				//console.log(data[j]);
-				inner += "<div style=\"height:32px;\" id=\"subOS_"+data[j].id+"\">";
-				inner += "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"  width=\"100%\" >";
-				inner += "<tr style=\"background-color:#FFF;\">";
-					inner += "<td class=\"tdGlobalSettings\" width=\"200\">"+data[j].name+"</td>";
-					//**********************
-					inner += "<td class=\"tdGlobalSettings\" width=\"250\">";
-					if(data[j].link!='new' && data[j].link!='cancel'){
-						inner += "<img onclick=\"setGoodFromTMPToClient(this)\" id=\"sgfTMPtc_"+data[j].id+"\" ";
-						inner += " src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/checkbox.gif\" align=\"absmiddle\" />";
-					}
-					inner += "&nbsp;</td>";
-					//**********************
-					inner += "<td class=\"tdGlobalSettings\">&nbsp;</td>";
-					//**********************
-					inner += "<td class=\"tdGlobalSettings\" width=\"30\">";
-					if(!data[j].exception){
-						inner += "<img src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/edit_item.gif\" align=\"absmiddle\" ";
-						inner += "style=\"cursor:pointer;\" onclick=\"editOrderStatus('"+(data[j].id)+"')\" />";
-					}
-					inner += "&nbsp;</td>";
-					//**********************
-					inner += "<td class=\"tdGlobalSettings\" width=\"30\">";
-					if(!data[j].exception){
-						inner += "<img src=\"<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/delete_item.gif\" align=\"absmiddle\" />";
-					}
-					inner += "&nbsp;</td>";
-					//**********************
-				inner += "</tr></table></div>";
-			}
-			inner += "</div>";
-			inner += "<div style=\"padding:10px;\" id=\"\">";
-			inner += "<input type=\"hidden\" id=\"newOrderStatusId\" />";
-			inner += "<input type=\"text\" style=\"width:150px;height:25px;\" placeholder=\"Название\" id=\"newOrderStatusName\" />&nbsp;&nbsp;";
-			inner += "<input type=\"text\" style=\"width:150px;height:25px;\" placeholder=\"Идентификатор\" id=\"newOrderStatusLink\" />&nbsp;&nbsp;";
-			inner += "<input type=\"button\" style=\"width:150px;height:25px;\" id=\"newOrderStatusButton\" onclick=\"saveOrderStatus()\"";
-			inner += "value=\"Добавить состояние\" />";
-			inner += "</div>";
-			document.getElementById("popup_cont").innerHTML = inner;
-			document.getElementById("popup_title").innerHTML = "Управление статусами заказов";
-			
-			var preloaderParams = false;
-			preloaderParams = {
-				'callback':function(){
-					//alert("Тестирование");
-				}
-			}
-			inputPreloader(document.getElementById("newOrderStatusName"), 'testNewOrderStatusName', preloaderParams);
-			
-			var preloaderParams = false;
-			preloaderParams = {
-				'callback':function(){
-					//alert("Тестирование");
-				}
-			}
-			inputPreloader(document.getElementById("newOrderStatusLink"), 'testNewOrderStatusLink', preloaderParams);
-			
-			var myStyle = {
-				"width":"600"
-			}
-			stopPreloader();
-			__popup(myStyle);
-			
-			$( "#divGetOrderStatuses" ).sortable({
-				//cursorAt: { left: -20 },
-				//items: "div:not(.dmulti2)",
-				//cancel: ".dmulti2",
-				start: function(){
-					//$(".dmulti2").css("display","none");
-					//$(".dmulti").css("border-bottom-left-radius","15px");
-					//$(".dmulti").css("border-bottom-right-radius","15px");
-					//alert(this.firstChild.firstChild.className);
-				},
-				update: function() {
-					saveOrderStatusesPriors();
-				//	testChanger();
-				//	var mURL = gurl.replace(/\/{1,10}$/, "");
-				//	mURL = mURL.replace(/^\/adminarea\//, "");
-				//	//mURL = explode("/", mURL);
-				//	savePriors(mURL);
-				//	//save_myitems_prior();
-				//	//$("#items_left_menu a").hover("destroy");
-				//	//$("#rootfoldermenu a").hover("destroy");
-				//	$("#items_left_menu a").off( "mouseenter mouseleave" );
-				//	$("#rootfoldermenu a").off( "mouseenter mouseleave" );
-				//	$("#rootfoldermenu a").css("background-color", "");
-				//	rowToFolderDragNDrop = false;
-				//	itemToFolderDragNDrop = false;
-				//	//document.querySelector("#prm_*");
-				},
-				sort: function() {
-				//	//alert(this.items);
-				//	$("#items_left_menu a").hover(function() {
-				//		$(this).css("background-color", "#FF0000");
-				//		rowToFolderDragNDrop = this;
-				//	}, function() {
-				//		this.style.backgroundColor = "";
-				//		rowToFolderDragNDrop = false;
-				//	});
-				//	$("#rootfoldermenu a").hover(function() {
-				//		$(this).css("background-color", "#FF0000");
-				//		rowToFolderDragNDrop = {"href":"javascript:show_ritems(0"};
-				//	}, function() {
-				//		$(this).css("background-color", "");
-				//		rowToFolderDragNDrop = false;
-				//	});
-				},
-				stop: function( event, ui ) {
-				//	//$(".dmulti2").css("display","");
-				//	$(".dmulti2").css("display","");
-				//	$(".dmulti").css("height","");
-				//	$(".dmulti").css("border-bottom-left-radius","0");
-				//	$(".dmulti").css("border-bottom-right-radius","0");
-				//	if(rowToFolderDragNDrop){
-				//		hpp = itemToFolderDragNDrop.id.replace(/^div_myitemname_/, "");
-				//		hrr = rowToFolderDragNDrop.href.replace(/^javascript:show_ritems\(/, "");
-				//		hrr = hrr.replace(/\)$/, "");
-				//		change_item_parent_dnd(hpp, hrr);
-				//		//$("#items_left_menu a").hover("destroy");
-				//		//$("#rootfoldermenu a").hover("destroy");
-				//		$("#items_left_menu a").off( "mouseenter mouseleave" );
-				//		$("#rootfoldermenu a").off( "mouseenter mouseleave" );
-				//		$("#rootfoldermenu a").css("background-color", "");
-				//		rowToFolderDragNDrop = false;
-				//		itemToFolderDragNDrop = false;
-				//	}
-				}
-			});
-		}
-	});
-}
-//********************************
 function setGoodFromStoreToTMP(obj){
-	var idPrefix = obj.id.replace(/_[0-9]*$/gi, '_');
-	var aobjs = document.querySelectorAll( 'img[id^="' + idPrefix );
-	for(var j=0; j<aobjs.length; j++){
-		var aobj = aobjs[j];
-		if(aobj!=obj){
-			aobj.src = aobj.src.replace(/_checked\.gif$/gi, '.gif');
-		}
-	}
-	//console.log(aobjs);
-	if(obj.src.match(/_checked\.gif$/)){
-		obj.src = obj.src.replace(/_checked\.gif$/gi, '.gif');
-	}else{
-		obj.src = obj.src.replace(/\.gif$/gi, '_checked.gif');
-	}
-}
-//********************************
-function setGoodFromTMPToClient(obj){
 	var idPrefix = obj.id.replace(/_[0-9]*$/gi, '_');
 	var aobjs = document.querySelectorAll( 'img[id^="' + idPrefix );
 	for(var j=0; j<aobjs.length; j++){
@@ -1046,6 +893,29 @@ for(var j=0; j<objs.length; j++){
 		}
 	}
 }
+//********************************
+var objs = document.getElementById("languagesTabs").getElementsByTagName("span");
+for(var j=0; j<objs.length; j++){
+	var obj = objs[j];
+	obj.onclick = function(){
+		var objs = document.getElementById("gsAll").getElementsByClassName("adminGlobalSettings");
+		var sobjs = document.getElementById("languagesTabs").getElementsByTagName("span");
+		for(var j=0; j<objs.length; j++){
+			var obj = document.getElementById("gs-"+j);
+			if(obj){
+				obj.style.display = "none";
+				sobjs[j].className = "";
+				if(sobjs[j]==this){
+					obj.style.display = "";
+					sobjs[j].className = "active";
+				}
+			}
+		}
+	}
+}
+//********************************
+
+//********************************
 </script>
 
 <? } ?>

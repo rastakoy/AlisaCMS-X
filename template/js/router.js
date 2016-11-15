@@ -8,6 +8,7 @@ $(document).ready(function(){
 			id = id.replace(/\/$/gi, '');
 			//console.log('click');
 			getData(this.getAttribute("href"));
+			$(this).blur();
 			return false;
 		}
 	}
@@ -74,9 +75,15 @@ function getData(url, newParam, newValue){
 	//alert(params+"::"+paramsURL);
 	//**************************
 	if(params['action']=='editItem' && !params['itemId']){
-		var paction = "ajax=addNewItem&parents="+__PARAMS['parents']+"&option="+__PARAMS['option'];
+		if(params['option']=='orders'){
+			var paction = "ajax=addNewItem&option=orders";
+			//window.location.href = "/adminarea/?ajax=addNewItem&option=orders";
+		}else{
+			var paction = "ajax=addNewItem&parents="+__PARAMS['parents']+"&option="+__PARAMS['option'];
+		}
+		if(params['isAdmin']=='1'){ paction += "&isAdmin=1"; }
 		if(params['optionExternal']=='1'){ paction += "&optionExternal=1"; }
-		//console.log(paction);
+		console.log(paction);
 		//return false;
 		$.ajax({
 			type: "POST",
@@ -87,7 +94,11 @@ function getData(url, newParam, newValue){
 				//console.log(html);
 				var data = eval("("+html+")");
 				if(data['data']){ data = data['data']['0']; }
-				getData(window.location.pathname+"?action=editItem,option="+data.option+",parents="+data.parents+",itemId="+data.itemId);
+				if(data.option=='orders'){
+					getData("/adminarea/?option=assembly,orderId="+data.itemId);
+				}else{
+					getData(window.location.pathname+"?action=editItem,option="+data.option+",parents="+data.parents+",itemId="+data.itemId);
+				}
 			}
 		});
 		return false;
@@ -162,11 +173,12 @@ function getData(url, newParam, newValue){
 		}
 		//*******************
 		oldParamsURL = paramsURL;
+		__popup_close();
 		startPreloader();
 		__PARAMS = params;
 		//*******************
 		paction =  "ajax=getPage&url="+url+paramsURL;
-		//console.log(paction);
+		console.log(paction);
 		$.ajax({
 			type: "POST",
 			url: __GLOBALS.ajax,
@@ -237,6 +249,7 @@ function getData(url, newParam, newValue){
 				controlLeftMenu(params.option);
 				stopPreloader();
 				__GLOBALS.editing = false;
+				setTimeout("initScaner()", 100);
 			}
 		});
 	}else{
@@ -438,30 +451,37 @@ function initPagination(){
 }
 //************************************************
 function initItems(){
-	$(".div_myitemname").hover(function() {
-		if(this.className != "div_myitemname dmnoover"){
-			if(!this.getAttribute("myBgColor")){
-				this.setAttribute("myBgColor", this.style.backgroundColor);
+	if(__PARAMS.option!='orders'){
+		$(".div_myitemname").hover(function() {
+			if(this.className != "div_myitemname dmnoover"){
+				if(!this.getAttribute("myBgColor")){
+					this.setAttribute("myBgColor", this.style.backgroundColor);
+				}
+				$(this).css('background-color', '#D5F4D7');
 			}
-			$(this).css('background-color', '#D5F4D7');
-		}
-	}, function() {
-		if(this.className != "div_myitemname dmnoover"){
-			if(this.getAttribute("myBgColor")){
-				$(this).css('background-color', this.getAttribute("myBgColor"));
-			}else{
-				$(this).css('background-color', '');
+		}, function() {
+			if(this.className != "div_myitemname dmnoover"){
+				if(this.getAttribute("myBgColor")){
+					$(this).css('background-color', this.getAttribute("myBgColor"));
+				}else{
+					$(this).css('background-color', '');
+				}
 			}
-		}
-	});
+		});
+	}
 	$( ".div_myitemname" ).dblclick(function () {
 		//alert(this.parentNode.id.replace(/prm_/, ""));
 		if(gurl.match(/\/\/$/)){
 			gurl = gurl.replace(/\/$/, '');
 		}
+		//console.log(__PARAMS);
 		//console.log(__GLOBALS.adminBase+"/"+this.parentNode.id.replace(/prm_/, ""));
 		//alert(this.id);
-		getData(__GLOBALS.adminBase+"/"+this.parentNode.id.replace(/prm_/, ""));
+		if(__PARAMS.option=='orders'){
+			showAssembly(this.parentNode.id.replace(/prm_/, ""));
+		}else{
+			getData(__GLOBALS.adminBase+"/"+this.parentNode.id.replace(/prm_/, ""));
+		}
 		addLeftBranchRedForRightPanel();
 		//__css_itemShowCSS();
 	});

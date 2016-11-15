@@ -402,6 +402,27 @@ switch($array['ajax']){
 	case 'saveOrderStatusesPriors':
 		echo $classOrders->saveOrderStatusesPriors($array);
 		break;
+	case 'setGoodFromTMPToClient':
+		echo $classOrders->setGoodFromTMPToClient($array);
+		break;
+	case 'setOrderStatusColor':
+		echo $classOrders->setOrderStatusColor($array);
+		break;
+	case 'showAssembly':
+		$siteSettings = $this->constructSiteSettings();
+		$params['option'] = "assembly";
+		$optionName = $params['option'];
+		$query = $this->query("SELECT * FROM `menusettings` WHERE `link`='$params[option]' ");
+		$option = $query->fetch_assoc();
+		$params['orderId'] = $array['orderId'];
+		$order = $classOrders->getOrderById($array['orderId']);
+		$params['shopDirectory'] = $siteSettings['shopDirectory'];
+		$items = $classOrders->getGoods($params);
+		$orderStatuses = $classOrders->getOrderStatuses(true);
+		$showTemplate = true;
+		$loadPage = '__assembly';
+		//echo $classOrders->showAssembly($array);
+		break;
 	default:
 		//Значение параметра ajax по-умолчанию
 		break;

@@ -1057,13 +1057,16 @@ var currentOptionName = '<?=$params['option']?>';
 var currentItemId = '<?=$item['id']?>';
 <? if($initImages){ ?>startFileUploader();<? } //Инициализация загрузчика изображений ?> 
 tinymce_init();
+
 //*********************************************************
-document.getElementById('adminarearight').onkeyup = function(event){
-	if(event.keyCode==13 && document.getElementById('editRecordTester')){
-		saveNewLeftMenuItem();
-	}
-	return false;
-}
+
+//document.getElementById('adminarearight').onkeyup = function(event){
+//	if(event.keyCode==13 && document.getElementById('editRecordTester')){
+//		document.getElementById('adminarearight').onkeyup = false;
+//		saveNewLeftMenuItem();
+//	}
+//	return false;
+//}
 </script>
 <div id="editRecordTester" style="display:none;"></div>
 <? } ?>
@@ -1228,4 +1231,7 @@ function restoreFromTrash(option, itemId){
 		</div>
 		
 	  <div id="nztime"></div>
+<script>
+//initScaner();
+</script>
 
