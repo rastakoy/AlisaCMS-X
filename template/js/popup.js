@@ -14,8 +14,14 @@ function __popup(myStyle){
 	obj_m.style.height = wheight+"px";
 	obj_m.style.display="";
 	obj_m.style.cursor="pointer";
+	obj_m.onclose = false;
+	obj_m.noclose = false;
+	if(myStyle && myStyle.onclose){
+		obj_m.onclose = myStyle.onclose;
+		obj_m.noclose = myStyle.noclose;
+	}
 	obj_m.onclick = function(){
-		__popup_close();
+		__popup_close(this.onclose, this.noclose);
 	}
 	//*******************************
 	obj_w = document.getElementById("popup_cont");
@@ -37,6 +43,11 @@ function __popup(myStyle){
 		obj_w.style.left = (wwwidth/2-myStyle.width.replace(/px/gi,'')/2)+"px";
 		winLeft = wwwidth/2-myStyle.width.replace(/px/gi,'')/2;
 		winTop = 20+document.body.scrollTop;
+	}else if(myStyle && myStyle.width){
+		obj_w.style.height = myStyle.height;
+		if($(obj_w).height()>wwheight - 100){
+			obj_w.style.height = (wwheight - 100)+"px";
+		}
 	}else{
 		//console.log((myStyle.width)+(myStyle.width.match(/%$/))?'':"px");
 		obj_w.style.width = (wwidth-100)+"px";
@@ -57,11 +68,14 @@ function __popup(myStyle){
 		obj_c.style.left = (wwidth-40)+"px";
 	}
 	obj_c.style.display="";
+	obj_c.onclose = false;
+	obj_c.noclose = false;
+	if(myStyle && myStyle.onclose){
+		obj_c.onclose = myStyle.onclose;
+		obj_c.noclose = myStyle.noclose;
+	}
 	obj_c.onclick = function(){
-		//if(myStyle && myStyle.onclose){
-		//	eval(myStyle.onclose+"()");
-		//}
-		__popup_close(myStyle.onclose);
+		__popup_close(this.onclose, this.noclose);
 	}
 	//*******************************
 	obj_t = document.getElementById("popup_title");
@@ -78,15 +92,18 @@ function __popup(myStyle){
 	}
 }
 //************************************************
-function __popup_close(data){
+function __popup_close(data, noclose){
 	if(data){
 		data();
 	}
-	document.getElementById("popup_bg").style.display = "none";
-	document.getElementById("popup_cont").style.display = "none";
-	document.getElementById("popup_cont").innerHTML = "";
-	document.getElementById("popup_close").style.display = "none";
-	document.getElementById("popup_title").style.display = "none";
-	document.getElementById("popup_title").innerHTML = "";
+	if(!noclose){
+		document.getElementById("popup_bg").style.display = "none";
+		document.getElementById("popup_cont").style.height = "10px";
+		document.getElementById("popup_cont").style.display = "none";
+		document.getElementById("popup_cont").innerHTML = "";
+		document.getElementById("popup_close").style.display = "none";
+		document.getElementById("popup_title").style.display = "none";
+		document.getElementById("popup_title").innerHTML = "";
+	}
 }
 //************************************************

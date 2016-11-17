@@ -712,7 +712,13 @@ class Data extends DatabaseInterface{
 	*/
 	function toggleData($array){
 		if(!isset($array['value'])){
-			$q = "SELECT * FROM `$array[option]` WHERE `id`='$array[itemId]' ";
+			if(!$array['keyField']){
+				$array['keyField'] = 'id';
+			}
+			if(!$array['keyValue']){
+				$array['keyValue'] = $array['itemId'];
+			}
+			$q = "SELECT * FROM `$array[option]` WHERE `$array[keyField]`='$array[keyValue]' ";
 			$query = $this->query($q);
 			$item = $query->fetch_assoc();
 			if($item[$array['field']]=='1'){
@@ -723,7 +729,7 @@ class Data extends DatabaseInterface{
 		}else{
 			$value = $array['value'];
 		}
-		$q = "UPDATE `$array[option]` SET `$array[field]`='$value' WHERE `id`='$array[itemId]' ";
+		$q = "UPDATE `$array[option]` SET `$array[field]`='$value' WHERE `$array[keyField]`='$array[keyValue]' ";
 		echo $q;
 		$query = $this->query($q);
 	}

@@ -57,6 +57,8 @@ class DatabaseInterface extends Mysqli{
 	 * @version 	1.0
 	 */
 	function query($query, $resultmode = MYSQLI_STORE_RESULT){
+		$query = trim($query);
+		//********************************
 		$exceptions[] = "INFORMATION_SCHEMA";
 		$exceptions[] = "SHOW FIELDS";
 		$exceptions[] = "UPDATE";
@@ -92,7 +94,20 @@ class DatabaseInterface extends Mysqli{
 		//********************************
 		try{
 			//echo $query."<br/>\n";
-			return $this->s_query($query, $resultmode);
+			if(preg_match("/^INSERT/", $query)){
+				$table = explode("`", $query);
+				$table = $table['1'];
+				$q = $this->s_query($query, $resultmode);
+				if($q){
+					$return = $this->s_query("SELECT * FROM `$table` ORDER BY `id` DESC LIMIT 0,1", $resultmode);
+					$item = $return->fetch_assoc();
+					return $item;
+				}else{
+					return $q;
+				}
+			}else{
+				return $this->s_query($query, $resultmode);
+			}
 		}catch(Exception $e){
 			//Core::s_writeToLog(array(
 			//	'date' => date('d-m-Y H:i:s'),

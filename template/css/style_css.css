@@ -61,6 +61,7 @@ div#popup_close{
 	opacity:.80;  /*свойство из спецификации CSS3, которое поддерживается не всеми браузерами*/
 	filter: alpha(opacity=80); /* код для IE */
 	z-index:903;
+	transition:all .35s ease;
 }
 div#popup_cont{
 	background-color: #FFFFFF;
@@ -71,6 +72,7 @@ div#popup_cont{
 	border: 1px solid #006600;
 	overflow: auto;
 	z-index:901;
+	transition:all .35s ease;
 }
 div#popup_title{
 	background-color: #DADADA;
@@ -82,7 +84,7 @@ div#popup_title{
 	text-transform:uppercase;
 	font-weight:bold;
 	text-align:center;
-	transition:left .35s ease;
+	transition:all .35s ease;
 }
 /*  /POPUP   */
 

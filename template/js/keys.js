@@ -3,23 +3,23 @@ function initScaner(){
 	document.body.onkeypress = false;
 	document.body.onkeypress = function(event){
 		if(event.keyCode=="13"){
-			//fastOrderString += "—";
-			var price = fastOrderString.replace(/^.*-/gi, '');
-			var code = fastOrderString.replace(RegExp("-"+price+"$", "gi"), '');
-			//code = "1234567890";
-			if(code.match(/[0-9]{6}$/gi)){
-				code = code.substring(code.length-6, code.length);
+			if(fastOrderString.match(/~~$/gi)){
+				fastOrderString = "testtest;+000018";
 			}
-			console.log("price="+price+":");
+			if(fastOrderString.match(/(\$|;)\+[0-9]{6}$/gi)){
+				code = fastOrderString.substring(fastOrderString.length-8, fastOrderString.length);
+			}else{
+				code = "";
+			}
 			console.log("code="+code+":");
-			//console.log(fastOrderString);
+			console.log(fastOrderString);
 			fastOrderString = "";
 			
-			if(code.match(/^[0-9]{1,6}$/gi) && price.match(/^[0-9]*$/gi)){
-				//alert("YES");
-				getData('/adminarea/?action=editItem,option=orders,parents=,isAdmin=1');
+			if(code.match(/^(\$|;)\+[0-9]{1,6}$/gi)){
+				addNewGoodIntoOrder(false, code.replace(/^(\$|;)\+/gi, ''));
+				//getData('/adminarea/?action=editItem,option=orders,parents=,isAdmin=1');
 			}else{
-				//alert("FUCK");
+				//console.log("findnt data");
 			}
 		}else{
 			fastOrderString += String.fromCharCode(event.keyCode || event.charCode);

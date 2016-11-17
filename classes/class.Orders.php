@@ -256,7 +256,7 @@ class Orders extends DatabaseInterface{
 		while($good=$query->fetch_assoc()){
 			//$query = $this->query("SELECT * FROM `$array[shopDirectory]` WHERE `id`='$good[itemId]' ");
 			//$good['item'] = $query->fetch_assoc();
-			$good['item'] = $classData->getItemById($array['shopDirectory'], $good['itemId']);
+			$good['item'] = $classData->getItemById($array['shopDirectory'], $good['goodId']);
 			$goods[] = $good;
 		}
 		return $goods;
@@ -265,18 +265,46 @@ class Orders extends DatabaseInterface{
 	/**
 	
 	*/
-	function showAssembly($array){
-		print_r($array);
-	//	$classData = new Data();
-	//	$q = "SELECT * FROM `assembly` WHERE `orderId`='$array[orderId]' ORDER BY `id` DESC ";
-	//	$query = $this->query($q);
-	//	while($good=$query->fetch_assoc()){
-	//		//$query = $this->query("SELECT * FROM `$array[shopDirectory]` WHERE `id`='$good[itemId]' ");
-	//		//$good['item'] = $query->fetch_assoc();
-	//		$good['item'] = $classData->getItemById($array['shopDirectory'], $good['itemId']);
-	//		$goods[] = $good;
-	//	}
-	//	return $goods;
+	function addNewGoodIntoOrder($array){
+		//print_r($array);
+		if(!$array['orderId']){
+			$query = $this->query("SELECT * FROM `orders` WHERE `isAdmin`='1' AND `orderStatus`='1' ");
+			if($query->num_rows>0){
+				$order = $query->fetch_assoc();
+				$array['orderId'] = $order['id'];
+			}else{
+				$q = "INSERT INTO `orders` (`orderStatus`, `isAdmin`) VALUES ('1', '1') ";
+				$order = $query = $this->query($q);
+				$array['orderId'] = $order['id'];
+			}
+		}
+		if(!$array['orderId']){
+			return "{\"error\":\"Не удалось определить идентификатор заказа\"}";
+		}
+		//**************************************
+		if($array['goodId']){
+			$query = $this->query("SELECT * FROM `$array[shopDirectory]` WHERE `id`='$array[goodId]' ");
+			$good = $query->fetch_assoc();
+			$query = $this->query("SELECT * FROM `assembly` WHERE `orderId`='$array[orderId]' AND `goodId`= '$array[goodId]' ");
+			if($query){
+				if($query->num_rows > 0){
+					$item = $query->fetch_assoc();
+					$query2 = $this->query("UPDATE `assembly` SET `qtty`=`qtty`+1 WHERE `id`='$item[id]' ");
+					return "{\"orderId\":\"$array[orderId]\",\"itemId\":\"$item[id]\"}";
+				}else{
+					$q = "INSERT INTO `assembly` (`orderId`, `goodId`, `addDate`, `price`, `qtty`)
+					VALUES ('$array[orderId]', '$array[goodId]', '".date('Y-m-d H:i:s')."', '$good[price]', '1') ";
+					$item = $this->query($q);
+					return "{\"orderId\":\"$array[orderId]\",\"itemId\":\"$item[id]\"}";
+				}
+			}else{
+				return "{\"error\":\"Не удалось определить запрос\",\"\":\"\",\"\":\"\"}";
+			}
+		}
+		//************
+		$q = "INSERT INTO `assembly` (`orderId`, `addDate`) VALUES ('$array[orderId]', '".date('Y-m-d H:i:s')."') ";
+		$item = $this->query($q);
+		return "{\"action\":\"addGood\",\"orderId\":\"$array[orderId]\",\"itemId\":\"$item[id]\"}";
 	}
 	
 }

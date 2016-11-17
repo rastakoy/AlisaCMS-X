@@ -678,8 +678,9 @@ $( ".trGlobalSettings" ).dblclick(function () {
 			<td class="tdGlobalSettings">&nbsp;</td>
 		</tr>
 		<tr>
-			<td class="tdGlobalSettings" width="300">Вертикальный формат фото</td>
-			<td class="tdGlobalSettings" width=""><input type="checkbox" id="restsOnOff_id" onclick="restsOnOff()"></td>
+			<td class="tdGlobalSettings" width="300">Вертикальный ориентация изображений</td>
+			<td class="tdGlobalSettings" width=""><input type="checkbox" id="imagesVerticalOrientation_id"
+			onclick="imagesVerticalOrientation(this)" <? if($siteSettings['photoVerticalOrientation']=='1') echo "checked"; ?> ></td>
 			<td class="tdGlobalSettings">&nbsp;</td>
 		</tr>
 		<tr>
@@ -746,6 +747,22 @@ $( ".trGlobalSettings" ).dblclick(function () {
 </div>
 
 <script>
+//********************************
+function imagesVerticalOrientation(obj){
+	var paction = "ajax=toggle";
+	paction += "&option=settings";
+	paction += "&keyField=arrayName";
+	paction += "&keyValue=photoVerticalOrientation";
+	paction += "&field=value";
+	$.ajax({
+		type: "POST",
+		url: __ajax_url,
+		data: paction,
+		success: function(html) {
+			console.log(html);
+		}
+	});
+}
 //********************************
 function setOrderStatusColor(obj){
 	var id = obj.id.replace(/^.*_/gi, '');

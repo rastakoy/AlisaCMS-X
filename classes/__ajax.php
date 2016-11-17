@@ -358,6 +358,9 @@ switch($array['ajax']){
 		}
 		echo $classData->toggleData($array);
 		break;
+	case 'toggle':
+		echo $classData->toggleData($array);
+		break;
 	case 'changeConnectorTable':
 		echo $classFilters->changeConnectorTable($array);
 		break;
@@ -422,6 +425,30 @@ switch($array['ajax']){
 		$showTemplate = true;
 		$loadPage = '__assembly';
 		//echo $classOrders->showAssembly($array);
+		break;
+	case 'prepareAddNewGoodIntoOrder':
+		$siteSettings = $this->constructSiteSettings();
+		$params = $array;
+		$params['option'] = $siteSettings['shopDirectory'];
+		$optionName = $siteSettings['shopDirectory'];
+		$query = $this->query("SELECT * FROM `menusettings` WHERE `link`='$optionName' ");
+		$option = $query->fetch_assoc();
+		
+		$parents = $classData->getParents($params);
+		if(count($parents)=='0'){
+			$items = $classData->getItems($params['option'], '0', '');
+		}else{
+			$items = $classData->getItems($params['option'], $parents[count($parents)-1]['id'], '');
+		}
+		$items = $items['data'];
+		
+		$showTemplate = true;
+		$loadPage = '__fastCatalog';
+		break;
+	case 'addNewGoodIntoOrder':
+		$siteSettings = $this->constructSiteSettings();
+		$array['shopDirectory'] = $siteSettings['shopDirectory'];
+		echo $classOrders->addNewGoodIntoOrder($array);
 		break;
 	default:
 		//Значение параметра ajax по-умолчанию

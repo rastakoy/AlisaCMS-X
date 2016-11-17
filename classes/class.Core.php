@@ -109,11 +109,7 @@ class Core extends DatabaseInterface{
 					$optionName = $params['option'];
 					$query = $this->query("SELECT * FROM `menusettings` WHERE `link`='$params[option]' ");
 					$option = $query->fetch_assoc();
-					if($classData->isExternal($params['option'])){
-						$parents = $classData->getExternalParents($params);
-					}else{
-						$parents = $classData->getParents($params);
-					}
+					$parents = $classData->getParents($params);
 					$titles = $classData->constructTitles($option['title'], $parents);
 					$folder = $classData->getFolder($parents[count($parents)-1]['id'], $optionName);
 					$items = $classOrders->getOrders($params);

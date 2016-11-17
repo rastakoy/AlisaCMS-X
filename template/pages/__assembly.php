@@ -121,29 +121,8 @@ if($titles['0']=='catalog'){
 ?>
 		<div class="admintitle" style="padding:0px; margin:0px;" >
 		
-		<? if($addItem){ ?>
-		<a href="javascript:getData('<?=$GLOBALS['adminBase']?>/?action=editItem,option=<?=$params['option']?>,parents=<?=$params['parents']
-		?><?  if($option['external']=='1'){ ?>,optionExternal=1<? } ?>,isAdmin=1')" id="add_item_to_cat_button"
-		style="width:85px;"><?=$addItemTitle?></a>
-		<? } ?>
-		
-		<? if($addFolder){ ?>
-		<a href="javascript:getData('<?=$GLOBALS['adminBase']?>/?option=<?=$params['option']?>,parents=<?=$params['parents']?>,action=addNewFolder')"
-		id="add_folder_to_cat_button"><?=$addFolderTitle?></a>
-		<? } ?>
-		
-		<? if($editFolder){ ?><a href="javascript:" id="edit_folder_cat_button"
-		onclick="getData('<?=$GLOBALS['adminBase']?>/?option=<?=$optionName?>,action=editFolder,folderId=<?=$parents[count($parents)-1]['id']
-		?>,parents=<?=$params['parents']?>')"><?=$editFolderTitle?></a>
-		<? } ?>
-		
-		<? if($deleteFolder){ ?>
-		<a onclick="deleteOptionFolder('<?=$loadPage?>', '<?=$parentNotice['id']?>', '<?=str_replace("'", "\\'", $parentNotice['name'])?>', 'back')"
-		href="javascript:" id="deletefolderbutton"><?=$deleteFolderTitle?></a>
-		<? } ?>
-		
-		<a href="javascript:getData('/adminarea/?ajax=addGoodIntoOrder,orderId=<?=$params['orderId']?>')" id="add_item_to_cat_button"
-		style="width:130px; margin-right:150px;">Добавить товар</a>
+		<a href="javascript:" id="add_item_to_cat_button" onclick="prepareAddNewGoodIntoOrder('<?=$params['orderId']?>')"
+		style="width:180px; margin-right:150px;" >Добавить товар в заказ</a>
 		<a href="javascript:showHelp('catalog');" id="outerhelp">?</a>
 		<a href="javascript:getOrderStatuses();" id="fastSettings">&nbsp;</a>
 		<span style="padding-top:5px; display:block;">&nbsp;<?=$version?></span>
@@ -174,6 +153,7 @@ if($params['action']=='addNewFolder') { ?>
 
 <div class="rightPanelBorder">&nbsp;</div>
 
+<? /*
 <div class="languagesTabs">
 	<span <?
 	if($order['manual']=='0'){
@@ -187,6 +167,7 @@ if($params['action']=='addNewFolder') { ?>
 	?>'orderStatus', 'all')"<? } ?> >Режим ручной</span>
 </div>
 <div style="float:none;clear:both;"></div>
+*/ ?>
 
 <div class="ui-state-default-3 ui-sortable" id="myitems_sortable">
 
@@ -205,11 +186,11 @@ if($params['action']=='addNewFolder') { ?>
 			width="16" height="16" border="0" align="center" style="margin-right:5px;cursor:pointer;margin-top:5px;" />
 			</td>
 			<td height="34" width="70" style="font-weight:bold;" align="center">%</td>
-			<td height="34" width="100" style="font-weight:bold;" align="center">
+			<td height="34" width="120" style="font-weight:bold;" align="center">
 			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/price-discount.gif"
 			width="16" height="16" border="0" align="center" style="margin-right:5px;cursor:pointer;margin-top:5px;" />
 			</td>
-			<td height="34" width="100" align="center">
+			<td height="34" width="100" align="">
 			<img src="<?=$GLOBALS['adminBase']?>/template/images/green/icons/sum.gif"
 			width="16" height="16" border="0" align="center" style="margin-right:5px;cursor:pointer;margin-top:5px;" />
 			</td>
@@ -221,14 +202,14 @@ if($params['action']=='addNewFolder') { ?>
 				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/comments.gif"
 				id="imgcomments_<?=$item['id']?>" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"><? } ?>
 			</td>
-			<td height="34" width="20"><a href="javascript:" title="Редактировать запись"><img src="/adminarea/template/images/green/myitemname_popup/edit_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"></a></td>
-			<td height="34" width="20"><a href="javascript:" title="Удалить запись"><img src="/adminarea/template/images/green/myitemname_popup/delete_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="addToTrash('<?=$item['id']?>')"></a></td>
+			<td height="34" width="20">&nbsp;</td>
+			<td height="34" width="20">&nbsp;</td>
 		</tr></table>
 	</div></div>
 <? //echo "<pre>"; print_r($items); echo "</pre>"; ?>
 <? //echo "<pre>"; print_r($parentNotice); echo "</pre>"; ?>
 <? //echo "<pre>orderStatuses:"; print_r($orderStatuses); echo "</pre>"; ?>
-<? if(is_array($items)){ $count=0; foreach($items as $item){
+<? if(is_array($items)){ $count=1; foreach($items as $item){
 $lnk = false;
 if($item['folder']=='1' && $titles['0']!='static') { //Выписываем дирректорию  ?>
 
@@ -256,12 +237,17 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 			<? } ?>
 			<td height="34" width="180" style="font-weight:bold;"><span
 			id="itemName_<?=$item['id']?>"><?=$item['item']['name']?></span></td>
-			<td height="34" width="100" align="center"><?=$item['item']['price']?></td>
+			<td height="34" width="100" align="center"><?=$item['price']?></td>
 			<td height="34" width="50" align="center"><input type="number" style="width:45px;height:30px;" min="1" step="1"
 			max="1000" id="qtty_<?=$item['id']?>" value="<?=$item['qtty']?>" onchange="__ao_changeQtty(this)"></td>
 			<td height="34" width="70" style="font-weight:bold;" align="center">---</td>
-			<td height="34" width="100" style="font-weight:bold;" align="center"><?=$item['item']['priceDiscount']?></td>
-			<td height="34" width="100" style="font-weight:bold;" align="center"><?=$item['item']['sum']?></td>
+			<td height="34" width="120" style="font-weight:bold;" align="center">---<?=$item['item']['priceDiscount']?></td>
+			
+			<?  // общая сумма расчета позиции
+			$sum = $item['price'] * $item['qtty'];
+			?>
+			<td height="34" width="100" style="font-weight:bold;" align=""><?=$sum?></td>
+			
 			<td height="34" width="">&nbsp;</td>
 			<td height="34" width="20">&nbsp;</td>
 			<td height="34" width="20"><a href="javascript:" title="Внимание: незаполненные поля">&nbsp;</a></td>
@@ -278,72 +264,30 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 <? $count++; }}} ?>
 </div>
 <script>
-var restoreObject = {};
-function addToTrash(itemId){
-	var name = document.getElementById("itemName_"+itemId).innerText;
-	var obj = document.getElementById("itemName_"+itemId).parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-	//console.log(obj.id);
-	bgObj = obj.getElementsByClassName("div_myitemname")[0];
-	if(bgObj.getAttribute("myBgColor")){
-		$(bgObj).css('background-color', bgObj.getAttribute("myBgColor"));
-	}else{
-		$(bgObj).css('background-color', '');
-	}
-	var oinner = obj.innerHTML;
-	oinner = oinner.replace(/<tbody>/gi, '');
-	oinner = oinner.replace(/<\/tbody>/gi, '');
-	//console.log(oinner);
-	restoreObject[itemId] = oinner;
-	obj.innerHTML = "<div class=\"trashPreloader\" id=\"itemName_"+itemId+"\"></div>";
-	var paction =  "ajax=addToTrash";
-	paction += "&itemId="+itemId;
-	paction += "&option=<?=$params['option']?>";
+//*********************************************************
+function prepareAddNewGoodIntoOrder(orderId, parents){
+	//var paction =  "ajax=addNewGoodIntoOrder";
+	var paction =  "ajax=prepareAddNewGoodIntoOrder";
+	paction += "&orderId="+orderId;
+	paction += "&parents="+parents;
+	startPreloader();
 	$.ajax({
 		type: "POST",
 		url: __ajax_url,
 		data: paction,
 		success: function(html) {
 			//console.log(html);
-			var data = eval("("+html+")");
-			if(data.itemId){
-				var obj = document.getElementById("itemName_"+data.itemId).parentNode;
-				var inner = "<div class=\"trashPreloader\" style=\"background-image:none;\" id=\"itemName_"+data.itemId+"\">";
-				inner += "<br/><a href=\"javascript:\" ";
-				inner += " onclick=\"restoreFromTrash('<?=$params['option']?>', '"+data.itemId+"')\">Восстановить</a></div>";
-				obj.innerHTML = inner;
-			}else{
-				console.log("Ошибка");
-			}
+			stopPreloader();
+			document.getElementById("popup_title").innerHTML = "Выбор товара для добавления в заказ";
+			$("#popup_cont").empty();
+			$("#popup_cont").append(html);
+			__popup({"width":"500","height":"auto","onclose":function(){showAssembly(orderId)},"noclose":true});
 		}
 	});
 }
+//ajax=addNewGoodIntoOrder,orderId=<?=$params['orderId']?>
 //*********************************************************
-function restoreFromTrash(option, itemId){
-	var obj = document.getElementById("itemName_"+itemId).parentNode;
-	obj.innerHTML = "<div class=\"trashPreloader\" id=\"itemName_"+itemId+"\"></div>";
-	var paction =  "ajax=restoreFromTrash";
-	paction += "&itemId="+itemId;
-	paction += "&option="+option;
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			//console.log(html);
-			var data = eval("("+html+")");
-			if(data.itemId){
-				var obj = document.getElementById("itemName_"+data.itemId);
-				//obj.parentNode.removeChild(obj);
-				obj.parentNode.innerHTML = restoreObject[data.itemId];
-			}else{
-				console.log("Ошибка");
-			}
-			//initItems();
-		}
-	});
-}
-//*********************************************************
-var stusesColors = { <? foreach($orderStatuses as $key=>$oStatus){ $str .= "\"$key\":\"oStatus[color]\","; } echo preg_replace("/,$/", '', $str); ?> };
+
 //*********************************************************
 </script>
 <? } //**********************  //ПРОСМОТР ГРУППЫ ?>

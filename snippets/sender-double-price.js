@@ -1,0 +1,1 @@
+paction += "&<?=$field['link']?>="+encodeURIComponent(document.getElementById("<?=$field['link']?>").value);
