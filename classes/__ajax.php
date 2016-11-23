@@ -1,4 +1,5 @@
 <?
+$siteSettings = $this->constructSiteSettings();
 switch($array['ajax']){
 	case 'getLeftBranch':
 		//echo "url=$array[url]\n";
@@ -419,6 +420,7 @@ switch($array['ajax']){
 		$option = $query->fetch_assoc();
 		$params['orderId'] = $array['orderId'];
 		$order = $classOrders->getOrderById($array['orderId']);
+		$user = $classUsers->getUserById($order['userId']);
 		$params['shopDirectory'] = $siteSettings['shopDirectory'];
 		$items = $classOrders->getGoods($params);
 		$orderStatuses = $classOrders->getOrderStatuses(true);
@@ -441,14 +443,53 @@ switch($array['ajax']){
 			$items = $classData->getItems($params['option'], $parents[count($parents)-1]['id'], '');
 		}
 		$items = $items['data'];
-		
 		$showTemplate = true;
 		$loadPage = '__fastCatalog';
 		break;
 	case 'addNewGoodIntoOrder':
-		$siteSettings = $this->constructSiteSettings();
 		$array['shopDirectory'] = $siteSettings['shopDirectory'];
 		echo $classOrders->addNewGoodIntoOrder($array);
+		break;
+	case 'deleteItemFromOrder':
+		echo $classOrders->deleteItemFromOrder($array);
+		break;
+	case 'changeOrderQtty':
+		echo $classOrders->changeOrderQtty($array);
+		break;
+	case 'confirmOrder':
+		$array['shopDirectory'] = $siteSettings['shopDirectory'];
+		echo $classOrders->confirmOrder($array);
+		break;
+	case 'getAdminOrder':
+		echo $classOrders->getAdminOrder($array);
+		break;
+	case 'showStoreWindow':
+		$item = $classData->getItemById($array['table'], $array['id']);
+		echo "{\"table\":\"$array[table]\",\"id\":\"$array[id]\",\"store\":\"$item[store]\"}";
+		break;
+	case 'addGoodToStore':
+		echo $classOrders->addGoodToStore($array);
+		break;
+	case 'removeGoodFromStore':
+		echo $classOrders->removeGoodFromStore($array);
+		break;
+	case 'prepareAssociateClientWithOrder':
+		$params = $array;
+		$users = $classUsers->getUsersByAttribute("reg", "1", "fio asc");
+		$showTemplate = true;
+		$loadPage = '__fastUsers';
+		break;
+	case 'associateClientWithOrder':
+		echo $classOrders->associateClientWithOrder($array);
+		break;
+	case 'showComments':
+		$params = $array;
+		$comments = $classComments->getCommentsByParentId($array['itemId']);
+		$showTemplate = true;
+		$loadPage = '__comments';
+		break;
+	case 'lookNewOrders':
+		echo $classOrders->lookNewOrders($array);
 		break;
 	default:
 		//Значение параметра ajax по-умолчанию

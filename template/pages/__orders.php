@@ -121,9 +121,8 @@ if($titles['0']=='catalog'){
 		<div class="admintitle" style="padding:0px; margin:0px;" >
 		
 		<? if($addItem){ ?>
-		<a href="javascript:getData('<?=$GLOBALS['adminBase']?>/?action=editItem,option=<?=$params['option']?>,parents=<?=$params['parents']
-		?><?  if($option['external']=='1'){ ?>,optionExternal=1<? } ?>,isAdmin=1')" id="add_item_to_cat_button"
-		style="width:85px;"><?=$addItemTitle?></a>
+		<a href="javascript:" id="add_item_to_cat_button" onclick="getAdminOrder()"
+		style="width:85px;">ќформить заказ<? //echo $addItemTitle?></a>
 		<? } ?>
 		
 		<? if($addFolder){ ?>

@@ -58,6 +58,14 @@ function __popup(myStyle){
 		winLeft = wwwidth/2-(wwidth-100)/2;
 		winTop = 20+document.body.scrollTop;
 	}
+	obj_w.style.backgroundImage = '';
+	if(myStyle && myStyle['background-image']){
+		//console.log(myStyle);
+		//console.log(myStyle['background-image']);
+		//console.log("myStyle['background-image']");
+		obj_w.style.backgroundImage = myStyle['background-image'];
+		//console.log(obj_w.style.backgroundImage);
+	}
 	obj_w.style.display="";
 	//*******************************
 	obj_c = document.getElementById("popup_close");
@@ -98,8 +106,9 @@ function __popup_close(data, noclose){
 	}
 	if(!noclose){
 		document.getElementById("popup_bg").style.display = "none";
-		document.getElementById("popup_cont").style.height = "10px";
+		document.getElementById("popup_cont").style.height = "none";
 		document.getElementById("popup_cont").style.display = "none";
+		document.getElementById("popup_cont").style.paddingTop = "0";
 		document.getElementById("popup_cont").innerHTML = "";
 		document.getElementById("popup_close").style.display = "none";
 		document.getElementById("popup_title").style.display = "none";

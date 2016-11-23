@@ -556,6 +556,33 @@ a#fastSettings:hover{
 	text-decoration: none;
 	background-color:#66B7FF;
 }
+a#fastReload{
+	display: block;
+	float: left;
+	width: 10px;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	color:#333333;
+	background-image: url(/adminarea/template/images/green/icons/reload-16x16.png);
+	background-position:center center;
+	background-repeat:no-repeat;
+	background-color:#B3DBFF;
+	border: 1px solid #CCCCCC;
+	border-radius: 5px;
+	text-align: center;
+	margin-right: 5px;
+	font-size: 10px;
+	line-height: normal;
+	text-transform: uppercase;
+	margin-bottom: 5px;
+	transition: all 0.35s ease;
+}
+a#fastReload:hover{
+	text-decoration: none;
+	background-color:#66B7FF;
+}
 /***********************************/
 img#left_panel_close{
 	position:fixed;

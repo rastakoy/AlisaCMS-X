@@ -36,6 +36,8 @@ $(document).ready(function(){
 <div class="menuitem" style="transition:none;background:url(/adminarea/template/images/green/menu_hr_static_long.jpg); background-repeat:no-repeat;">&nbsp;</div> 
 <!--  -------------------------------------------------------------------- -->
 <script>
-
+if(document.getElementById("rootordersmenu")){
+	__lookNewOrders();
+}
 </script>
 <!--  -------------------------------------------------------------------- -->

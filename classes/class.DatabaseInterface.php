@@ -119,6 +119,24 @@ class DatabaseInterface extends Mysqli{
 		}
 	}
 	
+	/**
+	
+	*/
+	function encodeSQL($params, $start){
+		if(is_array($params)){
+			foreach($params as $key=>$value){
+				preg_match("/(^>|^>=|^<|^<=)/", $value, $assig);
+				echo "$assig";
+				print_r($assig);
+				echo "\n-----------\n";
+			}
+		}
+		if(strlen($str)>0){
+			$str = $start.$str;
+		}
+		return $str;
+	}
+	
 	function okamaBlade($q){
 		
 	}

@@ -40,6 +40,7 @@
 <script type="text/javascript" src="/adminarea/template/js/connectors.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/orders.statuses.js"></script>
 <script type="text/javascript" src="/adminarea/template/js/orders.js"></script>
+<script type="text/javascript" src="/adminarea/template/js/comments.js"></script>
 
 <script src="/adminarea/template/js/jquery.ui.core.js"></script>
 <script src="/adminarea/template/js/jquery.ui.widget.js"></script>

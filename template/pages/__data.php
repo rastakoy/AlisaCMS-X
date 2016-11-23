@@ -1151,13 +1151,15 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 				</td>
 			<? } ?>
 			<td height="34" width="" style="font-weight:bold;"><span id="itemName_<?=$item['id']?>"><?=$item['name']?></span></td>
-			<td height="34" width="20">&nbsp;</td>
+			<td height="34" width="45" bgcolor="#CCCCCC" style="padding-left:3px;"><img
+			src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/rests.gif"
+			width="16" height="16" border="0" align="left"><?=$item['onStore']?></td>
 			<td height="34" width="20">&nbsp;</td>
 			<td height="34" width="20"><a href="javascript:" title="Внимание: незаполненные поля">&nbsp;</a></td>
 			<!--<td height="34" width="20"><a href="javascript:" title="Клонировать запись"><img src="/adminarea/template/images/green/icons/copy.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="clone_myitemblock('105')"></a></td>-->
-			<td height="34" width="20"><? if($item['includeComments']=='1'){ ?>
+			<td height="34" width="24"><? if($item['includeComments']=='1'){ ?>
 				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/comments.gif"
-				id="imgcomments_<?=$item['id']?>" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"><? } ?>
+				id="imgcomments_<?=$item['id']?>" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="showComments('<?=$item['id']?>');"><? } ?>
 			</td>
 			<td height="34" width="20"><a href="javascript:" title="Редактировать запись"><img src="/adminarea/template/images/green/myitemname_popup/edit_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"></a></td>
 			<td height="34" width="20"><a href="javascript:" title="Удалить запись"><img src="/adminarea/template/images/green/myitemname_popup/delete_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="addToTrash('<?=$item['id']?>')"></a></td>

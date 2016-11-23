@@ -122,7 +122,8 @@ if($titles['0']=='catalog'){
 		<div class="admintitle" style="padding:0px; margin:0px;" >
 		
 		<a href="javascript:" id="add_item_to_cat_button" onclick="prepareAddNewGoodIntoOrder('<?=$params['orderId']?>')"
-		style="width:180px; margin-right:150px;" >Добавить товар в заказ</a>
+		style="width:180px; margin-right:75px;" >Добавить товар в заказ</a>
+		<a href="javascript:" id="fastReload" style="margin-right:75px;" onclick="showAssembly('<?=$params['orderId']?>')">&nbsp;</a>
 		<a href="javascript:showHelp('catalog');" id="outerhelp">?</a>
 		<a href="javascript:getOrderStatuses();" id="fastSettings">&nbsp;</a>
 		<span style="padding-top:5px; display:block;">&nbsp;<?=$version?></span>
@@ -146,12 +147,20 @@ if($titles['0']=='catalog'){
 
 <? //**********************  ДОБАВЛЕНИЕ ГРУППЫ
 if($params['action']=='addNewFolder') { ?>
-
 <? //**********************  //ДОБАВЛЕНИЕ ГРУППЫ 
 
 }else{ //**********************  ПРОСМОТР ГРУППЫ ?>
 
-<div class="rightPanelBorder">&nbsp;</div>
+<div class="rightPanelBorder" style="padding:10px;min-height:auto;"><?   if($order['userId']!='0'){ ?>
+<? //echo "<pre>user:"; print_r($user); echo "</pre>"; ?>
+Клиент: <?=$user['fio']?><br/>
+Телефон: <?=$user['phone']?><br/>
+E-mail: <?=$user['email']?><br/>
+Адрес доставки: <?=$order['place']?><br/>
+<? }else{ ?>
+<b>Связать заказ с клиентом</b>&nbsp;&nbsp;&nbsp;
+<button onclick="prepareAssociateClientWithOrder('<?=$order['id']?>')">Определить клиента</button>
+<? } ?></div>
 
 <? /*
 <div class="languagesTabs">
@@ -209,7 +218,10 @@ if($params['action']=='addNewFolder') { ?>
 <? //echo "<pre>"; print_r($items); echo "</pre>"; ?>
 <? //echo "<pre>"; print_r($parentNotice); echo "</pre>"; ?>
 <? //echo "<pre>orderStatuses:"; print_r($orderStatuses); echo "</pre>"; ?>
-<? if(is_array($items)){ $count=1; foreach($items as $item){
+<? if(is_array($items)){
+$count=1;
+$allSum=0;
+foreach($items as $item){
 $lnk = false;
 if($item['folder']=='1' && $titles['0']!='static') { //Выписываем дирректорию  ?>
 
@@ -239,7 +251,8 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 			id="itemName_<?=$item['id']?>"><?=$item['item']['name']?></span></td>
 			<td height="34" width="100" align="center"><?=$item['price']?></td>
 			<td height="34" width="50" align="center"><input type="number" style="width:45px;height:30px;" min="1" step="1"
-			max="1000" id="qtty_<?=$item['id']?>" value="<?=$item['qtty']?>" onchange="__ao_changeQtty(this)"></td>
+			max="1000" id="qtty_<?=$item['id']?>_<?=$params['orderId']?>" value="<?=$item['qtty']?>"
+			onchange="changeOrderQtty(this)"></td>
 			<td height="34" width="70" style="font-weight:bold;" align="center">---</td>
 			<td height="34" width="120" style="font-weight:bold;" align="center">---<?=$item['item']['priceDiscount']?></td>
 			
@@ -256,51 +269,62 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/comments.gif"
 				id="imgcomments_<?=$item['id']?>" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"><? } ?>
 			</td>
-			<td height="34" width="20"><a href="javascript:" title="Редактировать запись"><img src="/adminarea/template/images/green/myitemname_popup/edit_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"></a></td>
-			<td height="34" width="20"><a href="javascript:" title="Удалить запись"><img src="/adminarea/template/images/green/myitemname_popup/delete_item.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="addToTrash('<?=$item['id']?>')"></a></td>
+			<td height="34" width="20">&nbsp;</td>
+			<td height="34" width="20"><a href="javascript:" title="Удалить товар"><img
+			src="/adminarea/template/images/green/myitemname_popup/delete_item.gif" id="imgoptions_105"
+			width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;"
+			onclick="deleteItemFromOrder('<?=$params['orderId']?>', '<?=$item['id']?>')"></a></td>
 		</tr></table>
 	</div>
 </div>
-<? $count++; }}} ?>
+<?
+$count++;
+$allSum += $sum;
+}}} ?>
+
+
+	<div class="ui-state-default-2 connectedSortable" id="">
+	<div class="div_myitemname" style="padding-top: 0px;">
+		<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+			<td height="34" width="590" style="font-weight:bold;">Общая сумма</td>
+			<td height="34" width="100" align=""><?=$allSum?></td>
+			<td height="34" width="">&nbsp;</td>
+			<td height="34" width="20">&nbsp;</td>
+			<td height="34" width="20"><a href="javascript:" title="Внимание: незаполненные поля">&nbsp;</a></td>
+			<!--<td height="34" width="20"><a href="javascript:" title="Клонировать запись"><img src="/adminarea/template/images/green/icons/copy.gif" id="imgoptions_105" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="clone_myitemblock('105')"></a></td>-->
+			<td height="34" width="20"><? if($item['includeComments']=='1'){ ?>
+				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/comments.gif"
+				id="imgcomments_<?=$item['id']?>" width="16" height="16" border="0" align="right" style="margin-right:5px;cursor:pointer;margin-top:5px;" onclick="show_myitemblock('div_myitemname_105');hide_idc('105')"><? } ?>
+			</td>
+			<td height="34" width="20">&nbsp;</td>
+			<td height="34" width="20">&nbsp;</td>
+		</tr></table>
+	</div></div>
+
+
+</div></div>
+
+<? if($order['orderStatus']=='1'){ ?>
+<div align="center">
+	<div style="width:320px;height:30px;margin-top:14px;">
+	<a href="javascript:" id="add_item_to_cat_button" onclick="confirmOrder('<?=$params['orderId']?>')"
+	style="width:120px;margin-right:20px;" >Принять заказ</a>
+	<a href="javascript:" id="deletefolderbutton" onclick="prepareAddNewGoodIntoOrder('<?=$params['orderId']?>')"
+	style="width:120px;float:right;" >Отменить заказ</a>
+	</div>
 </div>
+<? } ?>
+
 <script>
-//*********************************************************
-function prepareAddNewGoodIntoOrder(orderId, parents){
-	//var paction =  "ajax=addNewGoodIntoOrder";
-	var paction =  "ajax=prepareAddNewGoodIntoOrder";
-	paction += "&orderId="+orderId;
-	paction += "&parents="+parents;
-	startPreloader();
-	$.ajax({
-		type: "POST",
-		url: __ajax_url,
-		data: paction,
-		success: function(html) {
-			//console.log(html);
-			stopPreloader();
-			document.getElementById("popup_title").innerHTML = "Выбор товара для добавления в заказ";
-			$("#popup_cont").empty();
-			$("#popup_cont").append(html);
-			__popup({"width":"500","height":"auto","onclose":function(){showAssembly(orderId)},"noclose":true});
-		}
-	});
-}
 //ajax=addNewGoodIntoOrder,orderId=<?=$params['orderId']?>
 //*********************************************************
-
-//*********************************************************
 </script>
+
+
+
+
 <? } //**********************  //ПРОСМОТР ГРУППЫ ?>
 <!--  ------------------------------------------------------------- -->
-		  
-		  
-		</div>
-		<div class="manageadminforms" id="lookContent" style="display:none;">
-		  А вот сюда загрузится модуль редактирования папки
-		</div>
-		<div class="manageadminforms" id="help_content" style="display:none;">
-		  Справка будет тут
-		</div>
-		
-	  <div id="nztime"></div>
+
+
 

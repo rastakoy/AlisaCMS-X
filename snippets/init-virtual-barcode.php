@@ -4,7 +4,7 @@
 		<?
 		$classBarcode->code39($classBarcode->addZeros($item['id']));
 		?>
-	<div style="float:left;padding-left:20px;">
+	<div style="float:left;padding-left:20px; padding-top:20px;">
 	<button onclick="managePrintBarCode('<?=$item['id']?>', '<?=$params['option']?>')"
 	style="width:200px;height:25px;margin-bottom:7px;">Настроить макет ценника</button>
 	<br/>

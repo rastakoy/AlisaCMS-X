@@ -50,6 +50,7 @@ class Core extends DatabaseInterface{
 		$classBarcode = new Barcode();
 		$classOrders = new Orders();
 		$classUsers = new Users();
+		$classComments = new Comments();
 		
 		$externalData = new ExternalData(); //класс для работы с данными из внешних источников
 		

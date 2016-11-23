@@ -25,4 +25,13 @@ class Users extends DatabaseInterface{
 		//}
 	}
 	
+	/**
+	
+	*/
+	function getUserById($id){
+		$query = $this->query("SELECT * FROM `users` WHERE `id`='$id' ");
+		$user=$query->fetch_assoc();
+		return $user;
+	}
+	
 }

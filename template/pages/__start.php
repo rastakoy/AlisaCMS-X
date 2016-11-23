@@ -579,11 +579,10 @@ $( ".trGlobalSettings" ).dblclick(function () {
 	<b style="text-transform:uppercase;">Основные настройки</b>
 		<div class="languagesTabs" id="languagesTabs">
 			<span class="active">Основное</span>
-			<span onclick="">Магазин</span>
-			<span onclick="">Почта</span>
-			<span onclick="">Склад</span>
-			<span onclick="">Обратная связь</span>
-			<span onclick="">Пользователи</span>
+			<span>Магазин</span>
+			<span>Комментарии</span>
+			<span>Обратная связь</span>
+			<span>Пользователи</span>
 			
 		</div>
 	<!--<div id="myitems_sortable" class="" style="display:;">-->

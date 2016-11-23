@@ -106,6 +106,8 @@ onclick="help_sver_menu_toggle(this)" />
 <div id="popup_title" style="display:none;"></div>
 <div id="popup_close" style="display:none;"></div>
 
+<div id="divAudio" style="display:none;"></div>
+
 <!-- <input type="text" id="scaner" /> -->
 
 <script>
