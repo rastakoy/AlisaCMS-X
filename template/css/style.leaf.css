@@ -1,0 +1,55 @@
+div#top_leaf{
+	position:absolute;
+	background-image: url(/images/leaf/top_leaf.png);
+	background-repeat: no-repeat;
+	background-position: center -50px;	
+	top: 0px;
+	height: 350px;
+	width: 100%;
+	transition: background 200ms ease;
+}
+div#top_leaf_2{
+	position:absolute;
+	background-image: url(/images/leaf/top_leaf_right.png);
+	background-repeat: no-repeat;
+	background-position: center -50px;	
+	top: 0px;
+	height: 350px;
+	width: 100%;
+}
+div#menu_leaf{
+	position:absolute;
+	background-image: url(/images/leaf/menu_leaf.png);
+	background-repeat: no-repeat;
+	background-position: center -70px;	
+	top: 0px;
+	height: 350px;
+	width: 100%;
+}
+div#top_leaf_right_near{
+	position:absolute;
+	background-image: url(/images/leaf/top_leaf_right_near.png);
+	background-repeat: no-repeat;
+	background-position: center -70px;	
+	top: 0px;
+	height: 350px;
+	width: 100%;
+}
+div#top_leaf_left_near{
+	position:absolute;
+	background-image: url(/images/leaf/top_leaf_right_near.png);
+	background-repeat: no-repeat;
+	background-position: left -380px;	
+	top: 0px;
+	height: 350px;
+	width: 100%;
+}
+div#top_apple{
+	position:absolute;
+	background-image: url(/images/leaf/top_apple.png);
+	background-repeat: no-repeat;
+	background-position: center -70px;	
+	top: 0px;
+	height: 350px;
+	width: 100%;
+}

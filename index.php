@@ -4,12 +4,11 @@
 	if($GLOBALS['offline'] == '1'){
 		ini_set('display_errors', '1');
 		$GLOBALS['host'] = 'localhost';
-		$GLOBALS['database'] = 'alisa_x';
+		$GLOBALS['database'] = 'sigma';
 		$GLOBALS['user'] = 'root';
 		$GLOBALS['pass'] = '';
-		$GLOBALS['site'] = 'http://alisacms-x.my/';
-		$GLOBALS['adminBase'] = "/adminarea";
-		$GLOBALS['ajax'] = $GLOBALS['adminBase'].'/index.php';
+		$GLOBALS['site'] = 'http://sigma.my/';
+		$GLOBALS['ajax'] = '/index.php';
 		$GLOBALS['language'] = 'rus';
 		$GLOBALS['activeInterval'] = '3600';
 		$GLOBALS['onPage'] = '50';
@@ -19,10 +18,10 @@
 	}else{
 		ini_set('error_reporting', E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
 		$GLOBALS['host'] = 'localhost';
-		$GLOBALS['database'] = 'krainadb';
-		$GLOBALS['user'] = 'krainadbuser';
-		$GLOBALS['pass'] = 'N0a9D2i0';
-		$GLOBALS['site'] = 'http://kraina.beststart.net/';
+		$GLOBALS['database'] = '';
+		$GLOBALS['user'] = '';
+		$GLOBALS['pass'] = '';
+		$GLOBALS['site'] = 'http://site.net/';
 		$GLOBALS['language'] = 'rus';
 		$GLOBALS['activeInterval'] = '300';
 		$GLOBALS['onPage'] = '50';
@@ -39,8 +38,12 @@
 	
 	//for php 5.2
 	function my_autoloader($className) {
-		if(file_exists('classes/class.'.$className.'.php')){
+		if($className=='Core'){
 			include 'classes/class.'.$className.'.php';
+		}else{
+			if(file_exists('adminarea/classes/class.'.$className.'.php')){
+				include 'adminarea/classes/class.'.$className.'.php';
+			}
 		}
 	}
 	spl_autoload_register('my_autoloader');
@@ -50,7 +53,7 @@
 	/* Данный участок кода разбивает строку адреса на массив */
 
 	//print_r($_SERVER);
-	$prega = "/(^\\".str_replace("/index.php", '', $GLOBALS['ajax'])."\/|\/{1,100}$)/";
+	$prega = "/(^".str_replace("/index.php", '', $GLOBALS['ajax'])."\/|\/{1,100}$)/";
 	$string = preg_replace($prega, '', $_SERVER['REQUEST_URI']);
 	$core = new Core();
 	$GLOBALS['string'] = $string;
@@ -59,6 +62,7 @@
 	$string = preg_replace("/\/$/", "", $params['0']);
 	$params = $core->constructParams($params['1']);
 	$string = explode('/', $string);
+	//echo "<pre>STRING:"; print_r($string); echo "</pre>";
 
 	/* Конец разбиения строки аддреса */
 

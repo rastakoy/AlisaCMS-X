@@ -1,0 +1,14 @@
+#AuthType Basic
+#AuthName "Thats protected Area!"
+#AuthUserFile /home/alisacms-x.my/www/adminarea/.htpasswd
+#Require valid-user
+#<Files .htpasswd>
+#   deny from all  #запрет доступа из браузера к .htpasswd
+#</Files>
+
+RewriteEngine On
+RewriteRule ^([^.]+)/?$ index.php?do=$1 [L]
+
+#RewriteCond %{HTTP_HOST} ^alisacms\.my$ [NC]
+#RewriteRule ^(.*)$ http://alisacms.my/$1 [R=301,L]
+

@@ -1,0 +1,27 @@
+div.items_isdiscount{
+	position:relative;
+	float:right;
+	width: 50px;
+	height: 50px;
+	z-index: 50;
+	background-image: url(/images/ico/skidka.png);
+	top: -145px;
+}
+div.items_isakc{
+	position:relative;
+	float:right;
+	width: 50px;
+	height: 50px;
+	z-index: 50;
+	background-image: url(/images/ico/akcia.png);
+	top: -145px;
+}
+div.items_isnew{
+	position:relative;
+	float:right;
+	width: 50px;
+	height: 50px;
+	z-index: 50;
+	background-image: url(/images/ico/new.png);
+	top: -145px;
+}

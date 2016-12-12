@@ -1,0 +1,13 @@
+table#order-send-0 td{
+	background-color: #FFFFFF;
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #999999;
+}
+.wmbasket{
+	border-radius: 10px;
+}
+.wmbasket input{
+	height: 30px;
+	padding-left: 3px;
+}
