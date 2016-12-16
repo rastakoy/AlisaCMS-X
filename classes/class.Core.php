@@ -122,6 +122,21 @@ class Core extends DatabaseInterface{
 					$loadPage = 'item';
 				}
 				break;
+				
+			case 'clients':
+				$mainItem = $classData->getElementBySiteURL($array);
+				if($mainItem['folder']=='1'){
+					$loadPage = 'clients';
+				}
+				break;
+					
+			case 'partners':
+				$mainItem = $classData->getElementBySiteURL($array);
+				if($mainItem['folder']=='1'){
+					$loadPage = 'partners';
+				}
+				break;
+				
 			default:
 				break;
 		}
