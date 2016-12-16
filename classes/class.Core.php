@@ -64,7 +64,7 @@ class Core extends DatabaseInterface{
 			//return false;
 		}
 		//*****************************************
-		require_once("__ajax.php");
+		require_once("classes/__ajax.php");
 		//*****************************************
 		if($showTemplate){
 			if(isset($selectLanguage) && file_exists("template/pages/".$selectLanguage."/".$loadPage.".txt")){
@@ -129,7 +129,7 @@ class Core extends DatabaseInterface{
 					$mainItem['isItemInBasket'] = $classOrders->isItemInBasket($user['id'], $mainItem['id']);
 				}
 				break;
-				
+
 			case 'clients':
 				$mainItem = $classData->getElementBySiteURL($array);
 				if($mainItem['folder']=='1'){
@@ -144,6 +144,9 @@ class Core extends DatabaseInterface{
 				}
 				break;
 				
+			case 'about':
+				 $mainItem = $classData->getElementBySiteURL(array("texts", "about"));
+				 break;
 			default:
 				break;
 		}
