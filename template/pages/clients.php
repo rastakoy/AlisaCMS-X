@@ -16,15 +16,14 @@ if($mainItem['id']=='0'){
 } else {
 	echo "<h1>".$mainItem['name']."</h1>";
 	echo $mainItem['content'];
-	
-$key = '0';
-foreach($mainItem['tumb'] as $key=>$image){
-	if($key=='0'){
-		echo "<img src=\"/loadimages/$image[name]\" class=\"item_image_small\"  onClick=\"revolve_image(this)\" ";
-		echo "style=\"cursor:pointer; width:100%; \"   />";
-	} 
-	$cc++;
-}
-
+	if($mainItem['tumb']!=""){
+		$key = '0';
+		foreach($mainItem['tumb'] as $key=>$image){
+			if($key=='0'){
+				echo "<img src=\"/loadimages/$image[name]\" class=\"item_image_small\"  onClick=\"revolve_image(this)\" ";
+				echo "style=\"cursor:pointer; width:100%; \"   />";
+			}
+		}
+	}
 }
 ?>
