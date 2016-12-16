@@ -265,15 +265,35 @@ class Orders extends DatabaseInterface{
 	/**
 	
 	*/
-	function addNewGoodIntoOrder($array){
+	function isItemInBasket($userId, $goodId){
+		$query = $this->query("SELECT * FROM `orders` WHERE `userId`='$userId' AND `orderStatus`='1' AND `isAdmin`='0' ");
+		if($query->num_rows>0){
+			$order = $query->fetch_assoc();
+			$query = $this->query("SELECT * FROM `assembly` WHERE `orderId`='$order[id]' AND `goodId`= '$goodId' ");
+			if($query->num_rows > 0){
+				return $query->fetch_assoc();
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	
+	*/
+	function addNewGoodIntoOrder($array, $isAdmin='1'){
 		//print_r($array);
+		$array['userId'] = ($array['userId'])?$array['userId']:'0';
+		$array['qtty'] = ($array['qtty'])?$array['qtty']:'1';
 		if(!$array['orderId']){
-			$query = $this->query("SELECT * FROM `orders` WHERE `isAdmin`='1' AND `orderStatus`='1' ");
+			$query = $this->query("SELECT * FROM `orders` WHERE `isAdmin`='$isAdmin' AND `userId`='$array[userId]' AND `orderStatus`='1' ");
 			if($query->num_rows>0){
 				$order = $query->fetch_assoc();
 				$array['orderId'] = $order['id'];
 			}else{
-				$q = "INSERT INTO `orders` (`orderStatus`, `isAdmin`) VALUES ('1', '1') ";
+				$q = "INSERT INTO `orders` (`orderStatus`, `isAdmin`, `userId`) VALUES ('1', '$isAdmin', '$array[userId]') ";
 				$order = $query = $this->query($q);
 				$array['orderId'] = $order['id'];
 			}
@@ -289,11 +309,11 @@ class Orders extends DatabaseInterface{
 			if($query){
 				if($query->num_rows > 0){
 					$item = $query->fetch_assoc();
-					$query2 = $this->query("UPDATE `assembly` SET `qtty`=`qtty`+1, `price`='$good[price]' WHERE `id`='$item[id]' ");
+					$query2 = $this->query("UPDATE `assembly` SET `qtty`=`qtty`+$array[qtty], `price`='$good[price]' WHERE `id`='$item[id]' ");
 					return "{\"orderId\":\"$array[orderId]\",\"itemId\":\"$item[id]\"}";
 				}else{
 					$q = "INSERT INTO `assembly` (`orderId`, `goodId`, `addDate`, `price`, `qtty`)
-					VALUES ('$array[orderId]', '$array[goodId]', '".date('Y-m-d H:i:s')."', '$good[price]', '1') ";
+					VALUES ('$array[orderId]', '$array[goodId]', '".date('Y-m-d H:i:s')."', '$good[price]', '$array[qtty]') ";
 					$item = $this->query($q);
 					return "{\"orderId\":\"$array[orderId]\",\"itemId\":\"$item[id]\"}";
 				}
@@ -320,7 +340,7 @@ class Orders extends DatabaseInterface{
 	*/
 	function changeOrderQtty($array){
 		$query = $this->query("UPDATE `assembly` SET `qtty`='$array[qtty]' WHERE `id`='$array[itemId]' ");
-		return "{\"orderId\":\"$array[orderId]\"}";
+		return "{\"orderId\":\"$array[orderId]\",\"assemblyId\":\"$array[itemId]\",\"qtty\":\"$array[qtty]\"}";
 	}
 	
 	/**
@@ -440,7 +460,8 @@ class Orders extends DatabaseInterface{
 		//echo "<pre>user:"; print_r($user); echo "</pre>";
 		$query = $this->query("SELECT * FROM `orders` WHERE `orderStatus`='1' AND `isAdmin`='0' AND `userId`='$user[id]' ");
 		if($query && $query->num_rows>0){
-		
+			$order = $query->fetch_assoc();
+			return $order['id'];
 		}else{
 			//return "{\"orderStatus\":\"empty\"}";
 			return false;

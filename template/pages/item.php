@@ -4,7 +4,7 @@
 ?>
 <div id="div_myitems">
 <div>
-<h1>Вилка заз.В-4100 VI-KO</h1><div xmlns:v="http://rdf.data-vocabulary.org/#" id="div_breadlinks"><span typeof="v:Breadcrumb"><a href="./" rel="v:url" property="v:title">Главная</a> › </span><span typeof="v:Breadcrumb"><a href="items/" rel="v:url" property="v:title">Каталог</a> › </span><span typeof="v:Breadcrumb"><a href="items/udleniteli_vilki/" rel="v:url" property="v:title">Удлинители, вилки</a> › </span><span typeof="v:Breadcrumb"><a href="items/udleniteli_vilki/vilki/" rel="v:url" property="v:title">Вилки и гнезда</a> › </span><span typeof="v:Breadcrumb">Вилка заз.В-4100 VI-KO</span></div><br>
+<h1><?=$mainItem['name']?></h1><div xmlns:v="http://rdf.data-vocabulary.org/#" id="div_breadlinks"><span typeof="v:Breadcrumb"><a href="./" rel="v:url" property="v:title">Главная</a> › </span><span typeof="v:Breadcrumb"><a href="items/" rel="v:url" property="v:title">Каталог</a> › </span><span typeof="v:Breadcrumb"><a href="items/udleniteli_vilki/" rel="v:url" property="v:title">Удлинители, вилки</a> › </span><span typeof="v:Breadcrumb"><a href="items/udleniteli_vilki/vilki/" rel="v:url" property="v:title">Вилки и гнезда</a> › </span><span typeof="v:Breadcrumb">Вилка заз.В-4100 VI-KO</span></div><br>
 </div>
 <!--  -----------------------------------------  -->
 <div id="item_left_block"><div id="div_fancybox" style="">
@@ -33,7 +33,7 @@ foreach($mainItem['tumb'] as $key=>$image){
 		echo "<img src=\"/loadimages/$image[name]\" class=\"item_image_small\"  onClick=\"revolve_image(this)\" ";
 		echo "style=\"cursor:pointer; width:80px; height:60px; \"   /></a></div>";
 		echo "<script>curSimgParent='$mainItem[id]';</script>";
-	} else {
+	}else{
 		if($imglink!=""){
 			$imglink = $classImages->createImageLink("loadimages", "320x240", $image['name']);
 			echo "<div class=\"div_itemimg\"><a rel=\"{gallery: 'gal1', smallimage: '$imglink',largeimage: '/loadimages/$image[name]'}\">";
@@ -144,14 +144,21 @@ var  orderKey=-1;
 	<span>
 	<b>На складе: </b><span style="" id="onStore">есть</span><br>
 	<b>Цена:</b>
-	</span><span class="filtername" style="display:inline;margin-top: 0px; margin-bottom: 5px;" id="itemPrice">0 грн.</span><br>
-	<span><input type="number" value="1" style="width:60px; height:30px;" id="qttyItem_7255" step="1" min="1" max="1000" onchange="__pb_changeQtty(this)"></span>
+	</span><span class="filtername" style="display:inline;margin-top: 0px; margin-bottom: 5px;" id="itemPrice"><?=$mainItem['price']?> грн.</span><br>
+	<span><input type="number" value="<?=($mainItem['isItemInBasket']['qtty'])?$mainItem['isItemInBasket']['qtty']:'1'?>"
+	style="width:60px; height:30px;"
+	id="qttyItem<?=($mainItem['isItemInBasket']['qtty'])?"_".$mainItem['isItemInBasket']['id']:'_'.$mainItem['id']?><?=($mainItem['isItemInBasket']['qtty'])?"_".$mainItem['isItemInBasket']['orderId']:''?>"
+	step="1" min="1" max="1000" <? if($mainItem['isItemInBasket']['qtty']){
+	?>onchange="changeOrderQtty(this)"<? } ?> ></span>
 	<span id="spanEdiz" style=""></span><br>
 	<b>Итого: </b><span id="itemItogo">0 грн.</span>
 </div>
-<div style="margin-top:30px;">
+<div style="margin-top:30px;"><? if($mainItem['isItemInBasket']['qtty']>0){ ?>
 <span id="basket_icon" style="background-image: url(/template/images/basket_empty.gif); margin-top: 0px;"></span>
-<a id="basket_button" href="javascript:add_to_r()" class="item_bye_butt" style="margin-top: 0px;">Купить</a><br><br><br>
+<a id="basket_button" href="javascript:" onclick="showBasket()" class="item_bye_butt" style="margin-top: 0px;">В корзине</a><? }else{ ?>
+<span id="basket_icon" style="background-image: url(/template/images/basket_empty.gif); margin-top: 0px;"></span>
+<a id="basket_button" href="javascript:" onclick="addItemIntoOrder(this, '<?=$mainItem['id']?>')" class="item_bye_butt" style="margin-top: 0px;">Купить</a><? } ?>
+<br><br><br>
 </div>
 </div>
 <div style="float:none;clear:both;">

@@ -828,7 +828,15 @@ class Data extends DatabaseInterface{
 		$parent = '0';
 		if(is_array($array) && count($array)>0){
 			if(count($array)==1){
-				
+				$item['id'] = '0';
+				$item['parent'] = '0';
+				$item['folder'] = '1';
+				$item['href'] = $array[0];
+				$item['visible'] = '1';
+				$item['option'] = $this->getOptionByName($array['0']);
+				$item['childrenFolders'] = $this->getItems($array['0'], $item['id']);
+				$item['childrenItems'] = $this->getItems($array['0'], $item['id'], false);
+				return $item;
 			}else{
 				while($level<count($array)){
 					$q = "SELECT * FROM `$array[0]` WHERE `parent`='$parent' AND `link`='".$array[$level]."' LIMIT 0,1 ";

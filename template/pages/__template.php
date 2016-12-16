@@ -1,11 +1,11 @@
 <?  //require_once("__init.php"); ?>
 <html>
-<?  require_once("__head.php"); ?>
+<?  require_once("template/pages/__head.php"); ?>
 <body id="root_body">
 <div align="center"><div id="container-all" align="left">
-<?  require_once("__header.php"); ?>
-<?  require_once("__horizontal_menu.php"); ?>
-<?  require_once("__left_menu.php"); ?>
+<?  require_once("template/pages/__header.php"); ?>
+<?  require_once("template/pages/__horizontal_menu.php"); ?>
+<?  require_once("template/pages/__left_menu.php"); ?>
 
 <!-- ======== CONTENT ============= -->
 <div style="width:690px; float:right;">

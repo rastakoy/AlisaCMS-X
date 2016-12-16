@@ -37,12 +37,16 @@ class Core extends DatabaseInterface{
 		$showTemplate = false;
 		$loadPage = false;
 		$itemTemplate = false;
+		//*************************************
+		//$classAdmin = new Admin();
 		$classSitemenus = new Sitemenus();
-		$menus = $classSitemenus->getMenus();
 		$classOrders = new Orders();
-		$users = new Users();
-		$user = $users->getUser($array);
-		
+		$classUsers = new Users();
+		$classImages = new Images();
+		//*************************************
+		$menus = $classSitemenus->getMenus();
+		$user = $classUsers->getUser($array);
+		//*************************************
 		if(!$user){
 			//return false;
 		}
@@ -102,11 +106,13 @@ class Core extends DatabaseInterface{
 		$admin = new Admin();
 		$login = $_SESSION['login'];
 		$pass = $_SESSION['password'];
-		$administrator = $admin->isAdmin($login, $pass);
+		$users = new Users();
+		$user = $users->getUser($array);
 		//***********************************
 		$classSitemenus = new Sitemenus();
 		$classData = new Data();
 		$classImages = new Images();
+		$classOrders = new Orders();
 		//***********************************
 		$menus = $classSitemenus->getMenus();
 		$showTemplate = true;
@@ -116,27 +122,19 @@ class Core extends DatabaseInterface{
 		}
 		//print_r($array);
 		switch($array['0']){
-			case 'items':
-				$mainItem = $classData->getElementBySiteURL($array);
-				if($mainItem['folder']=='0'){
-					$loadPage = 'item';
-				}
-				break;
-				
 			case 'clients':
 				$mainItem = $classData->getElementBySiteURL($array);
 				if($mainItem['folder']=='1'){
 					$loadPage = 'clients';
 				}
 				break;
-					
-			case 'partners':
+			case 'items':
 				$mainItem = $classData->getElementBySiteURL($array);
-				if($mainItem['folder']=='1'){
-					$loadPage = 'partners';
+				if($mainItem['folder']=='0'){
+					$loadPage = 'item';
+					$mainItem['isItemInBasket'] = $classOrders->isItemInBasket($user['id'], $mainItem['id']);
 				}
 				break;
-				
 			default:
 				break;
 		}

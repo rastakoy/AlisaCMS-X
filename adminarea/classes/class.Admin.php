@@ -310,6 +310,18 @@ class Admin extends Core{
 		echo "<pre>"; print_r($array); echo "</pre>";
 	}
 	
+	/**
+	
+	*/
+	//function mergeJSON($json1, $json2, $type='start'){
+	//	if($type=='end'){
+	//	
+	//	}elseif($type=='start'){
+	//		$json1 = trim($json1);
+	//		$json1 = 
+	//	}
+	//}
+	
 	//function humanizeJson(){}
 	
 	

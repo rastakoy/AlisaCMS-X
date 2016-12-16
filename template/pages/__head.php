@@ -10,8 +10,9 @@
 
 <script type="text/javascript" src="/template/js/popup.js"></script>
 <script type="text/javascript" src="/template/js/basket.js"></script>
+<script type="text/javascript" src="/template/js/button.preloader.js"></script>
 
-<script type="text/javascript" src="/template/js/jquery/jquery-1.9.1.min.js"></script>
+<!--<script type="text/javascript" src="/template/js/jquery/jquery-1.9.1.min.js"></script>-->
 <script type="text/javascript" src="/template/js/jquery/jquery-1.7.1.min.js"></script>
 
 <script src="/jqzoom/js/jquery.jqzoom-core.js" type="text/javascript"></script>

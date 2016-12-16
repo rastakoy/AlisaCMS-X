@@ -6,7 +6,7 @@ class Users extends DatabaseInterface{
 	/**
 	
 	*/
-	function getUser($array){
+	function getUser($array=false){
 		$user = false;
 		if($array['login'] && $array['password']){
 			$password = __SECRET.$array['password'].__SECRET;
