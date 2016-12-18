@@ -51,12 +51,6 @@ switch($array['ajax']){
 	case 'changeOrderQtty':
 		echo $classOrders->changeOrderQtty($array);
 		break;
-	case 'prepareShowBasket':
-		$json .= "{\"goodId\":\"$array[goodId]\"";
-		$json .= ",\"callback\":$array[callback]";
-		$json .= ",\"preloaderClas\":\"".($array['preloaderTagName'].$array['preloaderClassPrefix'].$array['preloaderClassId'])."\"";
-		echo $json."}";
-		break;
 	default:
 		//Значение параметра ajax по-умолчанию
 		echo "{\"ajaxStatus\":\"ok\"}";

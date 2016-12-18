@@ -847,11 +847,8 @@ class Data extends DatabaseInterface{
 					$level++;
 				}
 				if($item){
-					//echo "<pre>"; print_r($array); echo "</pre>";
 					$item['href'] = implode("/", $array);
 					$item['tumb'] = $this->getImages($array['0'], $item['id']);
-					$item['breadCrumbs'] = $this->getBreadCrumbs($array['0'], $item['id'], $array['0']);
-					//echo "<pre>"; print_r($item['breadCrumbs']); echo "</pre>";
 					if($item['folder']=='1'){
 						$item['childrenFolders'] = $this->getItems($array['0'], $item['id']);
 						$item['childrenItems'] = $this->getItems($array['0'], $item['id'], false);
@@ -862,32 +859,6 @@ class Data extends DatabaseInterface{
 		}
 	}
 	
-	
-	/**
-	
-	*/
-	function getBreadCrumbs($table, $parent, $href, $array=false){
-		if($parent=='0'){return $this->setBreadCrumbsHrefs($array, $href);}
-		$query = $this->query("SELECT * FROM `$table` WHERE `id`='$parent' ");
-		if($query && $query->num_rows>0){
-			$item = $query->fetch_assoc();
-			$array[] = $item;
-			return $this->getBreadCrumbs($table, $item['parent'], $href, $array);
-		}
-	}
-	
-	/**
-	
-	*/
-	function setBreadCrumbsHrefs($array, $startHref){
-		$array = array_reverse($array);
-		$prefix = $startHref;
-		foreach($array as $key=>$item){
-			$prefix .= "/".$item['link'];
-			$array[$key]['href'] = $prefix;
-		}
-		return $array;
-	}
 	
 	/**
 	

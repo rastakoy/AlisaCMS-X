@@ -3,12 +3,9 @@
 //echo "<pre>mainItem:"; print_r($mainItem); echo "</pre>";
 ?>
 <div id="div_myitems">
-<h1 style="margin-bottom:5px;"><?=$mainItem['name']?></h1>
-<?
-$breadcrumbs = $mainItem['breadCrumbs'];
-$root = array($array['0'], 'Каталог');
-require_once("__breadcrumbs.php"); ?>
-<div style="height:20px;"></div>
+<div>
+<h1><?=$mainItem['name']?></h1><div xmlns:v="http://rdf.data-vocabulary.org/#" id="div_breadlinks"><span typeof="v:Breadcrumb"><a href="./" rel="v:url" property="v:title">Главная</a> › </span><span typeof="v:Breadcrumb"><a href="items/" rel="v:url" property="v:title">Каталог</a> › </span><span typeof="v:Breadcrumb"><a href="items/udleniteli_vilki/" rel="v:url" property="v:title">Удлинители, вилки</a> › </span><span typeof="v:Breadcrumb"><a href="items/udleniteli_vilki/vilki/" rel="v:url" property="v:title">Вилки и гнезда</a> › </span><span typeof="v:Breadcrumb">Вилка заз.В-4100 VI-KO</span></div><br>
+</div>
 <!--  -----------------------------------------  -->
 <div id="item_left_block"><div id="div_fancybox" style="">
 <?
@@ -158,7 +155,7 @@ var  orderKey=-1;
 </div>
 <div style="margin-top:30px;"><? if($mainItem['isItemInBasket']['qtty']>0){ ?>
 <span id="basket_icon" style="background-image: url(/template/images/basket_empty.gif); margin-top: 0px;"></span>
-<a id="basket_button" href="javascript:" onclick="showBasket(this)" class="item_bye_butt" style="margin-top: 0px;">В корзине</a><? }else{ ?>
+<a id="basket_button" href="javascript:" onclick="showBasket()" class="item_bye_butt" style="margin-top: 0px;">В корзине</a><? }else{ ?>
 <span id="basket_icon" style="background-image: url(/template/images/basket_empty.gif); margin-top: 0px;"></span>
 <a id="basket_button" href="javascript:" onclick="addItemIntoOrder(this, '<?=$mainItem['id']?>')" class="item_bye_butt" style="margin-top: 0px;">Купить</a><? } ?>
 <br><br><br>

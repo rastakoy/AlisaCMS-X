@@ -1,13 +1,6 @@
 //*************************************
-function showBasket(object){
-	var preloaderParams = {
-		"ajax":"prepareShowBasket",
-		"callback":function(){
-			__callback_showBasket(data);
-		}
-	}
-	inputPreloader(object, preloaderParams);
-	/*document.getElementById("popup_title").innerHTML = "Ваша корзина";
+function showBasket(){
+	document.getElementById("popup_title").innerHTML = "Ваша корзина";
 	__popup();
 	var paction = "ajax=showBasket";
 	//console.log(paction);
@@ -19,14 +12,7 @@ function showBasket(object){
 			//console.log(html);
 			document.getElementById("popup_cont").innerHTML = html;
 		}
-	});*/
-}
-//*************************************
-function __callback_showBasket(data){
-	var obj = document.getElementsByClassName(data.preloaderClas)[0];
-	obj.className = obj.className.replace(RegExp(" ?"+data.preloaderClas, "gi"), '');
-	obj.onclick = function(){showBasket()};
-	obj.innerHTML = "В корзине";
+	});
 }
 //*************************************
 function addItemIntoOrder(object, itemId){
@@ -81,18 +67,6 @@ function changeOrderQtty(obj){
 					document.getElementById("qttyItem_"+data.assemblyId+"_"+data.orderId).value = data.qtty;
 				}
 			}
-		}
-	});
-}
-//*************************************
-function confirmOrder(){
-	var paction =  "ajax=confirmOrder";
-	$.ajax({
-		type: "POST",
-		url: __GLOBALS.ajax,
-		data: paction,
-		success: function(html) {
-			console.log(html);
 		}
 	});
 }
