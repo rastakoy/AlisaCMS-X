@@ -32,3 +32,17 @@ h1{
 	margin: 0px;
 	padding-top: 10px;
 }
+.podrob{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.podrob:hover {
+	color: #FFFF00;
+}
+.podrob div {
+    background-color: #333333;
+    padding: 10px;
+    border: 1px solid #999999;
+	border-radius:5px;
+    width: 70px;
+}
