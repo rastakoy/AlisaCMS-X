@@ -122,12 +122,6 @@ class Core extends DatabaseInterface{
 		}
 		//print_r($array);
 		switch($array['0']){
-			case 'clients':
-				$mainItem = $classData->getElementBySiteURL($array);
-				if($mainItem['folder']=='1'){
-					$loadPage = 'clients';
-				}
-				break;
 			case 'items':
 				$mainItem = $classData->getElementBySiteURL($array);
 				if($mainItem['folder']=='0'){
@@ -135,6 +129,25 @@ class Core extends DatabaseInterface{
 					$mainItem['isItemInBasket'] = $classOrders->isItemInBasket($user['id'], $mainItem['id']);
 				}
 				break;
+
+			case 'clients':
+				$mainItem = $classData->getElementBySiteURL($array);
+				if($mainItem['folder']=='1'){
+					$loadPage = 'clients';
+				}
+				break;
+				
+			case 'partners':
+				$mainItem = $classData->getElementBySiteURL($array);
+				if($mainItem['folder']=='1'){
+					$loadPage = 'partners';
+				}
+				break;
+				
+			case 'about':
+				 $mainItem = $classData->getElementBySiteURL(array("texts", "about"));
+				 break;
+				 
 			default:
 				break;
 		}
