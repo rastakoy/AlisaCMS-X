@@ -1,4 +1,7 @@
 <?php
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 /* Обьявляем переменные для подключения к БД */
 	$GLOBALS['offline'] = '1';
 	if($GLOBALS['offline'] == '1'){
@@ -71,8 +74,6 @@
 	if(isset($_GET["qqfile"])){
 		file_put_contents("test.txt", "$return\r\n------\r\n", FILE_APPEND);
 		header("Content-type: text/plain; charset=windows-1251");
-		header("Cache-Control: no-store, no-cache, must-revalidate");
-		header("Cache-Control: post-check=0, pre-check=0", false);
 		$return = $core->loadImage($_GET);
 		echo $return;
 		
@@ -84,13 +85,9 @@
 	}elseif(isset($_POST['ajax'])){
 		//Только Ajax POST'ы
 		header("Content-type: text/plain; charset=windows-1251");
-		header("Cache-Control: no-store, no-cache, must-revalidate");
-		header("Cache-Control: post-check=0, pre-check=0", false);
 		$core->makePost($_POST);
 	}else{
 		header("Content-type: text/html; charset=windows-1251");
-		header("Cache-Control: no-cache, must-revalidate");
-		header("Pragma: no-cache");
 		$core->makePage($string, $params);
 	}
 
