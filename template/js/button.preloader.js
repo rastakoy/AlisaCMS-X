@@ -23,13 +23,13 @@ function inputPreloader(object, preloaderParams){
 			paction += "&preloaderClassId="+this.preloaderClassId;
 			paction += "&preloaderClassPrefix=_preloaderClassId_";
 			paction += "&preloaderTagName="+this.tagName.toLowerCase();
-			//console.log(paction);
+			console.log("Bpreloader="+paction);
 			$.ajax({
 				type: "POST",
 				url: __GLOBALS.ajax,
 				data: paction,
 				success: function(html) {
-					//console.log(html);
+					console.log(html);
 					html = (html=='')?'{}':html;
 					var data = eval("("+html+")");
 					//console.log(data);

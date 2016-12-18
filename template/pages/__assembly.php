@@ -39,7 +39,7 @@ if($item['folder']=='1' && $titles['0']!='static') { //Выписываем дирректорию  ?
 
 <? }else{ //Выписываем элемент
 if($item['item']['tumb']['0']['name']){
-	$lnk = $classImages->createImageLink("../loadimages", "44x33", $item['item']['tumb']['0']['name']);
+	$lnk = $classImages->createImageLink("loadimages", "44x33", $item['item']['tumb']['0']['name']);
 }
 ?>
 <div class="ui-state-default-2 connectedSortable"
@@ -50,7 +50,7 @@ id="prm_?action=editItem,option=<?=$params['option']?>,parents=<?=$params['paren
 			<? if($option['useimg']=='1'){ ?>
 				<td height="34" width="50" bgcolor="#FFFFFF">
 				<? if($lnk){ ?>
-				<img src="/loadimages/<?=$lnk?>" width="44" height="33"
+				<img src="/<?=$lnk?>" width="44" height="33"
 				border="1" class="imggal" align="absmiddle" style="">
 				<? }else{ ?>
 				<img src="<?=$GLOBALS['adminBase']?>/template/images/green/myitemname_popup/no_img.gif" width="44" height="33"
@@ -100,7 +100,7 @@ $allSum += $sum;
 
 <div align="center">
 	<div style="width:320px;height:30px;margin-top:14px;">
-	<button onclick="confirmOrder('<?=$params['orderId']?>')" 	style="margin-right:15px;" >Продолжить покупку</button>
+	<button onclick="confirmOrder()" 	style="margin-right:15px;" >Продолжить покупку</button>
 	<button onclick="__popup_close()" style="" >Закрыть корзину</button>
 	</div>
 </div>
