@@ -190,9 +190,10 @@ var  orderKey=-1;
 <!-- #############################################################  -->
 <br><br><br><br>
 <!-- <div class=\"item_separator\" style=\"margin-bottom: 10px;\">asd</div> -->
-
 </div>
 <!--  -----------------------------------------  -->
 </div>
+<div style="clear:both; float:none;"></div>
+<div><?=$mainItem['content']?></div>
 <!--  -----------------------------------------  -->
 </div>

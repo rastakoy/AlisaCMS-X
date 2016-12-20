@@ -21,13 +21,16 @@ if($item['tumb']['0']['name']){
 <tr><td style="border-bottom:#CCCCCC solid 1px;">
   <div align="center"><a href="/<?=$mainItem['href']?>/<?=$item['link']?>/"><img src="<?=$lnk?>" border="0" style="margin-bottom:10px;width:215px;height:195px;"></a></div></td>
 </tr>
+<? if($item['folder']=='0'){?>
 <tr><td height="50" align="center" valign="middle">
-<div style="width:110px; float:left; padding-top:4px;">	<span class="itemPrice">0 <span class="inItemPrice">грн.</span></span></div>
+<div style="width:110px; float:left; padding-top:4px;">	<span class="itemPrice"><?=$item['price']?> <span class="inItemPrice">грн.</span></span></div>
 	<a href="/<?=$mainItem['href']?>/<?=$item['link']?>/">
 	<div style="width:82px; height:30px; background-image:url(/template/images/kupit.jpg); float:right; margin-right:10px;"> </div>
 	</a>
 </td>
-</tr></tbody></table>
+</tr>
+<? } ?>
+</tbody></table>
 </div>
 <? }} ?>
 					 
